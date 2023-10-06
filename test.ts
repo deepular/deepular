@@ -4,7 +4,7 @@ import {
   Component,
   ɵReflectionCapabilities as ReflectionCapabilities,
   ɵsetCurrentInjector as setCurrentInjector,
-  Injectable, Injector, InjectFlags, InjectOptions, ProviderToken,
+  Injectable, Injector, InjectFlags, InjectOptions, ProviderToken, EnvironmentInjector, ApplicationRef, PlatformRef, createPlatform,
 } from '@angular/core';
 
 @Injectable()
@@ -46,6 +46,12 @@ class DeepkitInjector extends Injector {
   get(token: any, notFoundValue?: any, options?: (InjectOptions & { optional?: false }) | InjectOptions | InjectFlags): any {
   }
 }
+
+class DeepkitPlatform extends PlatformRef
+
+const platform = createPlatform();
+
+class DeepkitEnvironmentInjector extends EnvironmentInjector {}
 
 // use @deepkit/bson for https://angular.io/api/core/TransferState
 

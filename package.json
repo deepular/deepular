@@ -52,9 +52,11 @@
     "@angular/compiler": "^16.2.8",
     "@angular/core": "^16.2.8",
     "@angular/platform-browser": "^16.2.8",
+    "@angular/platform-server": "^16.2.8",
+    "@angular/ssr": "17.0.0-next.1",
     "@deepkit/app": "1.0.1-alpha.102",
     "@deepkit/broker": "^1.0.1-alpha.102",
-    "@deepkit/bson": "^1.0.1-alpha.102",
+    "@deepkit/bson": "1.0.1-alpha.102",
     "@deepkit/core": "1.0.1-alpha.100",
     "@deepkit/core-rxjs": "^1.0.1-alpha.100",
     "@deepkit/crypto": "^1.0.1-alpha.89",
@@ -83,4 +85,3 @@
     "includedScripts": []
   }
 }
-
