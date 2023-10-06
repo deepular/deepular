@@ -1,0 +1,69 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "refactor",
+            "section": "Refactor"
+          },
+          {
+            "type": "docs",
+            "section": "Documentations"
+          },
+          {
+            "type": "revert",
+            "section": "Revert"
+          }
+        ]
+      },
+      "infile": "packages/server/CHANGELOG.md",
+      "parserOpts": {
+        "headerPattern": "^(\\w*)(?:\\((server*)\\))?\\: (.*)$"
+      }
+    },
+    "@release-it/bumper": {
+      "in": {
+        "file": "packages/server/package.json",
+        "path": "version"
+      },
+      "out": [
+        {
+          "file": "packages/server/package.json",
+          "path": "version"
+        },
+        {
+          "file": "dist/packages/server/package.json",
+          "path": "version"
+        }
+      ]
+    }
+  },
+  "git": {
+    "commitMessage": "chore(server): release ${version}",
+    "tagName": "server-v${version}",
+    "requireCleanWorkingDir": false
+  },
+  "npm": {
+    "publishPath": "dist/packages/server",
+    "publish": false
+  },
+  "github": {
+    "release": true,
+    "releaseName": "server ${version}"
+  },
+  "hooks": {
+    "after:bump": "git checkout -- package.json",
+    "before:github:release": "npm publish dist/packages/server"
+  },
+  "ci": true
+}

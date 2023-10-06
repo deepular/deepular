@@ -1,0 +1,38 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "useDefineForClassFields": false,
+    "importHelpers": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "target": "es2022",
+    "module": "esnext",
+    "lib": ["esnext", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ngkit/server": [
+        "packages/server/src/index.ts"
+      ],
+      "@ngkit/client": ["packages/client/src/index.ts"],
+      "@ngkit/core": [
+        "packages/core/src/index.ts"
+      ]
+    }
+  },
+  "exclude": ["node_modules", "tmp"],
+  "angularCompilerOptions": {
+    "disableTypeScriptVersionCheck": true
+  },
+  "reflection": true
+}

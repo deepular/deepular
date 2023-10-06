@@ -1,0 +1,21 @@
+{
+  "name": "@ngkit/core",
+  "version": "0.0.0",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcus-sa/deepkit-community.git"
+  },
+  "dependencies": {
+    "tslib": "2.6.2"
+  },
+  "peerDependencies": {
+    "@deepkit/type-compiler": "^16.8.0",
+    "@nx/webpack": "^16.7.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
