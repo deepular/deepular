@@ -1,8 +1,8 @@
+/// <reference types="vite/client" />
 import 'zone.js/node';
 import { startServer } from '@ngkit/server';
 import { App } from '@deepkit/app';
 import { FrameworkModule } from '@deepkit/framework';
-import * as fs from 'node:fs';
 import { join } from 'node:path';
 
 import { AppController } from './app.controller';

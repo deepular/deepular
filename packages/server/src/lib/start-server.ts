@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { bootstrapApplication } from '@angular/platform-browser';
 import { from, tap, Observable } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
@@ -9,6 +10,8 @@ import {
   getNgKitSerializer,
   makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
+  SERIALIZED_CLASS_TYPES_STATE_KEY,
+  ServerControllerMethod,
 } from '@ngkit/core';
 import {
   ReflectionClass,
@@ -27,12 +30,14 @@ import {
   mergeApplicationConfig,
   signal,
   APP_INITIALIZER,
+  Signal,
 } from '@angular/core';
 import {
   renderApplication,
   provideServerRendering,
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
 } from '@angular/platform-server';
+import { ApplicationServer } from '@deepkit/framework';
 
 export async function startServer(
   component: ClassType,
@@ -88,7 +93,9 @@ export async function startServer(
             const serialize = serializers.get(propertyName)!;
 
             // TODO: only @rpc.loader() methods should be callable on the server
-            return (...args: []) => {
+            return (
+              ...args: []
+            ): ServerControllerMethod<unknown, unknown[]> => {
               let result = target[propertyName](...args);
 
               const transferStateKey = makeSerializableStateKey(
@@ -104,18 +111,32 @@ export async function startServer(
               const isPromise = result instanceof Promise;
               const isObservable = result instanceof Observable;
 
+              let value: Signal<unknown> | undefined;
+
               if (!isPromise && !isObservable) {
                 transferResult(result);
-                return signal(result);
+                value = signal(result);
               }
 
               if (isPromise) {
                 result = from(result);
               }
 
-              result = result.pipe(tap(transferResult));
+              if (!value) {
+                result = result.pipe(tap(transferResult));
+                value = toSignal(result, { requireSync: true });
+              }
 
-              return toSignal(result, { requireSync: true });
+              return {
+                refetch: (): never => {
+                  throw new Error('Cannot be used on the server');
+                },
+                update: (): never => {
+                  throw new Error('Cannot be used on the server');
+                },
+                loading: signal(false),
+                value,
+              };
             };
           },
         });
@@ -127,6 +148,8 @@ export async function startServer(
     provide: APP_INITIALIZER,
     deps: [TransferState],
     useFactory(transferState: TransferState) {
+      // transferState.set(SERIALIZED_CLASS_TYPES_STATE_KEY, [...rpcControllerSerializedClassTypes.values()]);
+
       rpcControllerSerializedClassTypes.forEach((serializedClassType, name) => {
         transferState.set(
           makeSerializedClassTypeStateKey(name),
@@ -145,7 +168,11 @@ export async function startServer(
   let document: string | undefined;
 
   router.get('/', async (request: HttpRequest) => {
-    document ||= await readFile(documentPath, 'utf8');
+    if (import.meta.env.PROD) {
+      document ||= await readFile(documentPath, 'utf8');
+    } else {
+      document = await readFile(documentPath, 'utf8');
+    }
 
     const html = await renderApplication(bootstrap, {
       url: request?.getUrl() || '/',
@@ -160,6 +187,12 @@ export async function startServer(
 
     return new HtmlResponse(html);
   });
+
+  if (import.meta.hot) {
+    const server = app.get(ApplicationServer);
+    import.meta.hot.accept();
+    import.meta.hot.dispose(() => server.close(true));
+  }
 
   await app.run(['server:start']);
 }

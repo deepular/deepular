@@ -4,13 +4,13 @@ import { defineConfig, splitVendorChunkPlugin } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
+import liveReload from 'rollup-plugin-livereload';
 import { join } from 'node:path';
 
 export default defineConfig(({ mode, ssrBuild }) => {
   return {
     publicDir: 'src/public',
     build: {
-      target: ['es2022'],
       modulePreload: false,
       minify: false,
       rollupOptions: {
@@ -18,6 +18,13 @@ export default defineConfig(({ mode, ssrBuild }) => {
         output: {
           esModule: true,
           format: 'esm',
+          ...(mode === 'development'
+            ? {
+                entryFileNames: `[name].js`,
+                chunkFileNames: `[name].js`,
+                assetFileNames: `[name].[ext]`,
+              }
+            : {}),
         },
         input: ssrBuild
           ? join(__dirname, 'src/main.server.ts')
@@ -27,15 +34,13 @@ export default defineConfig(({ mode, ssrBuild }) => {
     resolve: {
       mainFields: ['module'],
     },
-    optimizeDeps: {
-      include: ['@angular/forms'],
-    },
     plugins: [
       angular(),
       deepkitType(),
       nxViteTsPaths(),
       visualizer() as Plugin,
       !ssrBuild && splitVendorChunkPlugin(),
+      !ssrBuild && liveReload({ delay: 500 }),
     ],
     test: {
       globals: true,

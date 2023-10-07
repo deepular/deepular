@@ -26,3 +26,7 @@ export function makeDeserializableStateKey(
 
 export const makeSerializedClassTypeStateKey = (name: string) =>
   makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);
+
+export const SERIALIZED_CLASS_TYPES_STATE_KEY = makeStateKey<
+  readonly SerializedTypes[]
+>(`SERIALIZED_CLASS_TYPES_STATE_KEY`);

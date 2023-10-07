@@ -1,7 +1,7 @@
 {
   "name": "@ngkit/core",
   "version": "0.0.0",
-  "type": "commonjs",
+  "type": "module",
   "main": "./src/index.js",
   "typings": "./src/index.d.ts",
   "repository": {

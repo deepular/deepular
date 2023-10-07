@@ -1,10 +1,9 @@
 import { ClassType } from '@deepkit/core';
 import { bootstrapApplication as _bootstrapApplication } from '@angular/platform-browser';
-import { from } from 'rxjs';
+import { from, Subject, BehaviorSubject } from 'rxjs';
 import {
   ApplicationConfig,
   mergeApplicationConfig,
-  signal,
   TransferState,
 } from '@angular/core';
 import { RpcWebSocketClient } from '@deepkit/rpc';
@@ -18,6 +17,8 @@ import {
   makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
   NgKitDeserializer,
+  SERIALIZED_CLASS_TYPES_STATE_KEY,
+  ServerControllerMethod,
   unwrapType,
 } from '@ngkit/core';
 
@@ -25,7 +26,8 @@ export async function bootstrapApplication(
   rootComponent: ClassType,
   controllers: readonly string[] = [],
 ): Promise<void> {
-  const client = new RpcWebSocketClient('http://localhost:8080');
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
 
   const providers = controllers.map(controllerName => ({
     provide: controllerName,
@@ -40,9 +42,7 @@ export async function bootstrapApplication(
       }
       const controllerType = deserializeType(serializedClassType);
 
-      const remoteController = client.controller(controllerName, {
-        dontWaitForConnection: true,
-      });
+      const remoteController = client.controller(controllerName);
 
       const controllerReflectionClass = ReflectionClass.from(controllerType);
 
@@ -52,7 +52,7 @@ export async function bootstrapApplication(
         method => method.name,
       );
 
-      const deserializers = new Map<string, NgKitDeserializer<unknown>>(
+      const deserializers = new Map<string, NgKitDeserializer<any>>(
         controllerReflectionClass.getMethods().map(method => {
           const returnType = unwrapType(method.getReturnType());
           const deserialize = getNgKitDeserializer(returnType);
@@ -67,12 +67,30 @@ export async function bootstrapApplication(
 
           const deserialize = deserializers.get(propertyName)!;
 
-          return (...args: unknown[]) => {
+          return (
+            ...args: unknown[]
+          ): ServerControllerMethod<unknown, unknown[]> => {
+            const loading$ = new BehaviorSubject(false);
+            let value$: BehaviorSubject<unknown> | Subject<unknown>;
+
             const transferStateKey = makeDeserializableStateKey(
               controllerName,
               propertyName,
               args,
             );
+
+            const load = async (...newArgs: unknown[]): Promise<void> => {
+              if (loading$.value) {
+                throw new Error('Already refetching...');
+              }
+              loading$.next(true);
+              const data = newArgs.length
+                ? await target[propertyName](...newArgs)
+                : await target[propertyName](...args);
+              value$.next(data);
+              loading$.next(false);
+              return data;
+            };
 
             if (transferState.hasKey(transferStateKey)) {
               const transferStateValue = transferState.get(
@@ -86,12 +104,24 @@ export async function bootstrapApplication(
               const bson = new Uint8Array(transferStateValue.data);
               const { data } = deserialize(bson);
 
-              return signal(data);
+              value$ = new BehaviorSubject(data);
+            } else {
+              value$ = new Subject();
+              void load(...args);
             }
 
-            return toSignal(from(target[propertyName](...args)), {
+            const value = toSignal(value$.asObservable(), {
+              // @ts-ignore
+              requireSync: value$.constructor.name === BehaviorSubject.name,
+            });
+
+            const loading = toSignal(loading$.asObservable(), {
               requireSync: true,
             });
+
+            const update = (value: unknown) => value$.next(value);
+
+            return { value, loading, refetch: load, update };
           };
         },
       });
