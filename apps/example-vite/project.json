@@ -1,63 +1,103 @@
 {
-  "name": "example-graphql",
+  "name": "example-vite",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/example-graphql/src",
   "projectType": "application",
+  "sourceRoot": "apps/example-vite/src",
+  "prefix": "ngkit",
   "targets": {
-    "build": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
+    "build-client": {
+      "executor": "@nx/vite:build",
+      "outputs": [
+        "{options.outputPath}",
+        "{workspaceRoot}/dist/{projectRoot}"
+      ],
       "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/example-graphql",
-        "main": "apps/example-graphql/src/main.ts",
-        "tsConfig": "apps/example-graphql/tsconfig.app.json",
-        "assets": ["apps/example-graphql/src/assets"],
-        "isolatedConfig": true,
-        "webpackConfig": "apps/example-graphql/webpack.config.ts"
+        "configFile": "{projectRoot}/vite.config.ts",
+        "outputPath": "dist/{projectRoot}/client"
       },
+      "defaultConfiguration": "development",
       "configurations": {
-        "development": {},
-        "production": {}
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "sourcemap": false,
+          "mode": "production"
+        }
+      }
+    },
+    "build-server": {
+      "executor": "@nx/vite:build",
+      "outputs": [
+        "{options.outputPath}/server/main.server.js"
+      ],
+      "options": {
+        "configFile": "{projectRoot}/vite.config.ts",
+        "outputPath": "dist/{projectRoot}",
+        "ssr": true
+      },
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "sourcemap": false,
+          "mode": "production"
+        }
+      }
+    },
+    "serve-server": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vite-node --config=apps/example-vite/vite.config.ts --root apps/example-vite apps/example-vite/src/server/main.server.ts"
       }
     },
     "serve": {
-      "executor": "@nx/js:node",
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run example-vite:serve-server --watch",
+          "nx run example-vite:build-client --hmr"
+        ]
+      },
+      "dependsOn": ["build-client"]
+    },
+    "serve-client": {
+      "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "example-graphql:build"
+        "buildTarget": "example-vite:build-client",
+        "port": 3000
       },
       "configurations": {
         "development": {
-          "buildTarget": "example-graphql:build:development"
+          "buildTarget": "example-vite:build-client:development",
+          "hmr": true
         },
         "production": {
-          "buildTarget": "example-graphql:build:production"
+          "buildTarget": "example-vite:build-client:production"
         }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "analog-app:build"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/example-graphql/**/*.ts"]
+        "lintFilePatterns": [
+          "{projectRoot}/**/*.ts",
+          "{projectRoot}/**/*.html"
+        ]
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "apps/example-graphql/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
+      "executor": "@nx/vite:test",
+      "outputs": ["{projectRoot}/coverage"]
     }
   },
   "tags": []

@@ -4,7 +4,7 @@ import {
   Component,
   ɵReflectionCapabilities as ReflectionCapabilities,
   ɵsetCurrentInjector as setCurrentInjector,
-  Injectable, Injector, InjectFlags, InjectOptions, ProviderToken, EnvironmentInjector, ApplicationRef, PlatformRef, createPlatform,
+  Injectable, Injector, InjectOptions, ProviderToken, EnvironmentInjector, ApplicationRef, PlatformRef, createPlatform,
 } from '@angular/core';
 
 @Injectable()

@@ -1,10 +1,8 @@
-import { getBSONDeserializer, getBSONSerializer } from "@deepkit/bson";
-import { Observable } from 'rxjs';
-import { inject, signal, TransferState, StateKey, makeStateKey } from '@angular/core';
-import { ReflectionMethod, Type, ReflectionKind } from '@deepkit/type';
+import { StateKey, makeStateKey } from '@angular/core';
 
-import { ngKitSerializer } from "./serializer";
-
-export function makeNgKitStateKey<T>(instance: any, methodName: string): StateKey<T> {
-  return makeStateKey(`${instance.constructor.name}#${methodName}`);
+export function makeNgKitStateKey<T>(
+  instanceName: string,
+  methodName: string,
+): StateKey<T> {
+  return makeStateKey(`${instanceName}#${methodName}`);
 }

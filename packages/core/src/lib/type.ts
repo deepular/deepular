@@ -1,7 +1,5 @@
-import { getBSONDeserializer, getBSONSerializer } from "@deepkit/bson";
 import { Observable } from 'rxjs';
-import { inject, signal, TransferState, StateKey, makeStateKey } from '@angular/core';
-import { ReflectionMethod, Type, ReflectionKind } from '@deepkit/type';
+import { Type, ReflectionKind } from '@deepkit/type';
 
 export function unwrapType(type: Type): Type {
   switch (type.kind) {
@@ -9,7 +7,8 @@ export function unwrapType(type: Type): Type {
       return type.type;
 
     case ReflectionKind.class:
-      if (type.typeName === Observable.name) return type;
+      // TODO: Observable
+      // if (type.typeName === Observable.name) return type;
 
       return type;
 
