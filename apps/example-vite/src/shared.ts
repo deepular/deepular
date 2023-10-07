@@ -1,12 +1,10 @@
-import { NgKitControllerDefinition, RemoteController } from '@ngkit/core';
-
-export type AppController = RemoteController<AppControllerApi>;
-
-export const AppControllerApi = new NgKitControllerDefinition<AppControllerApi>(
-  'AppController',
-  [],
-);
+import { NgKitControllerSymbol } from '@ngkit/core';
 
 export interface AppControllerApi {
   count(): number;
 }
+
+export const AppControllerApi = NgKitControllerSymbol<AppControllerApi>(
+  'AppController',
+  [],
+);

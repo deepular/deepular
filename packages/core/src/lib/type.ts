@@ -1,5 +1,9 @@
-import { Observable } from 'rxjs';
-import { Type, ReflectionKind } from '@deepkit/type';
+import {
+  ReflectionKind,
+  Type,
+  TypeObjectLiteral,
+  TypePropertySignature,
+} from '@deepkit/type';
 
 export function unwrapType(type: Type): Type {
   switch (type.kind) {
@@ -15,4 +19,22 @@ export function unwrapType(type: Type): Type {
     default:
       return type;
   }
+}
+
+export function toSerializableDataType(type: Type): TypeObjectLiteral {
+  const parent: TypeObjectLiteral = {
+    kind: ReflectionKind.objectLiteral,
+    types: [],
+  };
+
+  const newType: TypePropertySignature = {
+    kind: ReflectionKind.propertySignature,
+    name: 'data',
+    parent,
+    type,
+  };
+
+  parent.types = [newType];
+
+  return parent;
 }

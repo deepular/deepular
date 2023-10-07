@@ -6,7 +6,7 @@ import * as fs from 'node:fs';
 import { join } from 'node:path';
 
 import { AppController } from './app.controller';
-import { AppComponent } from '../client/app.component';
+import { AppComponent } from './app.component';
 
 const publicDir = join(
   // @ts-ignore
@@ -14,7 +14,7 @@ const publicDir = join(
   'dist',
   // @ts-ignore
   import.meta.env.NX_PROJECT_ROOT,
-  'client',
+  'public',
 );
 
 const app = new App({

@@ -8,12 +8,13 @@
     "build-client": {
       "executor": "@nx/vite:build",
       "outputs": [
-        "{options.outputPath}",
-        "{workspaceRoot}/dist/{projectRoot}"
+        "{options.outputPath}"
       ],
       "options": {
         "configFile": "{projectRoot}/vite.config.ts",
-        "outputPath": "dist/{projectRoot}/client"
+        "outputPath": "dist/{projectRoot}/public",
+        "buildLibsFromSource": false,
+        "force": true
       },
       "defaultConfiguration": "development",
       "configurations": {
@@ -29,11 +30,14 @@
     "build-server": {
       "executor": "@nx/vite:build",
       "outputs": [
-        "{options.outputPath}/server/main.server.js"
+        "{options.outputPath}/main.server.js"
       ],
       "options": {
         "configFile": "{projectRoot}/vite.config.ts",
         "outputPath": "dist/{projectRoot}",
+        "buildLibsFromSource": false,
+        "emptyOutDir": false,
+        "force": true,
         "ssr": true
       },
       "defaultConfiguration": "development",
@@ -50,15 +54,20 @@
     "serve-server": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "vite-node --config=apps/example-vite/vite.config.ts --root apps/example-vite apps/example-vite/src/server/main.server.ts"
+        "command": "vite-node --config=apps/example-vite/vite.config.ts --root apps/example-vite apps/example-vite/src/main.server.ts"
+      },
+      "configurations": {
+        "watch": {
+          "command": "vite-node --watch --config=apps/example-vite/vite.config.ts --root apps/example-vite apps/example-vite/src/main.server.ts"
+        }
       }
     },
     "serve": {
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "nx run example-vite:serve-server --watch",
-          "nx run example-vite:build-client --hmr"
+          "nx run example-vite:serve-server:watch",
+          "nx run example-vite:build-client --watch --hmr"
         ]
       },
       "dependsOn": ["build-client"]
