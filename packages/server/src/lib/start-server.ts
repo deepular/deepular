@@ -117,7 +117,7 @@ export async function startServer(
 
   const bootstrap = () => bootstrapApplication(component, config);
 
-  router.get('/', async (request: HttpRequest) => {
+  router.get('/', async (request: HttpRequest) => { // FIXME: request is undefined
     const html = await renderApplication(bootstrap, {
       url: request?.getUrl() || '/',
       document,
