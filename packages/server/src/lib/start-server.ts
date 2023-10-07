@@ -2,14 +2,20 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { from, tap, Observable } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
 import { App } from '@deepkit/app';
+import { readFile } from 'node:fs/promises';
 import {
   unwrapType,
   CORE_CONFIG,
-  NgKitControllerDefinition,
   getNgKitSerializer,
   makeSerializableStateKey,
+  makeSerializedClassTypeStateKey,
 } from '@ngkit/core';
-import { ReflectionClass, resolveRuntimeType } from '@deepkit/type';
+import {
+  ReflectionClass,
+  resolveRuntimeType,
+  SerializedTypes,
+  serializeType,
+} from '@deepkit/type';
 import { rpcClass, RpcKernel } from '@deepkit/rpc';
 import { BSONSerializer } from '@deepkit/bson';
 import { ClassType } from '@deepkit/core';
@@ -20,6 +26,7 @@ import {
   Provider,
   mergeApplicationConfig,
   signal,
+  APP_INITIALIZER,
 } from '@angular/core';
 import {
   renderApplication,
@@ -29,7 +36,7 @@ import {
 
 export async function startServer(
   component: ClassType,
-  document: string,
+  documentPath: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   app: App<any>,
 ) {
@@ -39,6 +46,7 @@ export async function startServer(
   const injector = app.getInjectorContext().createChildScope('rpc');
 
   const rpcControllerNgProviders: Provider[] = [];
+  const rpcControllerSerializedClassTypes = new Map<string, SerializedTypes>(); // SerializedTypeClassType
 
   for (const [, { controller }] of rpcControllers.entries()) {
     const controllerType = resolveRuntimeType(controller);
@@ -46,19 +54,23 @@ export async function startServer(
     const instance = injector.get(controller);
 
     const controllerMetadata = rpcClass._fetch(controller);
-    if (
-      !(controllerMetadata?.definition instanceof NgKitControllerDefinition)
-    ) {
-      throw new Error('Missing NgKitControllerDefinition');
+    if (!controllerMetadata) {
+      throw new Error('Missing controller metadata');
     }
 
+    const controllerPath = controllerMetadata.getPath();
     const controllerReflectionMethods = controllerReflectionClass.getMethods();
     const controllerMethodNames = controllerReflectionMethods.map(
       method => method.name,
     );
 
+    rpcControllerSerializedClassTypes.set(
+      controllerPath,
+      serializeType(controllerType),
+    );
+
     rpcControllerNgProviders.push({
-      provide: controllerMetadata.definition._token,
+      provide: controllerPath,
       deps: [TransferState],
       useFactory(transferState: TransferState) {
         const serializers = new Map<string, BSONSerializer>(
@@ -80,7 +92,7 @@ export async function startServer(
               let result = target[propertyName](...args);
 
               const transferStateKey = makeSerializableStateKey(
-                controllerMetadata.definition!.path,
+                controllerPath,
                 propertyName,
                 args,
               );
@@ -111,13 +123,30 @@ export async function startServer(
     });
   }
 
+  const appInit: Provider = {
+    provide: APP_INITIALIZER,
+    deps: [TransferState],
+    useFactory(transferState: TransferState) {
+      rpcControllerSerializedClassTypes.forEach((serializedClassType, name) => {
+        transferState.set(
+          makeSerializedClassTypeStateKey(name),
+          serializedClassType,
+        );
+      });
+    },
+  };
+
   const config: ApplicationConfig = mergeApplicationConfig(CORE_CONFIG, {
-    providers: [provideServerRendering(), ...rpcControllerNgProviders],
+    providers: [provideServerRendering(), appInit, ...rpcControllerNgProviders],
   });
 
   const bootstrap = () => bootstrapApplication(component, config);
 
-  router.get('/', async (request: HttpRequest) => { // FIXME: request is undefined
+  let document: string | undefined;
+
+  router.get('/', async (request: HttpRequest) => {
+    document ||= await readFile(documentPath, 'utf8');
+
     const html = await renderApplication(bootstrap, {
       url: request?.getUrl() || '/',
       document,

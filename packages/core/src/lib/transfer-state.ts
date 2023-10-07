@@ -1,23 +1,28 @@
 import { StateKey, makeStateKey } from '@angular/core';
+import { SerializedTypes } from '@deepkit/type';
 
 export const makeNgKitStateKey = <T>(
-  instance: string,
-  method: string,
+  controllerName: string,
+  methodName: string,
   args: unknown[],
-) => makeStateKey<T>(`${instance}.${method}(${JSON.stringify(args)})`);
+) =>
+  makeStateKey<T>(`${controllerName}.${methodName}(${JSON.stringify(args)})`);
 
 export function makeSerializableStateKey(
-  instance: string,
-  method: string,
+  controllerName: string,
+  methodName: string,
   args: unknown[],
 ): StateKey<Uint8Array> {
-  return makeNgKitStateKey(instance, method, args);
+  return makeNgKitStateKey(controllerName, methodName, args);
 }
 
 export function makeDeserializableStateKey(
-  instance: string,
-  method: string,
+  controllerName: string,
+  methodName: string,
   args: unknown[],
 ): StateKey<{ readonly type: 'Buffer'; readonly data: readonly number[] }> {
-  return makeNgKitStateKey(instance, method, args);
+  return makeNgKitStateKey(controllerName, methodName, args);
 }
+
+export const makeSerializedClassTypeStateKey = (name: string) =>
+  makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);

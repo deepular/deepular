@@ -36,7 +36,6 @@
         "configFile": "{projectRoot}/vite.config.ts",
         "outputPath": "dist/{projectRoot}",
         "buildLibsFromSource": false,
-        "emptyOutDir": false,
         "force": true,
         "ssr": true
       },
@@ -69,8 +68,7 @@
           "nx run example-vite:serve-server:watch",
           "nx run example-vite:build-client --watch --hmr"
         ]
-      },
-      "dependsOn": ["build-client"]
+      }
     },
     "serve-client": {
       "executor": "@nx/vite:dev-server",

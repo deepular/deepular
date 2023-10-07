@@ -9,34 +9,42 @@ import {
 } from '@angular/core';
 import { RpcWebSocketClient } from '@deepkit/rpc';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ReflectionClass } from '@deepkit/type';
+import { deserializeType, ReflectionClass } from '@deepkit/type';
 
 import {
   CORE_CONFIG,
   getNgKitDeserializer,
   makeDeserializableStateKey,
-  NgKitControllerDefinition,
+  makeSerializableStateKey,
+  makeSerializedClassTypeStateKey,
   NgKitDeserializer,
   unwrapType,
 } from '@ngkit/core';
 
 export async function bootstrapApplication(
   rootComponent: ClassType,
-  controllers: NgKitControllerDefinition<unknown>[] = [],
+  controllers: readonly string[] = [],
 ): Promise<void> {
   const client = new RpcWebSocketClient('http://localhost:8080');
 
-  const providers = controllers.map(controllerDefinition => ({
-    provide: controllerDefinition._token,
+  const providers = controllers.map(controllerName => ({
+    provide: controllerName,
     deps: [TransferState],
     useFactory(transferState: TransferState) {
-      const remoteController = client.controller(controllerDefinition, {
+      const serializedClassType = transferState.get(
+        makeSerializedClassTypeStateKey(controllerName),
+        null,
+      );
+      if (!serializedClassType) {
+        throw new Error(`Missing serialized class type for ${controllerName}`);
+      }
+      const controllerType = deserializeType(serializedClassType);
+
+      const remoteController = client.controller(controllerName, {
         dontWaitForConnection: true,
       });
 
-      const controllerReflectionClass = ReflectionClass.from(
-        controllerDefinition._type,
-      );
+      const controllerReflectionClass = ReflectionClass.from(controllerType);
 
       const controllerReflectionMethods =
         controllerReflectionClass.getMethods();
@@ -61,7 +69,7 @@ export async function bootstrapApplication(
 
           return (...args: unknown[]) => {
             const transferStateKey = makeDeserializableStateKey(
-              controllerDefinition.path,
+              controllerName,
               propertyName,
               args,
             );

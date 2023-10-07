@@ -26,6 +26,6 @@ const app = new App({
   controllers: [AppController],
 });
 
-const document = fs.readFileSync(join(publicDir, 'index.html'), 'utf8');
+const documentPath = join(publicDir, 'index.html');
 
-void startServer(AppComponent, document, app);
+void startServer(AppComponent, documentPath, app);
