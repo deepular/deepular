@@ -4,7 +4,13 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@angular/compiler-cli': ^16.2.8
+
 patchedDependencies:
+  '@analogjs/vite-plugin-angular@0.2.11':
+    hash: eyg5afdqgxcaxbgikm4lmw7yei
+    path: patches/@analogjs__vite-plugin-angular@0.2.11.patch
   '@deepkit/framework@1.0.1-alpha.103':
     hash: ghkis7ecxffprsysuckjy2mgfe
     path: patches/@deepkit__framework@1.0.1-alpha.103.patch
@@ -101,7 +107,7 @@ dependencies:
 devDependencies:
   '@analogjs/vite-plugin-angular':
     specifier: ^0.2.11
-    version: 0.2.11(@angular-devkit/build-angular@16.2.5)
+    version: 0.2.11(patch_hash=eyg5afdqgxcaxbgikm4lmw7yei)(@angular-devkit/build-angular@16.2.5)
   '@angular/cli':
     specifier: ^16.2.5
     version: 16.2.5
@@ -269,13 +275,14 @@ packages:
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
-  /@analogjs/vite-plugin-angular@0.2.11(@angular-devkit/build-angular@16.2.5):
+  /@analogjs/vite-plugin-angular@0.2.11(patch_hash=eyg5afdqgxcaxbgikm4lmw7yei)(@angular-devkit/build-angular@16.2.5):
     resolution: {integrity: sha512-aYVuXnC4xivjGOSsX60d5cSqn8smrElmgobCEuJvLjzhZVmomxUFkKB3YnYVK0Zn2fSYdZcfKeKCZW/H3YRnig==}
     peerDependencies:
       '@angular-devkit/build-angular': ^15.0.0 || ^16.0.0
     dependencies:
       '@angular-devkit/build-angular': 16.2.5(@angular/compiler-cli@16.2.8)(@angular/platform-server@16.2.8)(@types/node@20.8.2)(jest@29.7.0)(stylus@0.59.0)(typescript@5.2.2)
     dev: true
+    patched: true
 
   /@angular-devkit/architect@0.1602.5(chokidar@3.5.3):
     resolution: {integrity: sha512-lbFA2nrF0A1Rs6AU9yYeSHflsiorqL4tSwL7wMtQWMNawRjORiY7IwETyL0PmnlKsbbPlTGnWBhMfeGyBOowEw==}
@@ -291,7 +298,7 @@ packages:
     resolution: {integrity: sha512-ZHyMhhSZkulJiDyTvONJV2OwbxTdjbrJGfkUhv4k4f4HfV8ADUXlhanGjuqykxWG2CmDIsV09j/5b1lg2fYqww==}
     engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
     peerDependencies:
-      '@angular/compiler-cli': ^16.0.0
+      '@angular/compiler-cli': ^16.2.8
       '@angular/localize': ^16.0.0
       '@angular/platform-server': ^16.0.0
       '@angular/service-worker': ^16.0.0
@@ -4488,7 +4495,7 @@ packages:
     resolution: {integrity: sha512-wq1dbbOUwrY/zkpZltcgmyEFANbJon79E5s4ueT3IT4NyiYh1uJeWa2vmB0kof7VP5Xhm/jutkJk336z67oLPg==}
     engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
     peerDependencies:
-      '@angular/compiler-cli': ^16.0.0
+      '@angular/compiler-cli': ^16.2.8
       typescript: '>=4.9.3 <5.2'
       webpack: ^5.54.0
     dependencies:

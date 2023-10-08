@@ -1,0 +1,69 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "refactor",
+            "section": "Refactor"
+          },
+          {
+            "type": "docs",
+            "section": "Documentations"
+          },
+          {
+            "type": "revert",
+            "section": "Revert"
+          }
+        ]
+      },
+      "infile": "packages/compiler/CHANGELOG.md",
+      "parserOpts": {
+        "headerPattern": "^(\\w*)(?:\\((compiler*)\\))?\\: (.*)$"
+      }
+    },
+    "@release-it/bumper": {
+      "in": {
+        "file": "packages/compiler/package.json",
+        "path": "version"
+      },
+      "out": [
+        {
+          "file": "packages/compiler/package.json",
+          "path": "version"
+        },
+        {
+          "file": "dist/packages/compiler/package.json",
+          "path": "version"
+        }
+      ]
+    }
+  },
+  "git": {
+    "commitMessage": "chore(compiler): release ${version}",
+    "tagName": "compiler-v${version}",
+    "requireCleanWorkingDir": false
+  },
+  "npm": {
+    "publishPath": "dist/packages/compiler",
+    "publish": false
+  },
+  "github": {
+    "release": true,
+    "releaseName": "compiler ${version}"
+  },
+  "hooks": {
+    "after:bump": "git checkout -- package.json",
+    "before:github:release": "npm publish dist/packages/compiler"
+  },
+  "ci": true
+}

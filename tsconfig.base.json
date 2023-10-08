@@ -6,6 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "strict": true,
+    "noImplicitOverride": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,

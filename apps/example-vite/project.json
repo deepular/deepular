@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/example-vite/src",
   "prefix": "ngkit",
+  "implicitDependencies": ["compiler"],
   "targets": {
     "build-client": {
       "executor": "@nx/vite:build",

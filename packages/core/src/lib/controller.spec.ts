@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 
-import { ServerController } from './controller';
+import { SignalController } from './controller';
 
 test('RemoteController', () => {
   class TestController {
@@ -18,7 +18,7 @@ test('RemoteController', () => {
     async load4(): Promise<Observable<string>> {}
   }
 
-  const test: ServerController<TestController> = new TestController() as unknown as ServerController<TestController>;
+  const test: SignalController<TestController> = new TestController() as unknown as SignalController<TestController>;
 
   test.
 })

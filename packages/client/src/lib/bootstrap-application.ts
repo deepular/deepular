@@ -14,11 +14,9 @@ import {
   CORE_CONFIG,
   getNgKitDeserializer,
   makeDeserializableStateKey,
-  makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
   NgKitDeserializer,
-  SERIALIZED_CLASS_TYPES_STATE_KEY,
-  ServerControllerMethod,
+  SignalControllerMethod,
   unwrapType,
 } from '@ngkit/core';
 
@@ -69,7 +67,7 @@ export async function bootstrapApplication(
 
           return (
             ...args: unknown[]
-          ): ServerControllerMethod<unknown, unknown[]> => {
+          ): SignalControllerMethod<unknown, unknown[]> => {
             const loading$ = new BehaviorSubject(false);
             let value$: BehaviorSubject<unknown> | Subject<unknown>;
 

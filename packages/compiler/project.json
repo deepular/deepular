@@ -1,0 +1,47 @@
+{
+  "name": "compiler",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/compiler/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "node_modules/@ngkit/compiler",
+        "tsConfig": "packages/compiler/tsconfig.lib.json",
+        "packageJson": "packages/compiler/package.json",
+        "main": "packages/compiler/src/index.ts",
+        "assets": ["packages/compiler/*.md"]
+      }
+    },
+    "release": {
+      "command": "release-it --config={projectRoot}/.release-it.json"
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "packages/compiler/**/*.ts",
+          "packages/compiler/package.json"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "packages/compiler/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": ["compiler"]
+}

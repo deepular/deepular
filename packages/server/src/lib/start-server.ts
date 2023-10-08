@@ -10,8 +10,7 @@ import {
   getNgKitSerializer,
   makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
-  SERIALIZED_CLASS_TYPES_STATE_KEY,
-  ServerControllerMethod,
+  SignalControllerMethod,
 } from '@ngkit/core';
 import {
   ReflectionClass,
@@ -95,7 +94,7 @@ export async function startServer(
             // TODO: only @rpc.loader() methods should be callable on the server
             return (
               ...args: []
-            ): ServerControllerMethod<unknown, unknown[]> => {
+            ): SignalControllerMethod<unknown, unknown[]> => {
               let result = target[propertyName](...args);
 
               const transferStateKey = makeSerializableStateKey(

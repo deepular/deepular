@@ -1,0 +1,13 @@
+diff --git a/src/lib/angular-vite-plugin.js b/src/lib/angular-vite-plugin.js
+index 7df0395a222c66428c6539822af3f6baa50487e3..92ee1473bc21668ef47b9efe4e44ad547be6a82f 100644
+--- a/src/lib/angular-vite-plugin.js
++++ b/src/lib/angular-vite-plugin.js
+@@ -71,7 +71,7 @@ function angular(options) {
+                         (_a = options === null || options === void 0 ? void 0 : options.tsconfig) !== null && _a !== void 0 ? _a : path.resolve(config.root || '.', process.env['NODE_ENV'] === 'test'
+                             ? './tsconfig.spec.json'
+                             : './tsconfig.app.json');
+-                    compilerCli = yield (0, devkit_1.loadEsmModule)('@angular/compiler-cli');
++                    compilerCli = yield (0, devkit_1.loadEsmModule)('@ngkit/compiler');
+                     return {
+                         optimizeDeps: {
+                             include: ['rxjs/operators', 'rxjs'],
