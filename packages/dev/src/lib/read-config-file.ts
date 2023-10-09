@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { stat } from 'node:fs/promises';
 import { cast } from '@deepkit/type';
-import { readConfigFile } from '@jsheaven/read-config-file';
+// import { readConfigFile } from '@jsheaven/read-config-file';
 
 import { NgKitDevConfig } from './config';
 import { dirname } from '@angular/compiler-cli';
@@ -32,12 +32,11 @@ export async function findDefaultConfigFilePath(
   return undefined;
 }
 
-export async function readNgKitDevConfigFile(
+export async function readConfigFile(
   path?: string,
   override?: Partial<NgKitDevConfig>,
 ): Promise<NgKitDevConfig> {
   path ||= await findDefaultConfigFilePath();
-  console.log({ path });
   if (!path) {
     // throw new Error('Missing config file path');
     return new NgKitDevConfig();
@@ -47,7 +46,8 @@ export async function readNgKitDevConfigFile(
   // const config = await readConfigFile({
   //   configFilePath: path,
   // });
-  const config = await import(path);
+  let config = await import(path);
+  config = 'default' in config ? config.default : config;
   const root = dirname(path);
 
   return cast<NgKitDevConfig>({ ...config, root });

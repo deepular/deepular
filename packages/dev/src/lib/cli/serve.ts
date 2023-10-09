@@ -1,17 +1,17 @@
 import { cli, Command, flag } from '@deepkit/app';
 import { installSourcemapsSupport } from 'vite-node/source-map';
-import { build, createServer, UserConfigExport } from 'vite';
+import { build, createServer } from 'vite';
 import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createHotContext, handleMessage } from 'vite-node/hmr';
 import { LoggerInterface } from '@deepkit/logger';
 
 import { NgKitDevConfig } from '../config';
-import { readNgKitDevConfigFile } from '../read-ng-kit-dev-config-file';
+import { readConfigFile } from '../read-config-file';
 import { createClientViteConfig, createServerViteConfig } from '../vite.config';
 
 @cli.controller('serve', {
-  description: 'Serve your application',
+  description: 'Develop your application',
 })
 export class ServeController implements Command {
   constructor(private readonly logger: LoggerInterface) {}
@@ -40,7 +40,7 @@ export class ServeController implements Command {
       resolveId(id, importer) {
         return node.resolveId(id, importer);
       },
-      createHotContext(runner, url) {
+      createHotContext: (runner, url) => {
         return createHotContext(
           runner,
           server.emitter,
@@ -65,7 +65,8 @@ export class ServeController implements Command {
 
     if (config.watch) {
       process.on('uncaughtException', err => {
-        this.logger.error('<red>[ngkit] Failed to execute file: \n</red>', err);
+        // FIXME: entry file gets executed multiple times
+        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
     }
   }
@@ -96,7 +97,7 @@ export class ServeController implements Command {
   }
 
   async execute(@flag c?: string, @flag watch: boolean = true): Promise<void> {
-    const config = await readNgKitDevConfigFile(c, { watch });
+    const config = await readConfigFile(c, { watch });
     await this.startServer(config);
     await this.buildClient(config);
   }

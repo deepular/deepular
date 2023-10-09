@@ -1,10 +1,10 @@
-/// <reference types="vitest" />
 import { join } from 'node:path';
 import _angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
 import liveReload from 'rollup-plugin-livereload';
 import { viteNodeHmrPlugin } from 'vite-node/hmr';
 import { splitVendorChunkPlugin, UserConfig, Plugin } from 'vite';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 import { NgKitDevConfig } from './config';
 
@@ -19,10 +19,8 @@ export async function createServerViteConfig(
   if (config.watch) {
     viteConfig.plugins!.push(viteNodeHmrPlugin());
   }
-  viteConfig.build!.rollupOptions!.input = join(
-    config.root,
-    config.entry.server,
-  );
+  viteConfig.build!.rollupOptions!.input =config.entry.server;
+  viteConfig.build!.outDir = config.outDir;
   return viteConfig;
 }
 
@@ -36,22 +34,14 @@ export async function createClientViteConfig(
     );
     viteConfig.plugins!.push(splitVendorChunkPlugin());
   }
-  viteConfig.build!.rollupOptions!.input = join(
-    config.root,
-    config.entry.client,
-  );
+  viteConfig.build!.outDir = join(config.outDir, 'public');
+  viteConfig.build!.rollupOptions!.input = config.entry.client;
   return viteConfig;
 }
 
 export async function createBaseViteConfig(
   config: NgKitDevConfig,
 ): Promise<UserConfig> {
-  const nxViteTsPaths =
-    config.nx &&
-    (await import('@nx/vite/plugins/nx-tsconfig-paths.plugin').then(m =>
-      m.nxViteTsPaths(),
-    ));
-
   return {
     publicDir: config.publicDir,
     server: {
@@ -60,7 +50,6 @@ export async function createBaseViteConfig(
     build: {
       modulePreload: false,
       minify: false,
-      outDir: config.outDir,
       rollupOptions: {
         preserveEntrySignatures: 'strict',
         output: {
@@ -80,19 +69,19 @@ export async function createBaseViteConfig(
       mainFields: ['module'],
     },
     plugins: [
+      nxViteTsPaths(),
       angular({ tsconfig: config.tsconfig }),
       deepkitType({ tsConfig: config.tsconfig }),
-      nxViteTsPaths,
     ],
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: ['src/test-setup.ts'],
-      include: ['**/*.spec.ts'],
-      cache: {
-        dir: `../../node_modules/.cache/vitest`,
-      },
-    },
+    // test: {
+    //   globals: true,
+    //   environment: 'jsdom',
+    //   setupFiles: ['src/test-setup.ts'],
+    //   include: ['**/*.spec.ts'],
+    //   cache: {
+    //     dir: `../../node_modules/.cache/vitest`,
+    //   },
+    // },
     define: {
       'import.meta.vitest': config.mode !== 'production',
     },
