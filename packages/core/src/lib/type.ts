@@ -38,3 +38,9 @@ export function toSerializableDataType(type: Type): TypeObjectLiteral {
 
   return parent;
 }
+
+export const getProviderNameForType = (
+  typeName: string,
+  ...generics: readonly string[]
+): string =>
+  generics.length ? `${typeName}<${generics.join(', ')}>` : typeName;

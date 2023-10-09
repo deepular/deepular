@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { bootstrapApplication } from '@angular/platform-browser';
-import { from, tap, Observable } from 'rxjs';
+import { from, tap, Observable, firstValueFrom } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
 import { App } from '@deepkit/app';
 import { readFile } from 'node:fs/promises';
@@ -11,6 +11,7 @@ import {
   makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
   SignalControllerMethod,
+  getProviderNameForType, SignalControllerTypeName, ServerControllerTypeName,
 } from '@ngkit/core';
 import {
   ReflectionClass,
@@ -49,7 +50,7 @@ export async function startServer(
 
   const injector = app.getInjectorContext().createChildScope('rpc');
 
-  const rpcControllerNgProviders: Provider[] = [];
+  const ngControllerProviders: Provider[] = [];
   const rpcControllerSerializedClassTypes = new Map<string, SerializedTypes>(); // SerializedTypeClassType
 
   for (const [, { controller }] of rpcControllers.entries()) {
@@ -62,29 +63,72 @@ export async function startServer(
       throw new Error('Missing controller metadata');
     }
 
-    const controllerPath = controllerMetadata.getPath();
+    const controllerName = controllerMetadata.getPath();
     const controllerReflectionMethods = controllerReflectionClass.getMethods();
     const controllerMethodNames = controllerReflectionMethods.map(
       method => method.name,
     );
 
     rpcControllerSerializedClassTypes.set(
-      controllerPath,
+      controllerName,
       serializeType(controllerType),
     );
 
-    rpcControllerNgProviders.push({
-      provide: controllerPath,
+    const serializers = new Map<string, BSONSerializer>(
+      controllerReflectionClass.getMethods().map(method => {
+        const returnType = unwrapType(method.getReturnType());
+        const serialize = getNgKitSerializer(returnType);
+        return [method.name, serialize];
+      }),
+    );
+
+    const serverControllerProviderName = getProviderNameForType(
+      ServerControllerTypeName,
+      controllerName,
+    );
+
+    ngControllerProviders.push({
+      provide: serverControllerProviderName,
       deps: [TransferState],
       useFactory(transferState: TransferState) {
-        const serializers = new Map<string, BSONSerializer>(
-          controllerReflectionClass.getMethods().map(method => {
-            const returnType = unwrapType(method.getReturnType());
-            const serialize = getNgKitSerializer(returnType);
-            return [method.name, serialize];
-          }),
-        );
+        return new Proxy(instance, {
+          get: (target, propertyName: string) => {
+            if (!controllerMethodNames.includes(propertyName)) return;
 
+            const serialize = serializers.get(propertyName)!;
+
+            // TODO: only @rpc.loader() methods should be callable on the server
+            return async (...args: []): Promise<unknown> => {
+              let result = await target[propertyName](...args);
+
+              const transferStateKey = makeSerializableStateKey(
+                controllerName,
+                propertyName,
+                args,
+              );
+
+              if (result instanceof Observable) {
+                result = await firstValueFrom(result);
+              }
+
+              transferState.set(transferStateKey, serialize({ data: result }));
+
+              return result;
+            };
+          },
+        });
+      },
+    });
+
+    const signalControllerProviderName = getProviderNameForType(
+      SignalControllerTypeName,
+      controllerName,
+    );
+
+    ngControllerProviders.push({
+      provide: signalControllerProviderName,
+      deps: [TransferState],
+      useFactory(transferState: TransferState) {
         return new Proxy(instance, {
           get: (target, propertyName: string) => {
             if (!controllerMethodNames.includes(propertyName)) return;
@@ -98,7 +142,7 @@ export async function startServer(
               let result = target[propertyName](...args);
 
               const transferStateKey = makeSerializableStateKey(
-                controllerPath,
+                controllerName,
                 propertyName,
                 args,
               );
@@ -143,12 +187,10 @@ export async function startServer(
     });
   }
 
-  const appInit: Provider = {
+  const ngAppInit: Provider = {
     provide: APP_INITIALIZER,
     deps: [TransferState],
     useFactory(transferState: TransferState) {
-      // transferState.set(SERIALIZED_CLASS_TYPES_STATE_KEY, [...rpcControllerSerializedClassTypes.values()]);
-
       rpcControllerSerializedClassTypes.forEach((serializedClassType, name) => {
         transferState.set(
           makeSerializedClassTypeStateKey(name),
@@ -159,7 +201,7 @@ export async function startServer(
   };
 
   const config: ApplicationConfig = mergeApplicationConfig(CORE_CONFIG, {
-    providers: [provideServerRendering(), appInit, ...rpcControllerNgProviders],
+    providers: [provideServerRendering(), ngAppInit, ...ngControllerProviders],
   });
 
   const bootstrap = () => bootstrapApplication(component, config);

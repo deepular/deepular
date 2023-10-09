@@ -15,7 +15,8 @@
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^16.2.8",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "@ngkit/core": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

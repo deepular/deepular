@@ -1,5 +1,6 @@
 import { Signal } from '@angular/core';
 import { Observable } from 'rxjs';
+import { RemoteController } from '@deepkit/rpc';
 
 type InferObservable<T> = T extends Observable<infer U> ? U : T;
 
@@ -22,3 +23,19 @@ export type SignalController<T> = {
     ? SignalifyFn<T[P]>
     : never;
 };
+
+export type ServerController<T> = RemoteController<T>;
+
+export const SignalControllerTypeName = 'SignalController';
+
+export const ServerControllerTypeName = 'ServerController';
+
+export type ControllerTypeName = typeof SignalControllerTypeName | typeof ServerControllerTypeName;
+
+export const CONTROLLER_TYPE_NAMES = [
+  SignalControllerTypeName,
+  ServerControllerTypeName,
+] as const;
+
+export const isControllerTypeName = (name: string): name is ControllerTypeName =>
+  CONTROLLER_TYPE_NAMES.includes(name as never);
