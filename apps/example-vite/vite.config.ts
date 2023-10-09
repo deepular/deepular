@@ -6,8 +6,6 @@ import angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
 import liveReload from 'rollup-plugin-livereload';
 import { join } from 'node:path';
-import * as ts from 'typescript';
-import { injectControllerTransformer } from '../../packages/compiler/src/lib/transformers';
 
 export default defineConfig(({ mode, ssrBuild }) => {
   return {
@@ -22,10 +20,10 @@ export default defineConfig(({ mode, ssrBuild }) => {
           format: 'esm',
           ...(mode === 'development'
             ? {
-              entryFileNames: `[name].js`,
-              chunkFileNames: `[name].js`,
-              assetFileNames: `[name].[ext]`,
-            }
+                entryFileNames: `[name].js`,
+                chunkFileNames: `[name].js`,
+                assetFileNames: `[name].[ext]`,
+              }
             : {}),
         },
         input: ssrBuild

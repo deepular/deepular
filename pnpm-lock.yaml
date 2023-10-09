@@ -11,6 +11,9 @@ patchedDependencies:
   '@analogjs/vite-plugin-angular@0.2.11':
     hash: eyg5afdqgxcaxbgikm4lmw7yei
     path: patches/@analogjs__vite-plugin-angular@0.2.11.patch
+  '@angular/compiler-cli@16.2.8':
+    hash: lsgg6qioeyjmrcb7ihg24dnrn4
+    path: patches/@angular__compiler-cli@16.2.8.patch
   '@deepkit/framework@1.0.1-alpha.103':
     hash: ghkis7ecxffprsysuckjy2mgfe
     path: patches/@deepkit__framework@1.0.1-alpha.103.patch
@@ -113,7 +116,7 @@ devDependencies:
     version: 16.2.5
   '@angular/compiler-cli':
     specifier: ^16.2.8
-    version: 16.2.8(@angular/compiler@16.2.8)(typescript@5.2.2)
+    version: 16.2.8(patch_hash=lsgg6qioeyjmrcb7ihg24dnrn4)(@angular/compiler@16.2.8)(typescript@5.2.2)
   '@commitlint/config-conventional':
     specifier: ^17.7.0
     version: 17.7.0
@@ -333,7 +336,7 @@ packages:
       '@angular-devkit/architect': 0.1602.5(chokidar@3.5.3)
       '@angular-devkit/build-webpack': 0.1602.5(chokidar@3.5.3)(webpack-dev-server@4.15.1)(webpack@5.88.2)
       '@angular-devkit/core': 16.2.5(chokidar@3.5.3)
-      '@angular/compiler-cli': 16.2.8(@angular/compiler@16.2.8)(typescript@5.2.2)
+      '@angular/compiler-cli': 16.2.8(patch_hash=lsgg6qioeyjmrcb7ihg24dnrn4)(@angular/compiler@16.2.8)(typescript@5.2.2)
       '@angular/platform-server': 16.2.8(@angular/animations@16.2.8)(@angular/common@16.2.8)(@angular/compiler@16.2.8)(@angular/core@16.2.8)(@angular/platform-browser@16.2.8)
       '@babel/core': 7.22.9
       '@babel/generator': 7.22.9
@@ -513,7 +516,7 @@ packages:
       rxjs: 7.5.7
       tslib: 2.6.2
 
-  /@angular/compiler-cli@16.2.8(@angular/compiler@16.2.8)(typescript@5.2.2):
+  /@angular/compiler-cli@16.2.8(patch_hash=lsgg6qioeyjmrcb7ihg24dnrn4)(@angular/compiler@16.2.8)(typescript@5.2.2):
     resolution: {integrity: sha512-kKcfr8vbdB+MYDgyeZdxeoVbOpoGFmxOj4IEVnOQ2SPYexcnLEK38qect6LpHGIEG5bOQrkQqWmNnmHAEH4L1g==}
     engines: {node: ^16.14.0 || >=18.10.0}
     hasBin: true
@@ -534,6 +537,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+    patched: true
 
   /@angular/compiler@16.2.8(@angular/core@16.2.8):
     resolution: {integrity: sha512-xWdMAeBkYh8ESk9iBSYnp2qfbGPNReggtNJuUL9I7AFGkzkvEWndyQ+oTXzCM5gjj4nWB5A/AAYYDU54sDac2Q==}
@@ -4499,7 +4503,7 @@ packages:
       typescript: '>=4.9.3 <5.2'
       webpack: ^5.54.0
     dependencies:
-      '@angular/compiler-cli': 16.2.8(@angular/compiler@16.2.8)(typescript@5.2.2)
+      '@angular/compiler-cli': 16.2.8(patch_hash=lsgg6qioeyjmrcb7ihg24dnrn4)(@angular/compiler@16.2.8)(typescript@5.2.2)
       typescript: 5.2.2
       webpack: 5.88.2
     dev: true

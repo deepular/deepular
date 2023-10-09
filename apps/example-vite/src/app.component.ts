@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { SignalController } from '@ngkit/core';
 
 import type { AppController } from './app.controller';
@@ -12,7 +12,5 @@ import type { AppController } from './app.controller';
 export class AppComponent {
   readonly count = this.app.count();
 
-  constructor(
-    readonly app: SignalController<AppController>,
-  ) {}
+  constructor(readonly app: SignalController<AppController>) {}
 }

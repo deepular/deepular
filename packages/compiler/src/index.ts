@@ -1,7 +1,10 @@
 import { NgKitProgram } from './lib/program.js';
-
-export { readConfiguration } from '@angular/compiler-cli';
+import { NgKitCompilerHost } from './lib/compiler-host.js';
 
 export const NgtscProgram = NgKitProgram;
 
-export { NgKitProgram };
+export const NgCompilerHost = NgKitCompilerHost;
+
+export { NgKitProgram, NgKitCompilerHost };
+
+export { readConfiguration } from '@angular/compiler-cli';

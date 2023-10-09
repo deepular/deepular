@@ -100,7 +100,8 @@
   "pnpm": {
     "patchedDependencies": {
       "@deepkit/framework@1.0.1-alpha.103": "patches/@deepkit__framework@1.0.1-alpha.103.patch",
-      "@analogjs/vite-plugin-angular@0.2.11": "patches/@analogjs__vite-plugin-angular@0.2.11.patch"
+      "@analogjs/vite-plugin-angular@0.2.11": "patches/@analogjs__vite-plugin-angular@0.2.11.patch",
+      "@angular/compiler-cli@16.2.8": "patches/@angular__compiler-cli@16.2.8.patch"
     }
   },
   "resolutions": {
