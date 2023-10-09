@@ -74,21 +74,19 @@ const ngKitCompilerPath = process.argv[2] || '@ngkit/compiler';
 
   if (!bundleFileAlreadyPatched) {
     bundleFileToPatch.content =
-      patchedByNgKitComment +
-      `import { NgKitProgram, NgKitCompilerHost } from '${ngKitCompilerPath}';\n` +
-      bundleFileToPatch.content;
+      patchedByNgKitComment + bundleFileToPatch.content;
 
     bundleFileToPatch.content = bundleFileToPatch.content.replace(
       'new NgtscProgram',
-      'new NgKitProgram',
+      `new require('${ngKitCompilerPath}').NgKitProgram`,
     );
     bundleFileToPatch.content = bundleFileToPatch.content.replace(
       'new NgCompilerHost',
-      'new NgKitCompilerHost',
+      `new require('${ngKitCompilerPath}').NgKitCompilerHost`,
     );
     bundleFileToPatch.content = bundleFileToPatch.content.replace(
       'NgCompilerHost.wrap',
-      'NgKitCompilerHost.wrap',
+      `require('${ngKitCompilerPath}').wrap`,
     );
 
     await writeFile(bundleFileToPatch.path, bundleFileToPatch.content, 'utf8');
