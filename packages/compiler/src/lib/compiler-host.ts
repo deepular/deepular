@@ -12,27 +12,6 @@ import { transformSourceFile } from './transform.js';
 export class NgKitCompilerHost extends NgCompilerHost {
   static override wrap = NgCompilerHost.wrap;
 
-  constructor(
-    delegate: ExtendedTsCompilerHost,
-    inputFiles: readonly string[],
-    rootDirs: readonly AbsoluteFsPath[],
-    shimAdapter: ShimAdapter,
-    shimTagger: ShimReferenceTagger,
-    entryPoint: AbsoluteFsPath | null,
-    diagnostics: ts.Diagnostic[],
-  ) {
-    super(
-      delegate,
-      inputFiles,
-      rootDirs,
-      shimAdapter,
-      shimTagger,
-      entryPoint,
-      diagnostics,
-    );
-    console.log('NgKitCompilerHost loaded');
-  }
-
   override getSourceFile(
     fileName: string,
     languageVersion: ts.ScriptTarget,
