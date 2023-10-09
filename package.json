@@ -105,7 +105,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "@deepkit/framework@1.0.1-alpha.103": "patches/@deepkit__framework@1.0.1-alpha.103.patch"
+      "@deepkit/framework@1.0.1-alpha.103": "patches/@deepkit__framework@1.0.1-alpha.103.patch",
+      "@deepkit/type-compiler@1.0.1-alpha.102": "patches/@deepkit__type-compiler@1.0.1-alpha.102.patch"
     }
   },
   "resolutions": {

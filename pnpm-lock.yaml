@@ -11,6 +11,9 @@ patchedDependencies:
   '@deepkit/framework@1.0.1-alpha.103':
     hash: ghkis7ecxffprsysuckjy2mgfe
     path: patches/@deepkit__framework@1.0.1-alpha.103.patch
+  '@deepkit/type-compiler@1.0.1-alpha.102':
+    hash: iefnrmur3b6xmcfnstmhso66aa
+    path: patches/@deepkit__type-compiler@1.0.1-alpha.102.patch
 
 dependencies:
   '@angular/common':
@@ -90,7 +93,7 @@ dependencies:
     version: 1.0.1-alpha.102(@deepkit/core@1.0.1-alpha.100)
   '@deepkit/type-compiler':
     specifier: 1.0.1-alpha.102
-    version: 1.0.1-alpha.102(typescript@5.2.2)
+    version: 1.0.1-alpha.102(patch_hash=iefnrmur3b6xmcfnstmhso66aa)(typescript@5.2.2)
   '@deepkit/workflow':
     specifier: ^1.0.1-alpha.102
     version: 1.0.1-alpha.102(@deepkit/core@1.0.1-alpha.100)(@deepkit/event@1.0.1-alpha.102)(@deepkit/injector@1.0.1-alpha.102)(@deepkit/stopwatch@1.0.1-alpha.102)(@deepkit/type@1.0.1-alpha.102)
@@ -3564,7 +3567,7 @@ packages:
   /@deepkit/topsort@1.0.1-alpha.89:
     resolution: {integrity: sha512-0Iu+atoeri+Uecn3AidW7T5wKF69uAc/br2rUT5J6DyKf4/yroqyAWGSQgjbuLh1vYLVi2hWA+j5zxVpf16rFw==}
 
-  /@deepkit/type-compiler@1.0.1-alpha.102(typescript@5.2.2):
+  /@deepkit/type-compiler@1.0.1-alpha.102(patch_hash=iefnrmur3b6xmcfnstmhso66aa)(typescript@5.2.2):
     resolution: {integrity: sha512-2Q9oTTVoZIFNzgHtIDo2+oTnkxzPZvjXPxfEWKCoiPkgYQPxNht3bOZeuwWpKg+jginXgrc60y3jV7V70Uk6dA==}
     hasBin: true
     requiresBuild: true
@@ -3581,6 +3584,7 @@ packages:
       typescript: 5.2.2
     transitivePeerDependencies:
       - supports-color
+    patched: true
 
   /@deepkit/type-spec@1.0.1-alpha.93:
     resolution: {integrity: sha512-ZJHq0tOCYW0pDZ4Ab3RLQiFvDCTD2Dur+af4I0kmtT23slz+WWMNehJF08lO4DUDyOO0f0DlLLCqO39GhY3J4Q==}
@@ -3602,7 +3606,7 @@ packages:
     peerDependencies:
       '@deepkit/type-compiler': ^1.0.1-alpha.93
     dependencies:
-      '@deepkit/type-compiler': 1.0.1-alpha.102(typescript@5.2.2)
+      '@deepkit/type-compiler': 1.0.1-alpha.102(patch_hash=iefnrmur3b6xmcfnstmhso66aa)(typescript@5.2.2)
       '@rollup/pluginutils': 5.0.5(rollup@2.79.1)
     transitivePeerDependencies:
       - rollup

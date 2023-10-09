@@ -1,0 +1,13 @@
+diff --git a/dist/esm/src/compiler.js b/dist/esm/src/compiler.js
+index c3bfed692cd456db794f84e9532149d897c6afce..6a25edb8ad1577cb8347ea2fdbe1e1fef584ac99 100644
+--- a/dist/esm/src/compiler.js
++++ b/dist/esm/src/compiler.js
+@@ -15,7 +15,7 @@ import stripJsonComments from 'strip-json-comments';
+ import { ReflectionOp, TypeNumberBrand } from '@deepkit/type-spec';
+ import { Resolver } from './resolver.js';
+ import { knownLibFilesForCompilerOptions } from '@typescript/vfs';
+-import * as micromatch from 'micromatch';
++import micromatch from 'micromatch';
+ // don't use from @deepkit/core since we don't want to have a dependency to @deepkit/core
+ export function isObject(obj) {
+     if (obj === null) {
