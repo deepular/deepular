@@ -44,7 +44,7 @@ export class ServeController implements Command {
         return createHotContext(
           runner,
           server.emitter,
-          [config.entry.server],
+          [config.server.entry],
           url,
         );
       },
@@ -53,14 +53,14 @@ export class ServeController implements Command {
     // provide the vite define variable in this context
     await runner.executeId('/@vite/env');
 
-    await runner.executeFile(config.entry.server);
+    await runner.executeFile(config.server.entry);
 
     if (!config.watch) {
       await server.close();
     }
 
     server.emitter?.on('message', payload => {
-      handleMessage(runner, server.emitter, [config.entry.server], payload);
+      handleMessage(runner, server.emitter, [config.server.entry], payload);
     });
 
     if (config.watch) {

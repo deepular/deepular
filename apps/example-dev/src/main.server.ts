@@ -6,11 +6,7 @@ import { join } from 'node:path';
 import { AppController } from './app.controller';
 import { AppComponent } from './app.component';
 
-const publicDir = join(
-  process.cwd(),
-  'dist',
-  'public',
-);
+const publicDir = join(process.cwd(), 'dist', 'public');
 
 const documentPath = join(publicDir, 'index.html');
 

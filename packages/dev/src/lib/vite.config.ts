@@ -1,4 +1,3 @@
-import { join } from 'node:path';
 import _angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
 import liveReload from 'rollup-plugin-livereload';
@@ -16,11 +15,14 @@ export async function createServerViteConfig(
   config: NgKitDevConfig,
 ): Promise<UserConfig> {
   const viteConfig = await createBaseViteConfig(config);
+
   if (config.watch) {
     viteConfig.plugins!.push(viteNodeHmrPlugin());
   }
-  viteConfig.build!.rollupOptions!.input =config.entry.server;
-  viteConfig.build!.outDir = config.outDir;
+
+  viteConfig.build!.rollupOptions!.input = config.server.entry;
+  viteConfig.build!.outDir = config.server.outDir;
+
   return viteConfig;
 }
 
@@ -28,14 +30,17 @@ export async function createClientViteConfig(
   config: NgKitDevConfig,
 ): Promise<UserConfig> {
   const viteConfig = await createBaseViteConfig(config);
+
   if (config.watch) {
     viteConfig.plugins!.push(
-      liveReload({ delay: config.clientLiveReloadDelay }) as Plugin,
+      liveReload({ delay: config.client.liveReloadDelay }) as Plugin,
     );
-    viteConfig.plugins!.push(splitVendorChunkPlugin());
   }
-  viteConfig.build!.outDir = join(config.outDir, 'public');
-  viteConfig.build!.rollupOptions!.input = config.entry.client;
+  viteConfig.plugins!.push(splitVendorChunkPlugin());
+
+  viteConfig.build!.outDir = config.client.outDir;
+  viteConfig.build!.rollupOptions!.input = config.client.entry;
+
   return viteConfig;
 }
 
