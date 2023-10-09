@@ -37,14 +37,32 @@ import {
   provideServerRendering,
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
 } from '@angular/platform-server';
-import { ApplicationServer } from '@deepkit/framework';
+import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
+import { RootModuleDefinition } from '@deepkit/app';
+
+export interface NgKitServerOptions extends RootModuleDefinition {
+  readonly publicDir: string;
+  readonly documentPath: string;
+}
 
 export async function startServer(
-  component: ClassType,
-  documentPath: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  app: App<any>,
+  rootComponent: ClassType,
+  { imports, controllers, listeners, providers, workflows, middlewares, publicDir, documentPath, ...frameworkOptions }: NgKitServerOptions,
 ) {
+  const app = new App({
+    imports: [
+      new FrameworkModule({
+        publicDir,
+        ...frameworkOptions,
+      }),
+      ...(imports || []),
+    ],
+    controllers,
+    listeners,
+    providers,
+    workflows,
+    middlewares,
+  });
   const router = app.get(HttpRouterRegistry);
   const { controllers: rpcControllers } = app.get(RpcKernel);
 
@@ -204,7 +222,7 @@ export async function startServer(
     providers: [provideServerRendering(), ngAppInit, ...ngControllerProviders],
   });
 
-  const bootstrap = () => bootstrapApplication(component, config);
+  const bootstrap = () => bootstrapApplication(rootComponent, config);
 
   let document: string | undefined;
 

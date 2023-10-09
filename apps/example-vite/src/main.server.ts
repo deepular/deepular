@@ -1,8 +1,6 @@
 /// <reference types="vite/client" />
 import 'zone.js/node';
 import { startServer } from '@ngkit/server';
-import { App } from '@deepkit/app';
-import { FrameworkModule } from '@deepkit/framework';
 import { join } from 'node:path';
 
 import { AppController } from './app.controller';
@@ -17,15 +15,10 @@ const publicDir = join(
   'public',
 );
 
-const app = new App({
-  imports: [
-    new FrameworkModule({
-      publicDir,
-    }),
-  ],
-  controllers: [AppController],
-});
-
 const documentPath = join(publicDir, 'index.html');
 
-void startServer(AppComponent, documentPath, app);
+void startServer(AppComponent, {
+  controllers: [AppController],
+  documentPath,
+  publicDir,
+});
