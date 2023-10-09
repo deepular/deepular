@@ -8,6 +8,7 @@
     "strict": true,
     "noImplicitOverride": true,
     "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
@@ -25,6 +26,7 @@
       "@ngkit/client": ["packages/client/src/index.ts"],
       "@ngkit/core": ["packages/core/src/index.ts"],
       "@ngkit/compiler": ["packages/compiler/src/index.ts"],
+      "@ngkit/dev": ["packages/dev/src/index.ts"],
       "@ngkit/server": ["packages/server/src/index.ts"]
     }
   },

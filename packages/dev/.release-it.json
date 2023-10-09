@@ -1,0 +1,69 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "refactor",
+            "section": "Refactor"
+          },
+          {
+            "type": "docs",
+            "section": "Documentations"
+          },
+          {
+            "type": "revert",
+            "section": "Revert"
+          }
+        ]
+      },
+      "infile": "packages/dev/CHANGELOG.md",
+      "parserOpts": {
+        "headerPattern": "^(\\w*)(?:\\((dev*)\\))?\\: (.*)$"
+      }
+    },
+    "@release-it/bumper": {
+      "in": {
+        "file": "packages/dev/package.json",
+        "path": "version"
+      },
+      "out": [
+        {
+          "file": "packages/dev/package.json",
+          "path": "version"
+        },
+        {
+          "file": "dist/packages/dev/package.json",
+          "path": "version"
+        }
+      ]
+    }
+  },
+  "git": {
+    "commitMessage": "chore(dev): release ${version}",
+    "tagName": "dev-v${version}",
+    "requireCleanWorkingDir": false
+  },
+  "npm": {
+    "publishPath": "dist/packages/dev",
+    "publish": false
+  },
+  "github": {
+    "release": true,
+    "releaseName": "dev ${version}"
+  },
+  "hooks": {
+    "after:bump": "git checkout -- package.json",
+    "before:github:release": "npm publish dist/packages/dev"
+  },
+  "ci": true
+}
