@@ -11,7 +11,9 @@ import {
   makeSerializableStateKey,
   makeSerializedClassTypeStateKey,
   SignalControllerMethod,
-  getProviderNameForType, SignalControllerTypeName, ServerControllerTypeName,
+  getProviderNameForType,
+  SignalControllerTypeName,
+  ServerControllerTypeName,
 } from '@ngkit/core';
 import {
   ReflectionClass,
@@ -47,7 +49,17 @@ export interface NgKitServerOptions extends RootModuleDefinition {
 
 export async function startServer(
   rootComponent: ClassType,
-  { imports, controllers, listeners, providers, workflows, middlewares, publicDir, documentPath, ...frameworkOptions }: NgKitServerOptions,
+  {
+    imports,
+    controllers,
+    listeners,
+    providers,
+    workflows,
+    middlewares,
+    publicDir,
+    documentPath,
+    ...frameworkOptions
+  }: NgKitServerOptions,
 ) {
   const app = new App({
     imports: [

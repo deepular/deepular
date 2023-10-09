@@ -142,7 +142,11 @@ export async function bootstrapApplication(
         },
       };
 
-      return [clientControllerProvider, serverControllerProvider, signalControllerProvider];
+      return [
+        clientControllerProvider,
+        serverControllerProvider,
+        signalControllerProvider,
+      ];
     },
   );
 

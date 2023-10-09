@@ -30,12 +30,15 @@ export const SignalControllerTypeName = 'SignalController';
 
 export const ServerControllerTypeName = 'ServerController';
 
-export type ControllerTypeName = typeof SignalControllerTypeName | typeof ServerControllerTypeName;
+export type ControllerTypeName =
+  | typeof SignalControllerTypeName
+  | typeof ServerControllerTypeName;
 
 export const CONTROLLER_TYPE_NAMES = [
   SignalControllerTypeName,
   ServerControllerTypeName,
 ] as const;
 
-export const isControllerTypeName = (name: string): name is ControllerTypeName =>
-  CONTROLLER_TYPE_NAMES.includes(name as never);
+export const isControllerTypeName = (
+  name: string,
+): name is ControllerTypeName => CONTROLLER_TYPE_NAMES.includes(name as never);
