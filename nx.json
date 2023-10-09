@@ -11,11 +11,7 @@
   "targetDefaults": {
     "release": {
       "dependsOn": ["^build", "build"],
-      "inputs": [
-        "production",
-        "^production",
-        "{projectRoot}/.release-it.json"
-      ]
+      "inputs": ["production", "^production", "{projectRoot}/.release-it.json"]
     },
     "build": {
       "dependsOn": ["^build"],

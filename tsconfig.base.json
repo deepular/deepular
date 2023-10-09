@@ -22,13 +22,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ngkit/server": [
-        "packages/server/src/index.ts"
-      ],
       "@ngkit/client": ["packages/client/src/index.ts"],
-      "@ngkit/core": [
-        "packages/core/src/index.ts"
-      ]
+      "@ngkit/core": ["packages/core/src/index.ts"],
+      "@ngkit/compiler": ["packages/compiler/src/index.ts"],
+      "@ngkit/server": ["packages/server/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"],
