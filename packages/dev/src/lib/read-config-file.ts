@@ -1,10 +1,9 @@
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { stat } from 'node:fs/promises';
 import { cast } from '@deepkit/type';
 // import { readConfigFile } from '@jsheaven/read-config-file';
 
-import { NgKitDevConfig } from './config';
-import { dirname } from '@angular/compiler-cli';
+import { NgKitConfig } from './config';
 
 const availableConfigFileExtensions = [
   'ts',
@@ -34,12 +33,12 @@ export async function findDefaultConfigFilePath(
 
 export async function readConfigFile(
   path?: string,
-  override?: Partial<NgKitDevConfig>,
-): Promise<NgKitDevConfig> {
+  override?: Partial<NgKitConfig>,
+): Promise<NgKitConfig> {
   path ||= await findDefaultConfigFilePath();
   if (!path) {
     // throw new Error('Missing config file path');
-    return new NgKitDevConfig();
+    return new NgKitConfig();
   }
 
   // FIXME TypeError: vm.SourceTextModule is not a constructor
@@ -50,5 +49,5 @@ export async function readConfigFile(
   config = 'default' in config ? config.default : config;
   const root = dirname(path);
 
-  return cast<NgKitDevConfig>({ ...config, root });
+  return cast<NgKitConfig>({ ...config, root });
 }

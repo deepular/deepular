@@ -5,23 +5,22 @@ import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createHotContext, handleMessage } from 'vite-node/hmr';
 import { LoggerInterface } from '@deepkit/logger';
+import { InjectorContext, ServiceContainer } from '@deepkit/injector';
 
-import { NgKitDevConfig } from '../config';
+import { NgKitConfig } from '../config';
 import { readConfigFile } from '../read-config-file';
-import { createClientViteConfig, createServerViteConfig } from '../vite.config';
+import { NgKitViteConfig } from '../vite.config';
 
 @cli.controller('serve', {
   description: 'Develop your application',
 })
 export class ServeController implements Command {
-  constructor(private readonly logger: LoggerInterface) {}
+  constructor(private readonly logger: LoggerInterface, private readonly config: NgKitConfig, private readonly viteConfig: NgKitViteConfig) {}
 
-  private async startServer(config: NgKitDevConfig): Promise<void> {
-    const viteConfig = await createServerViteConfig(config);
-
+  private async startServer(): Promise<void> {
     const server = await createServer({
       logLevel: 'error',
-      ...viteConfig,
+      ...this.viteConfig.server,
     });
     await server.pluginContainer.buildStart({});
 
@@ -44,7 +43,7 @@ export class ServeController implements Command {
         return createHotContext(
           runner,
           server.emitter,
-          [config.server.entry],
+          [this.config.server.entry],
           url,
         );
       },
@@ -53,17 +52,17 @@ export class ServeController implements Command {
     // provide the vite define variable in this context
     await runner.executeId('/@vite/env');
 
-    await runner.executeFile(config.server.entry);
+    await runner.executeFile(this.config.server.entry);
 
-    if (!config.watch) {
+    if (!this.config.watch) {
       await server.close();
     }
 
     server.emitter?.on('message', payload => {
-      handleMessage(runner, server.emitter, [config.server.entry], payload);
+      handleMessage(runner, server.emitter, [this.config.server.entry], payload);
     });
 
-    if (config.watch) {
+    if (this.config.watch) {
       process.on('uncaughtException', err => {
         // FIXME: entry file gets executed multiple times
         this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
@@ -71,9 +70,8 @@ export class ServeController implements Command {
     }
   }
 
-  private async buildClient(config: NgKitDevConfig) {
-    const viteConfig = await createClientViteConfig(config);
-    const watcherOrOutput = await build(viteConfig);
+  private async buildClient() {
+    const watcherOrOutput = await build(this.viteConfig.client);
 
     if ('on' in watcherOrOutput) {
       await new Promise<boolean>(resolve => {
@@ -97,8 +95,7 @@ export class ServeController implements Command {
   }
 
   async execute(@flag c?: string, @flag watch: boolean = true): Promise<void> {
-    const config = await readConfigFile(c, { watch });
-    await this.startServer(config);
-    await this.buildClient(config);
+    await this.startServer();
+    await this.buildClient();
   }
 }
