@@ -24,7 +24,7 @@ export class NgKitConfigClient {
    * @description client live reload delay in milliseconds
    * @default 500
    */
-  readonly liveReloadDelay: integer = 500;
+  readonly liveReloadDelay: integer = 0;
 
   constructor(private readonly root: string) {}
 }

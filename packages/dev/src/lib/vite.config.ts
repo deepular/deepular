@@ -1,9 +1,12 @@
+import { join } from 'node:path';
 import _angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
 import liveReload from 'rollup-plugin-livereload';
-import { viteNodeHmrPlugin } from 'vite-node/hmr';
-import { splitVendorChunkPlugin, Plugin, mergeConfig } from 'vite';
+import { Plugin, mergeConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { chunkSplitPlugin } from 'vite-plugin-chunk-split';
+import { viteNodeHmrPlugin } from 'vite-node/hmr';
+import type { Writable } from 'type-fest';
 
 import { NgKitConfig, ViteConfig } from './config';
 
@@ -35,7 +38,7 @@ export class NgKitViteConfig {
             ...(this.config.mode === 'development'
               ? {
                   entryFileNames: `[name].js`,
-                  chunkFileNames: `[name].js`,
+                  chunkFileNames: `[hash].js`,
                   assetFileNames: `[name].[ext]`,
                 }
               : {}),
@@ -60,30 +63,51 @@ export class NgKitViteConfig {
       //   },
       // },
       define: {
+        __PROD__: this.config.mode === 'production',
+        __DEV__: this.config.mode !== 'production',
         'import.meta.vitest': this.config.mode !== 'production',
       },
     };
   }
 
-  createForServer() {
+  createForServerSideRendering(): ViteConfig {
     const viteConfig = this.createBase();
-
-    if (this.config.watch) {
-      viteConfig.plugins!.push(viteNodeHmrPlugin());
-    }
 
     return mergeConfig(viteConfig, {
       build: {
-        outDir: this.config.server.outDir,
+        outDir: join(this.config.server.outDir, 'ssr'),
         ssr: this.config.server.entry,
         rollupOptions: {
           input: this.config.server.entry,
         },
+      },
+    } as ViteConfig);
+  }
+
+  createForServer(): ViteConfig {
+    const viteConfig = this.createBase();
+
+    return mergeConfig(viteConfig, {
+      server: {
         watch: {
-          exclude: [this.config.client.entry],
+          useFsEvents: true,
+          atomic: 500,
+          usePolling: false,
+          awaitWriteFinish: true,
         },
       },
-    });
+      build: {
+        outDir: this.config.server.outDir,
+        // ssr: this.config.server.entry,
+        // rollupOptions: {
+        //   input: this.config.server.entry,
+        // },
+        // watch: {
+        //   exclude: [this.config.client.entry],
+        // },
+      },
+      plugins: [this.config.watch && viteNodeHmrPlugin()],
+    } as ViteConfig);
   }
 
   createForClient(): ViteConfig {
@@ -92,6 +116,7 @@ export class NgKitViteConfig {
     return mergeConfig(viteConfig, {
       build: {
         outDir: this.config.client.outDir,
+        emptyOutDir: this.config.mode === 'production',
         rollupOptions: {
           input: this.config.client.entry,
         },
@@ -101,24 +126,26 @@ export class NgKitViteConfig {
       },
       plugins: [
         this.config.watch &&
-          (liveReload({ delay: this.config.client.liveReloadDelay }) as Plugin),
-        splitVendorChunkPlugin(),
+          (liveReload({
+            delay: this.config.client.liveReloadDelay,
+          }) as Plugin),
+        chunkSplitPlugin({ strategy: 'unbundle' }),
       ],
-    });
+    } as ViteConfig);
   }
 
-  applyToClient(fn: (config: ViteConfig) => ViteConfig): void {
-    (this as any).client = mergeConfig(
-      (this as any).client,
-      fn((this as any).client),
-    );
+  applyToClient(
+    this: Writable<this>,
+    fn: (config: ViteConfig) => ViteConfig,
+  ): void {
+    this.client = mergeConfig(this.client as ViteConfig, fn(this.client));
   }
 
-  applyToServer(fn: (config: ViteConfig) => ViteConfig): void {
-    (this as any).server = mergeConfig(
-      (this as any).server,
-      fn((this as any).server),
-    );
+  applyToServer(
+    this: Writable<this>,
+    fn: (config: ViteConfig) => ViteConfig,
+  ): void {
+    this.server = mergeConfig(this.server as ViteConfig, fn(this.server));
   }
 
   apply(fn: (config: ViteConfig) => ViteConfig): void {

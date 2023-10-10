@@ -2,6 +2,6 @@
   "name": "example-dev",
   "private": true,
   "scripts": {
-    "serve": "../../dist/packages/dev/cli.esm.js serve"
+    "serve": "node ../../dist/packages/dev/cli.esm.js serve"
   }
 }

@@ -1,18 +1,18 @@
 /// <reference types="vite/client" />
 import 'zone.js/node';
-import { startServer } from '@ngkit/server';
 import { join } from 'node:path';
+import { startServer } from '@ngkit/server';
+import { ApplicationServer } from '@deepkit/framework';
 
 import { AppController } from './app.controller';
 import { AppComponent } from './app.component';
 
 const publicDir = join(process.cwd(), 'dist', 'public');
-
 const documentPath = join(publicDir, 'index.html');
 
-console.log('Start server');
+import.meta.hot?.accept();
 
-void startServer(AppComponent, {
+await startServer(AppComponent, {
   controllers: [AppController],
   documentPath,
   publicDir,

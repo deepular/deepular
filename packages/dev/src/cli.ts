@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { App } from '@deepkit/app';
-import { FrameworkModule } from '@deepkit/framework';
 
 import { ServeController } from './lib/cli';
 import { NgKitConfig } from './lib/config';
@@ -17,6 +16,11 @@ const config = await readConfigFile();
 
 await new App({
   imports: [new FeaturesModule()],
-  providers: [{ provide: NgKitConfig, useValue: config }, NgKitViteConfig, PostCSSFeature, TailwindFeature],
+  providers: [
+    { provide: NgKitConfig, useValue: config },
+    NgKitViteConfig,
+    PostCSSFeature,
+    TailwindFeature,
+  ],
   controllers: [ServeController],
 }).run();

@@ -17,6 +17,7 @@
     "@deepkit/vite": "1.0.1-alpha.102",
     "@analogjs/vite-plugin-angular": "0.2.11",
     "@angular-devkit/build-angular": "^16.2.5",
+    "vite-plugin-chunk-split": "0.4.7",
     "deepmerge": "4.3.1"
   },
   "peerDependencies": {

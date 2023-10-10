@@ -22,7 +22,7 @@ export class ServeController implements Command {
 
   private async startServer(): Promise<void> {
     const server = await createServer({
-      logLevel: 'error',
+      logLevel: 'warn',
       ...this.viteConfig.server,
     });
     await server.pluginContainer.buildStart({});
@@ -72,11 +72,11 @@ export class ServeController implements Command {
 
     if (this.config.watch) {
       process.on('uncaughtException', err => {
-        // this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
+        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
 
       process.on('unhandledRejection', err => {
-        // this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
+        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
     }
   }
@@ -106,7 +106,6 @@ export class ServeController implements Command {
   }
 
   async execute(@flag c?: string, @flag watch: boolean = true): Promise<void> {
-    await this.buildClient();
-    await this.startServer();
+    await Promise.all([this.startServer(), this.buildClient()]);
   }
 }

@@ -1,9 +1,20 @@
 /// <reference types="vite/client" />
+import { readFile } from 'node:fs/promises';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { from, tap, Observable, firstValueFrom } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
+import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
+import { rpcClass, RpcKernel } from '@deepkit/rpc';
+import { BSONSerializer } from '@deepkit/bson';
+import { ClassType } from '@deepkit/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { RootModuleDefinition } from '@deepkit/app';
 import { App } from '@deepkit/app';
-import { readFile } from 'node:fs/promises';
+import {
+  renderApplication,
+  provideServerRendering,
+  ɵSERVER_CONTEXT as SERVER_CONTEXT,
+} from '@angular/platform-server';
 import {
   unwrapType,
   CORE_CONFIG,
@@ -21,10 +32,6 @@ import {
   SerializedTypes,
   serializeType,
 } from '@deepkit/type';
-import { rpcClass, RpcKernel } from '@deepkit/rpc';
-import { BSONSerializer } from '@deepkit/bson';
-import { ClassType } from '@deepkit/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
   TransferState,
   ApplicationConfig,
@@ -34,13 +41,6 @@ import {
   APP_INITIALIZER,
   Signal,
 } from '@angular/core';
-import {
-  renderApplication,
-  provideServerRendering,
-  ɵSERVER_CONTEXT as SERVER_CONTEXT,
-} from '@angular/platform-server';
-import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
-import { RootModuleDefinition } from '@deepkit/app';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
@@ -60,7 +60,7 @@ export async function startServer(
     documentPath,
     ...frameworkOptions
   }: NgKitServerOptions,
-) {
+): Promise<App<any>> {
   const app = new App({
     imports: [
       new FrameworkModule({
@@ -259,11 +259,29 @@ export async function startServer(
     return new HtmlResponse(html);
   });
 
-  if (import.meta.hot) {
-    const server = app.get(ApplicationServer);
-    import.meta.hot.accept();
-    import.meta.hot.dispose(() => server.close(true));
+  if (import.meta.hot?.data.shuttingDown) {
+    console.log('Waiting for server to shutdown...');
+    await import.meta.hot.data.shuttingDown;
+    import.meta.hot.data.shuttingDown = null;
   }
 
   await app.run(['server:start']);
+
+  if (import.meta.hot) {
+    const server = app.get(ApplicationServer);
+
+    const dispose = async () => {
+      let resolve: () => void;
+      import.meta.hot!.data.shuttingDown = new Promise<void>(
+        _resolve => (resolve = _resolve),
+      );
+      await server.close(false);
+      resolve!();
+    };
+
+    import.meta.hot.on('vite:beforeFullReload', dispose);
+    import.meta.hot.on('vite:beforeUpdate', dispose);
+  }
+
+  return app;
 }

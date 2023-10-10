@@ -7,7 +7,7 @@ import type { AppController } from './app.controller';
   selector: 'ngkit-app-root',
   standalone: true,
   template: `<div>Count: {{ count.value() }}</div>
-    - <button (click)="count.refetch()">Update</button>`,
+    - <button (click)="count.refetch()">Test</button>`,
 })
 export class AppComponent {
   readonly count = this.app.count();
