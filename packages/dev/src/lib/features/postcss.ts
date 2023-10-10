@@ -34,7 +34,7 @@ export class PostCSSFeature implements Feature<PostCSSConfig> {
     };
   }
 
-  apply(config: PostCSSConfig): ViteConfig {
+  applyConfig(config: PostCSSConfig): ViteConfig {
     return {
       css: {
         transformer: 'postcss',

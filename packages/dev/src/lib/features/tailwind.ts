@@ -8,7 +8,9 @@ import { feature } from './decorators';
 import { Feature } from './feature';
 import { PostCSSConfig, PostCSSFeature } from './postcss';
 
-@feature.config('tailwind', [PostCSSFeature])
+@feature.config('tailwind', {
+  requires: [PostCSSFeature],
+})
 export class TailwindFeature implements Feature<TailwindConfig> {
   constructor(private readonly config: NgKitConfig) {}
 
@@ -27,7 +29,7 @@ export class TailwindFeature implements Feature<TailwindConfig> {
     };
   }
 
-  apply(config: TailwindConfig): ViteConfig {
+  applyConfig(config: TailwindConfig): ViteConfig {
     return {
       css: {
         postcss: {

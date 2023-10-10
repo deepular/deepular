@@ -38,7 +38,7 @@ export class FeaturesModule extends createModule({ forRoot: true }) {
     );
 
     viteConfig.apply(viteConfig =>
-      featureImpl.apply(featureConfig, viteConfig),
+      featureImpl.applyConfig(featureConfig, viteConfig),
     );
   }
 
