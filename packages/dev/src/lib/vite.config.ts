@@ -23,6 +23,7 @@ export class NgKitViteConfig {
       server: {
         hmr: this.config.watch,
       },
+      mode: this.config.mode,
       build: {
         modulePreload: false,
         minify: false,
@@ -74,8 +75,12 @@ export class NgKitViteConfig {
     return mergeConfig(viteConfig, {
       build: {
         outDir: this.config.server.outDir,
+        ssr: this.config.server.entry,
         rollupOptions: {
           input: this.config.server.entry,
+        },
+        watch: {
+          exclude: [this.config.client.entry],
         },
       },
     });
@@ -84,17 +89,14 @@ export class NgKitViteConfig {
   createForClient(): ViteConfig {
     const viteConfig = this.createBase();
 
-    if (this.config.watch) {
-      (viteConfig.plugins ||= []).push(
-        liveReload({ delay: this.config.client.liveReloadDelay }) as Plugin,
-      );
-    }
-
     return mergeConfig(viteConfig, {
       build: {
         outDir: this.config.client.outDir,
         rollupOptions: {
           input: this.config.client.entry,
+        },
+        watch: {
+          exclude: [this.config.server.entry],
         },
       },
       plugins: [

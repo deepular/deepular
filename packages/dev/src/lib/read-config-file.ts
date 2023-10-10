@@ -1,6 +1,7 @@
 import { join, dirname } from 'node:path';
 import { stat } from 'node:fs/promises';
 import { cast } from '@deepkit/type';
+import deepmerge from 'deepmerge';
 // import { readConfigFile } from '@jsheaven/read-config-file';
 
 import { NgKitConfig } from './config';
@@ -34,9 +35,9 @@ export async function findDefaultConfigFilePath(
 export async function readConfigFile(
   path?: string,
   override?: Partial<NgKitConfig>,
-): Promise<Partial<NgKitConfig>> {
+): Promise<NgKitConfig> {
   path ||= await findDefaultConfigFilePath();
-  if (!path) return {};
+  if (!path) return new NgKitConfig();
 
   // FIXME TypeError: vm.SourceTextModule is not a constructor
   // const config = await readConfigFile({
@@ -45,6 +46,5 @@ export async function readConfigFile(
   let config = await import(path);
   config = 'default' in config ? config.default : config;
   const root = dirname(path);
-
-  return { ...config, root };
+  return cast<NgKitConfig>(deepmerge(new NgKitConfig(), { ...config, root }));
 }

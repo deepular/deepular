@@ -24,7 +24,7 @@ export class NgKitConfigClient {
    * @description client live reload delay in milliseconds
    * @default 500
    */
-  readonly liveReloadDelay?: integer = 500;
+  readonly liveReloadDelay: integer = 500;
 
   constructor(private readonly root: string) {}
 }
@@ -36,6 +36,7 @@ export class NgKitConfigFeatures {
 }
 
 export class NgKitConfig {
+  readonly root: string = process.cwd();
   readonly publicDir: string = join(this.root, 'src/public');
   readonly tsconfig: string = join(this.root, 'tsconfig.json');
   readonly watch: boolean = true;
@@ -45,6 +46,4 @@ export class NgKitConfig {
   readonly client: NgKitConfigClient = new NgKitConfigClient(this.root);
   readonly features: NgKitConfigFeatures = new NgKitConfigFeatures();
   readonly test?: VitestConfig;
-
-  constructor(readonly root = process.cwd()) {}
 }

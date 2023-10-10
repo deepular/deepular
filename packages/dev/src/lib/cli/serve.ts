@@ -72,8 +72,11 @@ export class ServeController implements Command {
 
     if (this.config.watch) {
       process.on('uncaughtException', err => {
-        // FIXME: entry file gets executed multiple times
-        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
+        // this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
+      });
+
+      process.on('unhandledRejection', err => {
+        // this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
     }
   }
@@ -103,7 +106,7 @@ export class ServeController implements Command {
   }
 
   async execute(@flag c?: string, @flag watch: boolean = true): Promise<void> {
-    await this.startServer();
     await this.buildClient();
+    await this.startServer();
   }
 }

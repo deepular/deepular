@@ -16,10 +16,7 @@ import { NgKitViteConfig } from './lib/vite.config';
 const config = await readConfigFile();
 
 await new App({
-  config: NgKitConfig,
   imports: [new FeaturesModule()],
-  providers: [NgKitViteConfig, PostCSSFeature, TailwindFeature],
+  providers: [{ provide: NgKitConfig, useValue: config }, NgKitViteConfig, PostCSSFeature, TailwindFeature],
   controllers: [ServeController],
-})
-  .configure(config)
-  .run();
+}).run();
