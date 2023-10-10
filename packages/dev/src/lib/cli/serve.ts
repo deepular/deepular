@@ -15,7 +15,11 @@ import { NgKitViteConfig } from '../vite.config';
   description: 'Develop your application',
 })
 export class ServeController implements Command {
-  constructor(private readonly logger: LoggerInterface, private readonly config: NgKitConfig, private readonly viteConfig: NgKitViteConfig) {}
+  constructor(
+    private readonly logger: LoggerInterface,
+    private readonly config: NgKitConfig,
+    private readonly viteConfig: NgKitViteConfig,
+  ) {}
 
   private async startServer(): Promise<void> {
     const server = await createServer({
@@ -59,7 +63,12 @@ export class ServeController implements Command {
     }
 
     server.emitter?.on('message', payload => {
-      handleMessage(runner, server.emitter, [this.config.server.entry], payload);
+      handleMessage(
+        runner,
+        server.emitter,
+        [this.config.server.entry],
+        payload,
+      );
     });
 
     if (this.config.watch) {

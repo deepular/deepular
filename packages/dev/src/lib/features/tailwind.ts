@@ -24,7 +24,7 @@ export class TailwindFeature implements Feature<TailwindConfig> {
         extend: {},
       },
       plugins: [],
-    }
+    };
   }
 
   apply(config: TailwindConfig): ViteConfig {
@@ -34,8 +34,8 @@ export class TailwindFeature implements Feature<TailwindConfig> {
           plugins: {
             tailwindcss: config,
           },
-        } as PostCSSConfig
+        } as PostCSSConfig,
       },
-    } as ViteConfig
+    } as ViteConfig;
   }
 }

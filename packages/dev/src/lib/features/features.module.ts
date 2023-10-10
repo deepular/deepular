@@ -2,7 +2,6 @@ import { AppModule, createModule } from '@deepkit/app';
 import { ClassType, isClass } from '@deepkit/core';
 import { ProviderWithScope, Token } from '@deepkit/injector';
 
-
 import { NgKitViteConfig } from '../vite.config';
 import { NgKitConfig, NgKitConfigFeatures } from '../config';
 import { feature } from './decorators';
@@ -21,23 +20,33 @@ export class FeaturesModule extends createModule({ forRoot: true }) {
 
     const featureMeta = feature._fetch(featureType);
     if (!featureMeta) {
-      throw new Error(`Feature ${featureType.name} is missing @feature.config() decorator`);
+      throw new Error(
+        `Feature ${featureType.name} is missing @feature.config() decorator`,
+      );
     }
 
     const featureName = featureMeta.name as keyof NgKitConfigFeatures;
-     let featureConfig = config.features[featureName];
+    let featureConfig = config.features[featureName];
     if (!featureConfig) return;
-    featureConfig === true ? featureImpl.getConfig?.() : featureConfig
+    featureConfig === true ? featureImpl.getConfig?.() : featureConfig;
     // if (!featureConfig) {
     //   throw new Error(`Missing configuration for feature ${featureType.name}`);
     // }
 
-    featureMeta.requires.forEach(featureType => this.applyFeatureIfEnabled(featureType));
+    featureMeta.requires.forEach(featureType =>
+      this.applyFeatureIfEnabled(featureType),
+    );
 
-    viteConfig.apply(viteConfig => featureImpl.apply(featureConfig,  viteConfig));
+    viteConfig.apply(viteConfig =>
+      featureImpl.apply(featureConfig, viteConfig),
+    );
   }
 
-  override processProvider(module: AppModule<any>, token: Token, provider: ProviderWithScope) {
+  override processProvider(
+    module: AppModule<any>,
+    token: Token,
+    provider: ProviderWithScope,
+  ) {
     if (!isClass(token)) return;
 
     const featureConfig = feature._fetch(token);

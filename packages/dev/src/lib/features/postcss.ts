@@ -1,12 +1,11 @@
-import { AcceptedPlugin, ProcessOptions, Processor } from "postcss";
+import { AcceptedPlugin, ProcessOptions, Processor } from 'postcss';
 import { join } from 'node:path';
 
 import { NgKitConfig, ViteConfig } from '../config';
 import { requireIfExists } from '../utils';
-import { NgKitViteConfig } from "../vite.config";
+import { NgKitViteConfig } from '../vite.config';
 import { Feature } from './feature';
-import { feature } from "./decorators";
-
+import { feature } from './decorators';
 
 export type PostCSSConfigPlugin = Transformer | Plugin | Processor;
 
@@ -22,7 +21,6 @@ export interface PostCSSConfig {
 
 @feature.config('postcss')
 export class PostCSSFeature implements Feature<PostCSSConfig> {
-
   constructor(private readonly config: NgKitConfig) {}
 
   getConfig(): PostCSSConfig {
@@ -33,7 +31,7 @@ export class PostCSSFeature implements Feature<PostCSSConfig> {
 
     return {
       plugins: [],
-    }
+    };
   }
 
   apply(config: PostCSSConfig): ViteConfig {
@@ -42,8 +40,7 @@ export class PostCSSFeature implements Feature<PostCSSConfig> {
         transformer: 'postcss',
         // @ts-ignore
         postcss: config,
-      }
+      },
     };
   }
 }
-

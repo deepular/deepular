@@ -1,7 +1,10 @@
-import { ClassType } from "@deepkit/core";
-import { ClassDecoratorResult, createClassDecoratorContext } from "@deepkit/type";
+import { ClassType } from '@deepkit/core';
+import {
+  ClassDecoratorResult,
+  createClassDecoratorContext,
+} from '@deepkit/type';
 
-import { Feature } from "./feature";
+import { Feature } from './feature';
 
 export class FeatureDecorator {
   name: string;
@@ -9,7 +12,7 @@ export class FeatureDecorator {
 }
 
 class FeatureDecoratorClass {
-  t = new FeatureDecorator;
+  t = new FeatureDecorator();
 
   config(name: string, requires: ClassType<Feature>[] = []) {
     this.t.name = name;
@@ -17,4 +20,5 @@ class FeatureDecoratorClass {
   }
 }
 
-export const feature: ClassDecoratorResult<typeof FeatureDecoratorClass> = createClassDecoratorContext(FeatureDecoratorClass);
+export const feature: ClassDecoratorResult<typeof FeatureDecoratorClass> =
+  createClassDecoratorContext(FeatureDecoratorClass);

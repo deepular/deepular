@@ -33,10 +33,10 @@ export class NgKitViteConfig {
             format: 'esm',
             ...(this.config.mode === 'development'
               ? {
-                entryFileNames: `[name].js`,
-                chunkFileNames: `[name].js`,
-                assetFileNames: `[name].[ext]`,
-              }
+                  entryFileNames: `[name].js`,
+                  chunkFileNames: `[name].js`,
+                  assetFileNames: `[name].[ext]`,
+                }
               : {}),
           },
         },
@@ -71,41 +71,52 @@ export class NgKitViteConfig {
       viteConfig.plugins!.push(viteNodeHmrPlugin());
     }
 
-    return {
-      ...viteConfig,
+    return mergeConfig(viteConfig, {
       build: {
-        ...viteConfig.build,
         outDir: this.config.server.outDir,
         rollupOptions: {
-          ...viteConfig.build?.rollupOptions,
           input: this.config.server.entry,
-        }
-      }
-    }
+        },
+      },
+    });
   }
 
   createForClient(): ViteConfig {
     const viteConfig = this.createBase();
 
     if (this.config.watch) {
-      viteConfig.plugins!.push(
+      (viteConfig.plugins ||= []).push(
         liveReload({ delay: this.config.client.liveReloadDelay }) as Plugin,
       );
     }
-    viteConfig.plugins!.push(splitVendorChunkPlugin());
 
-    viteConfig.build!.outDir = this.config.client.outDir;
-    viteConfig.build!.rollupOptions!.input = this.config.client.entry;
-
-    return viteConfig;
+    return mergeConfig(viteConfig, {
+      build: {
+        outDir: this.config.client.outDir,
+        rollupOptions: {
+          input: this.config.client.entry,
+        },
+      },
+      plugins: [
+        this.config.watch &&
+          (liveReload({ delay: this.config.client.liveReloadDelay }) as Plugin),
+        splitVendorChunkPlugin(),
+      ],
+    });
   }
 
   applyToClient(fn: (config: ViteConfig) => ViteConfig): void {
-    (this as any).client = mergeConfig((this as any).client, fn((this as any).client));
+    (this as any).client = mergeConfig(
+      (this as any).client,
+      fn((this as any).client),
+    );
   }
 
   applyToServer(fn: (config: ViteConfig) => ViteConfig): void {
-    (this as any).server = mergeConfig((this as any).server, fn((this as any).server));
+    (this as any).server = mergeConfig(
+      (this as any).server,
+      fn((this as any).server),
+    );
   }
 
   apply(fn: (config: ViteConfig) => ViteConfig): void {
