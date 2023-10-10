@@ -73,7 +73,7 @@ const ngKitCompilerPath = process.argv[2] || '@ngkit/compiler';
   }
 
   if (!bundleFileAlreadyPatched) {
-    const importClasses = `let NgKitProgram;\nlet NgKitCompilerHost;\nprocess.nextTick(async () => { ({ NgKitProgram, NgKitCompilerHost } = await import('${ngKitCompilerPath}')); });\n`;
+    const importClasses = `let NgKitProgram;\nlet NgKitCompilerHost;\nvoid new Promise(async () => { ({ NgKitProgram, NgKitCompilerHost } = await import('${ngKitCompilerPath}')); });\n`;
 
     bundleFileToPatch.content =
       patchedByNgKitComment + importClasses + bundleFileToPatch.content;
