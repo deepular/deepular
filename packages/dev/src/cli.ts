@@ -12,10 +12,8 @@ import {
 } from './lib/features';
 import { NgKitViteConfig } from './lib/vite.config';
 
-const configFilePath = process.argv[2];
-
 // TODO: merge cli flags
-const config = await readConfigFile(configFilePath);
+const config = await readConfigFile();
 
 await new App({
   config: NgKitConfig,

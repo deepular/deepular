@@ -34,12 +34,9 @@ export async function findDefaultConfigFilePath(
 export async function readConfigFile(
   path?: string,
   override?: Partial<NgKitConfig>,
-): Promise<NgKitConfig> {
+): Promise<Partial<NgKitConfig>> {
   path ||= await findDefaultConfigFilePath();
-  if (!path) {
-    // throw new Error('Missing config file path');
-    return new NgKitConfig();
-  }
+  if (!path) return {};
 
   // FIXME TypeError: vm.SourceTextModule is not a constructor
   // const config = await readConfigFile({
@@ -49,5 +46,5 @@ export async function readConfigFile(
   config = 'default' in config ? config.default : config;
   const root = dirname(path);
 
-  return cast<NgKitConfig>({ ...config, root });
+  return { ...config, root };
 }

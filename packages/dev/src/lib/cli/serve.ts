@@ -8,7 +8,6 @@ import { LoggerInterface } from '@deepkit/logger';
 import { InjectorContext, ServiceContainer } from '@deepkit/injector';
 
 import { NgKitConfig } from '../config';
-import { readConfigFile } from '../read-config-file';
 import { NgKitViteConfig } from '../vite.config';
 
 @cli.controller('serve', {

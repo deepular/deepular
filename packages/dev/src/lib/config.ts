@@ -4,7 +4,7 @@ import { integer } from '@deepkit/type';
 import vite from 'vite';
 import vitest from 'vitest';
 
-import { PostCSSConfig } from './features/postcss';
+import type { PostCSSConfig } from './features/postcss';
 
 export type VitestConfig = vitest.ResolvedConfig;
 
