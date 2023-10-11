@@ -1,5 +1,19 @@
+diff --git a/dist/cjs/src/compiler.js b/dist/cjs/src/compiler.js
+index 5e2146f4ed0fec7f18fa697db5c28b99697e9980..f1907f54e4d1189338bd684f0d0cbde0a2577c32 100644
+--- a/dist/cjs/src/compiler.js
++++ b/dist/cjs/src/compiler.js
+@@ -1904,8 +1904,8 @@ class ReflectionTransformer {
+                         return node;
+                     };
+                     if (isIdentifier(parameter.name)) {
+-                        const updatedParameterType = visitEachChild(parameter.type, searchArgument, this.context);
+                         if (found) {
++                            const updatedParameterType = visitEachChild(parameter.type, searchArgument, this.context);
+                             foundUsers.push({ type: updatedParameterType, parameterName: parameter.name });
+                         }
+                     }
 diff --git a/dist/esm/src/compiler.js b/dist/esm/src/compiler.js
-index c3bfed692cd456db794f84e9532149d897c6afce..6a25edb8ad1577cb8347ea2fdbe1e1fef584ac99 100644
+index c3bfed692cd456db794f84e9532149d897c6afce..0df2a5119af57b7bacf18bdbe777a9fb7ba2d61a 100644
 --- a/dist/esm/src/compiler.js
 +++ b/dist/esm/src/compiler.js
 @@ -15,7 +15,7 @@ import stripJsonComments from 'strip-json-comments';
@@ -11,3 +25,13 @@ index c3bfed692cd456db794f84e9532149d897c6afce..6a25edb8ad1577cb8347ea2fdbe1e1fe
  // don't use from @deepkit/core since we don't want to have a dependency to @deepkit/core
  export function isObject(obj) {
      if (obj === null) {
+@@ -1872,8 +1872,8 @@ export class ReflectionTransformer {
+                         return node;
+                     };
+                     if (isIdentifier(parameter.name)) {
+-                        const updatedParameterType = visitEachChild(parameter.type, searchArgument, this.context);
+                         if (found) {
++                       	    const updatedParameterType = visitEachChild(parameter.type, searchArgument, this.context);
+                             foundUsers.push({ type: updatedParameterType, parameterName: parameter.name });
+                         }
+                     }
