@@ -74,10 +74,6 @@ export class ServeController implements Command {
       process.on('uncaughtException', err => {
         this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
-
-      process.on('unhandledRejection', err => {
-        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
-      });
     }
   }
 

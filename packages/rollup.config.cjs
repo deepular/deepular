@@ -5,7 +5,7 @@ const preserveShebang = require('rollup-plugin-preserve-shebang');
 const tsconfig = require(path.join(workspaceRoot, 'tsconfig.base.json'));
 
 const nxResolveDistPackages = (packages) => {
-  const resolvePackagePath =  (id) => {
+  const resolvePackagePath = (id) => {
     const projectName = id.split('/')[1];
 
     const projectPath = path.join(workspaceRoot, 'packages', projectName);
@@ -59,7 +59,7 @@ module.exports = (config) => {
     const external = config.external;
     config.external = (id) => packages.includes(id) ? false : external(id);
 
-    // peer-deps-external conflicts with nx-resolve-packages when @deepkit packages are specified in package.json peerDependencies
+    // peer-deps-external conflicts with nx-resolve-dist-packages when @ngkit packages are specified in package.json peerDependencies
     config.plugins = config.plugins.filter(plugin => plugin.name !== 'peer-deps-external');
 
     config.plugins.push(nxResolveDistPackages(packages));

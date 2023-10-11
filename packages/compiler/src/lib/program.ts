@@ -3,7 +3,7 @@ import type { NgCompilerOptions } from '@angular/compiler-cli/src/ngtsc/core/api
 import type api from '@angular/compiler-cli/src/transformers/api';
 import ts from 'typescript';
 
-import { transformSourceFile } from './transform.js';
+import { transformSourceFile } from './utils';
 
 export class NgKitProgram extends NgtscProgram {
   constructor(

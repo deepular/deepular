@@ -1,5 +1,5 @@
-import { NgKitProgram } from './lib/program.js';
-import { NgKitCompilerHost } from './lib/compiler-host.js';
+import { NgKitProgram } from './lib/program';
+import { NgKitCompilerHost } from './lib/compiler-host';
 
 export {
   NgKitProgram,

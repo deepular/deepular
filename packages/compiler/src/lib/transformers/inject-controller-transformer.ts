@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 import { getProviderNameForType, isControllerTypeName } from '@ngkit/core';
 
-import { addImportIfMissing } from '../utils.js';
+import { addImportIfMissing } from '../utils';
 
 export const DECORATOR_IDENTIFIER_NAME = 'Inject';
 

@@ -1,13 +1,7 @@
 import ts from 'typescript';
 import { NgCompilerHost } from '@angular/compiler-cli/src/ngtsc/core';
-import type { ExtendedTsCompilerHost } from '@angular/compiler-cli/src/ngtsc/core/api';
-import type { AbsoluteFsPath } from '@angular/compiler-cli/src/ngtsc/file_system';
-import type {
-  ShimAdapter,
-  ShimReferenceTagger,
-} from '@angular/compiler-cli/src/ngtsc/shims';
 
-import { transformSourceFile } from './transform.js';
+import { transformSourceFile } from './utils';
 
 export class NgKitCompilerHost extends NgCompilerHost {
   static override wrap = NgCompilerHost.wrap;
