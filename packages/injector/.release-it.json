@@ -1,0 +1,69 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "refactor",
+            "section": "Refactor"
+          },
+          {
+            "type": "docs",
+            "section": "Documentations"
+          },
+          {
+            "type": "revert",
+            "section": "Revert"
+          }
+        ]
+      },
+      "infile": "packages/injector/CHANGELOG.md",
+      "parserOpts": {
+        "headerPattern": "^(\\w*)(?:\\((injector*)\\))?\\: (.*)$"
+      }
+    },
+    "@release-it/bumper": {
+      "in": {
+        "file": "packages/injector/package.json",
+        "path": "version"
+      },
+      "out": [
+        {
+          "file": "packages/injector/package.json",
+          "path": "version"
+        },
+        {
+          "file": "dist/packages/injector/package.json",
+          "path": "version"
+        }
+      ]
+    }
+  },
+  "git": {
+    "commitMessage": "chore(injector): release ${version}",
+    "tagName": "injector-v${version}",
+    "requireCleanWorkingDir": false
+  },
+  "npm": {
+    "publishPath": "dist/packages/injector",
+    "publish": false
+  },
+  "github": {
+    "release": true,
+    "releaseName": "injector ${version}"
+  },
+  "hooks": {
+    "after:bump": "git checkout -- package.json",
+    "before:github:release": "npm publish dist/packages/injector"
+  },
+  "ci": true
+}
