@@ -9,6 +9,7 @@ import { BSONSerializer } from '@deepkit/bson';
 import { ClassType } from '@deepkit/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RootModuleDefinition } from '@deepkit/app';
+import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
 import {
   renderApplication,
@@ -259,10 +260,13 @@ export async function startServer(
     return new HtmlResponse(html);
   });
 
+  const logger = app.get(Logger);
+
   if (import.meta.hot?.data.shuttingDown) {
-    console.log('Waiting for server to shutdown...');
+    logger.alert('Waiting for server to shutdown ...');
     await import.meta.hot.data.shuttingDown;
     import.meta.hot.data.shuttingDown = null;
+    import.meta.hot!.data.shuttingDownLogged = null;
   }
 
   await app.run(['server:start']);
@@ -275,7 +279,11 @@ export async function startServer(
       import.meta.hot!.data.shuttingDown = new Promise<void>(
         _resolve => (resolve = _resolve),
       );
-      await server.close(false);
+      if (!import.meta.hot!.data.shuttingDownLogged) {
+        logger.alert('Shutting down server ...');
+      }
+      import.meta.hot!.data.shuttingDownLogged = true;
+      await server.close(true);
       resolve!();
     };
 
