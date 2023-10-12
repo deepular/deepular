@@ -1,6 +1,6 @@
 import 'zone.js';
-import { bootstrapApplication } from '@ngkit/client';
+import { bootstrapClientApplication } from '@ngkit/client';
 
-import { AppComponent } from './app.component';
+import { AppComponent } from './app/app.component';
 
-void bootstrapApplication(AppComponent, ['AppController']);
+await bootstrapClientApplication(AppComponent, ['AppController']);

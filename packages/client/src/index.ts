@@ -1,1 +1,1 @@
-export * from './lib/bootstrap-application';
+export * from './lib/bootstrap-client-application';

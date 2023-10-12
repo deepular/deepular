@@ -4,7 +4,10 @@ import {
   Injector,
   Provider,
   StaticProvider,
-  ɵɵdefineInjectable, ɵɵinject, INJECTOR, EnvironmentInjector,
+  ɵɵdefineInjectable,
+  ɵɵinject,
+  INJECTOR,
+  EnvironmentInjector,
 } from '@angular/core';
 
 import { NG_PROV_DEF } from './defs';
@@ -12,8 +15,11 @@ import { NG_PROV_DEF } from './defs';
 export class DeepkitEnvironmentInjector extends EnvironmentInjector {}
 
 export class DeepkitInjector extends Injector {
-  static override create(options:
-                           {providers: Array<Provider|StaticProvider>, parent?: Injector, name?: string}): DeepkitInjector {}
+  static override create(options: {
+    providers: Array<Provider | StaticProvider>;
+    parent?: Injector;
+    name?: string;
+  }): DeepkitInjector {}
 
   /** @nocollapse */
   static override [NG_PROV_DEF] = /** @pureOrBreakMyCode */ ɵɵdefineInjectable({
@@ -30,7 +36,6 @@ export class DeepkitInjector extends Injector {
 }
 
 export function injector() {}
-
 
 setInjectImplementation();
 

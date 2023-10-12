@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, NgModuleRef } from '@angular/core';
+import { NgModuleRef } from '@angular/core';
 
 import { NgKitEnvironmentInjector } from './environment-injector';
 import { NgKitComponentFactoryResolver } from './component-factory-resolver';
@@ -11,17 +11,15 @@ export class NgKitModuleRefAdapter extends NgModuleRef<null> {
   override readonly instance = null;
 
   constructor(config: {
-    providers: ProviderWithScope,
-    parent: NgKitEnvironmentInjector|null,
-    debugName: string|null,
-    runEnvironmentInitializers: boolean
+    providers: ProviderWithScope;
+    parent: NgKitEnvironmentInjector | null;
+    debugName: string | null;
+    runEnvironmentInitializers: boolean;
   }) {
     super();
   }
 
-  destroy(): void {
-  }
+  destroy(): void {}
 
-  onDestroy(callback: () => void): void {
-  }
+  onDestroy(callback: () => void): void {}
 }

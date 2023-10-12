@@ -27,7 +27,7 @@ export default defineConfig(({ mode, ssrBuild }) => {
             : {}),
         },
         input: ssrBuild
-          ? join(__dirname, 'src/main.server.ts')
+          ? join(__dirname, 'src/main.client.ts')
           : join(__dirname, 'index.html'),
       },
     },

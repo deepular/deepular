@@ -20,7 +20,6 @@ export function transformSourceFile(
   return result.transformed[0];
 }
 
-
 export function addImportIfMissing(
   context: ts.TransformationContext,
   importName: string,

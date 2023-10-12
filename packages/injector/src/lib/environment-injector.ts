@@ -1,3 +1,3 @@
-import { EnvironmentInjector } from "@angular/core";
+import { EnvironmentInjector } from '@angular/core';
 
 export class NgKitEnvironmentInjector extends EnvironmentInjector {}

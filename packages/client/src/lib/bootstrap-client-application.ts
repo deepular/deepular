@@ -1,5 +1,4 @@
 import { ClassType } from '@deepkit/core';
-import { bootstrapApplication as _bootstrapApplication } from '@angular/platform-browser';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { RpcWebSocketClient } from '@deepkit/rpc';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 
 import {
+  bootstrapApplication,
   CORE_CONFIG,
   getProviderNameForType,
   SignalControllerTypeName,
@@ -21,7 +21,7 @@ import {
 import { ClientController } from './client-controller';
 import { TransferStateMissingForClientControllerMethodError } from './errors';
 
-export async function bootstrapApplication(
+export async function bootstrapClientApplication(
   rootComponent: ClassType,
   controllers: readonly string[] = [],
 ): Promise<void> {

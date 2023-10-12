@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
 import { readFile } from 'node:fs/promises';
-import { bootstrapApplication } from '@angular/platform-browser';
 import { from, tap, Observable, firstValueFrom } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
 import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
@@ -17,6 +16,7 @@ import {
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
 } from '@angular/platform-server';
 import {
+  bootstrapApplication,
   unwrapType,
   CORE_CONFIG,
   getNgKitSerializer,
