@@ -84,7 +84,6 @@
     "@nx/vite": "^16.10.0",
     "deepmerge": "^4.3.1",
     "postcss": "^8.4.31",
-    "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-preserve-shebang": "^1.0.1",
     "tailwindcss": "^3.3.3",
     "tslib": "2.6.2",
@@ -92,6 +91,7 @@
     "vite-node": "^0.34.6",
     "vite-plugin-chunk-split": "^0.4.7",
     "vite-plugin-dts": "~2.3.0",
+    "vite-plugin-full-reload": "^1.0.5",
     "vitest": "^0.34.6",
     "zone.js": "^0.14.0"
   },
@@ -110,6 +110,7 @@
     }
   },
   "resolutions": {
-    "@angular/compiler-cli": "^16.2.8"
+    "@angular/compiler-cli": "^16.2.8",
+    "typescript": "5.2.2"
   }
 }

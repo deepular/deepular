@@ -1,8 +1,8 @@
 import { join } from 'node:path';
 import _angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
-import liveReload from 'rollup-plugin-livereload';
-import { Plugin, mergeConfig } from 'vite';
+import fullReload from 'vite-plugin-full-reload';
+import { mergeConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { chunkSplitPlugin } from 'vite-plugin-chunk-split';
 import { viteNodeHmrPlugin } from 'vite-node/hmr';
@@ -96,6 +96,13 @@ export class NgKitViteConfig {
           usePolling: false,
           awaitWriteFinish: true,
         },
+        /*proxy: {
+          '/public': {
+            target: 'http://localhost:4200',
+            changeOrigin: true,
+            rewrite: path => path.replace(/^\/public/, '')
+          }
+        },*/
       },
       build: {
         outDir: this.config.server.outDir,
@@ -115,6 +122,16 @@ export class NgKitViteConfig {
     const viteConfig = this.createBase();
 
     return mergeConfig(viteConfig, {
+      server: {
+        hmr: this.config.client.hmr,
+        port: 4200,
+        watch: {
+          useFsEvents: true,
+          atomic: 500,
+          usePolling: false,
+          awaitWriteFinish: true,
+        },
+      },
       build: {
         outDir: this.config.client.outDir,
         emptyOutDir: this.config.mode === 'production',
@@ -122,14 +139,11 @@ export class NgKitViteConfig {
           input: this.config.client.entry,
         },
         watch: {
-          exclude: [this.config.server.entry],
+          include: [join(this.config.root, '**/*')],
         },
       },
       plugins: [
-        this.config.watch &&
-          (liveReload({
-            delay: this.config.client.liveReloadDelay,
-          }) as Plugin),
+        this.config.watch && !this.config.client.hmr && fullReload(join(this.config.root, '**/*'), { delay: this.config.client.fullReloadDelay }),
         chunkSplitPlugin({ strategy: 'unbundle' }),
       ],
     } as ViteConfig);

@@ -20,11 +20,12 @@ export class NgKitConfigServer {
 export class NgKitConfigClient {
   readonly outDir: string = join(this.root, 'dist/public');
   readonly entry: string = join(this.root, 'index.html');
+  readonly hmr: boolean = false;
   /**
-   * @description client live reload delay in milliseconds
-   * @default 500
+   * @description full reload delay in milliseconds
+   * @default 2500
    */
-  readonly liveReloadDelay: integer = 0;
+  readonly fullReloadDelay: integer = 2500;
 
   constructor(private readonly root: string) {}
 }

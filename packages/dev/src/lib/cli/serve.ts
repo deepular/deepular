@@ -5,7 +5,6 @@ import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createHotContext, handleMessage } from 'vite-node/hmr';
 import { LoggerInterface } from '@deepkit/logger';
-import { InjectorContext, ServiceContainer } from '@deepkit/injector';
 
 import { NgKitConfig } from '../config';
 import { NgKitViteConfig } from '../vite.config';
@@ -19,6 +18,21 @@ export class ServeController implements Command {
     private readonly config: NgKitConfig,
     private readonly viteConfig: NgKitViteConfig,
   ) {}
+
+  private async startClient() {
+    const server = await createServer({
+      logLevel: 'warn',
+      ...this.viteConfig.client,
+    });
+
+    await server.listen();
+
+    server.printUrls()
+
+    server.emitter?.on('message', payload => {
+      console.log(payload);
+    });
+  }
 
   private async startServer(): Promise<void> {
     const server = await createServer({
@@ -81,7 +95,7 @@ export class ServeController implements Command {
     const watcherOrOutput = await build(this.viteConfig.client);
 
     if ('on' in watcherOrOutput) {
-      await new Promise<boolean>(resolve => {
+      void new Promise<boolean>(resolve => {
         let success = true;
         watcherOrOutput.on('event', event => {
           if (event.code === 'START') {
@@ -101,7 +115,10 @@ export class ServeController implements Command {
     }
   }
 
-  async execute(@flag c?: string, @flag watch: boolean = true): Promise<void> {
-    await Promise.all([this.startServer(), this.buildClient()]);
+  async execute(@flag c?: string): Promise<void> {
+    await Promise.all([
+      this.startServer(),
+      this.startClient(),
+    ]);
   }
 }

@@ -8,6 +8,7 @@ export interface SignalControllerMethod<T, A extends unknown[]> {
   readonly value: Signal<T>;
   readonly update: (value: T) => void;
   readonly loading: Signal<boolean>;
+  readonly error: Signal<Error | null>;
   readonly refetch: ((...args: A) => Promise<T>) | (() => Promise<T>);
 }
 

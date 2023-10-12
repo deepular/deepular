@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { readFile } from 'node:fs/promises';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { from, tap, Observable, firstValueFrom } from 'rxjs';
+import { from, tap, Observable, firstValueFrom, catchError, of, BehaviorSubject } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
 import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
 import { rpcClass, RpcKernel } from '@deepkit/rpc';
@@ -185,6 +185,8 @@ export async function startServer(
               const isPromise = result instanceof Promise;
               const isObservable = result instanceof Observable;
 
+              const error = signal<Error | null>(null);
+
               let value: Signal<unknown> | undefined;
 
               if (!isPromise && !isObservable) {
@@ -197,7 +199,10 @@ export async function startServer(
               }
 
               if (!value) {
-                result = result.pipe(tap(transferResult));
+                result = result.pipe(tap(transferResult), catchError(err => {
+                  error.set(err);
+                  return of(err); // throw error ?
+                }));
                 value = toSignal(result, { requireSync: true });
               }
 
@@ -209,6 +214,7 @@ export async function startServer(
                   throw new Error('Cannot be used on the server');
                 },
                 loading: signal(false),
+                error,
                 value,
               };
             };
