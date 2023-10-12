@@ -65,7 +65,7 @@ export class NgKitViteConfig {
       define: {
         __PROD__: this.config.mode === 'production',
         __DEV__: this.config.mode !== 'production',
-        ngDevMode: this.config.mode !== 'production',
+        // ngDevMode: this.config.mode !== 'production',
         'import.meta.vitest': this.config.mode !== 'production',
       },
     };
