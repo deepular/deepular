@@ -9,6 +9,9 @@ overrides:
   typescript: 5.2.2
 
 patchedDependencies:
+  '@angular/core@16.2.8':
+    hash: uqoakp7stgl7bt6i4b2ipltota
+    path: patches/@angular__core@16.2.8.patch
   '@deepkit/framework@1.0.1-alpha.103':
     hash: ghkis7ecxffprsysuckjy2mgfe
     path: patches/@deepkit__framework@1.0.1-alpha.103.patch
@@ -37,7 +40,7 @@ dependencies:
     version: 16.2.8(@angular/compiler@16.2.8)(typescript@5.2.2)
   '@angular/core':
     specifier: ^16.2.8
-    version: 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+    version: 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
   '@angular/platform-browser':
     specifier: ^16.2.8
     version: 16.2.8(@angular/animations@16.2.8)(@angular/common@16.2.8)(@angular/core@16.2.8)
@@ -487,7 +490,7 @@ packages:
     peerDependencies:
       '@angular/core': 16.2.8
     dependencies:
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       tslib: 2.6.2
 
   /@angular/cli@16.2.5:
@@ -526,7 +529,7 @@ packages:
       '@angular/core': 16.2.8
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       rxjs: 7.5.7
       tslib: 2.6.2
 
@@ -561,10 +564,10 @@ packages:
       '@angular/core':
         optional: true
     dependencies:
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       tslib: 2.6.2
 
-  /@angular/core@16.2.8(rxjs@7.5.7)(zone.js@0.14.0):
+  /@angular/core@16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0):
     resolution: {integrity: sha512-v3kwZsjf7mKBGMky+UfxV3iwA1BFy1c3gmjyHSPSll9TPr2jkfwstoB2Cc+wmS2S9ezHFAMX++XXRymKVRQzQg==}
     engines: {node: ^16.14.0 || >=18.10.0}
     peerDependencies:
@@ -574,6 +577,7 @@ packages:
       rxjs: 7.5.7
       tslib: 2.6.2
       zone.js: 0.14.0
+    patched: true
 
   /@angular/platform-browser-dynamic@16.2.8(@angular/common@16.2.8)(@angular/compiler@16.2.8)(@angular/core@16.2.8)(@angular/platform-browser@16.2.8):
     resolution: {integrity: sha512-METr1TuMP2fHOXN0wVlW4CpQEIvy5fLSsPprDPuL+C0KeaCLuTST9Ek+yL7IVGu+VIpFZuqMC376z8n6ENo97g==}
@@ -586,7 +590,7 @@ packages:
     dependencies:
       '@angular/common': 16.2.8(@angular/core@16.2.8)(rxjs@7.5.7)
       '@angular/compiler': 16.2.8(@angular/core@16.2.8)
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       '@angular/platform-browser': 16.2.8(@angular/animations@16.2.8)(@angular/common@16.2.8)(@angular/core@16.2.8)
       tslib: 2.6.2
     dev: true
@@ -604,7 +608,7 @@ packages:
     dependencies:
       '@angular/animations': 16.2.8(@angular/core@16.2.8)
       '@angular/common': 16.2.8(@angular/core@16.2.8)(rxjs@7.5.7)
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       tslib: 2.6.2
 
   /@angular/platform-server@16.2.8(@angular/animations@16.2.8)(@angular/common@16.2.8)(@angular/compiler@16.2.8)(@angular/core@16.2.8)(@angular/platform-browser@16.2.8):
@@ -620,7 +624,7 @@ packages:
       '@angular/animations': 16.2.8(@angular/core@16.2.8)
       '@angular/common': 16.2.8(@angular/core@16.2.8)(rxjs@7.5.7)
       '@angular/compiler': 16.2.8(@angular/core@16.2.8)
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       '@angular/platform-browser': 16.2.8(@angular/animations@16.2.8)(@angular/common@16.2.8)(@angular/core@16.2.8)
       tslib: 2.6.2
       xhr2: 0.2.1
@@ -633,7 +637,7 @@ packages:
       '@angular/core': ^17.0.0 || ^17.0.0-next.0
     dependencies:
       '@angular/common': 16.2.8(@angular/core@16.2.8)(rxjs@7.5.7)
-      '@angular/core': 16.2.8(rxjs@7.5.7)(zone.js@0.14.0)
+      '@angular/core': 16.2.8(patch_hash=uqoakp7stgl7bt6i4b2ipltota)(rxjs@7.5.7)(zone.js@0.14.0)
       critters: 0.0.20
       tslib: 2.6.2
     dev: false

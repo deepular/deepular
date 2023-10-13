@@ -1,24 +1,23 @@
 /// <reference types="vite/client" />
 import 'zone.js/node';
-import { startServer } from '@ngkit/server';
 import { join } from 'node:path';
+import { startServer } from '@ngkit/server';
 
 import { AppController } from './app.controller';
 import { AppComponent } from './app.component';
+import { appConfig } from './app.config';
 
-const publicDir = join(
-  // @ts-ignore
-  import.meta.env.NX_WORKSPACE_ROOT,
-  'dist',
-  // @ts-ignore
-  import.meta.env.NX_PROJECT_ROOT,
-  'public',
+const publicDir = join(__dirname, 'public');
+const documentPath = join(__dirname, '..', 'index.html');
+
+import.meta.hot?.accept();
+
+await startServer(
+  AppComponent,
+  {
+    controllers: [AppController],
+    documentPath,
+    publicDir,
+  },
+  appConfig,
 );
-
-const documentPath = join(publicDir, 'index.html');
-
-void startServer(AppComponent, {
-  controllers: [AppController],
-  documentPath,
-  publicDir,
-});

@@ -1,6 +1,19 @@
-import { InjectorModule, ProviderProvide, TagProvider, Token } from '@deepkit/injector';
+import {
+  InjectorModule,
+  ProviderProvide,
+  TagProvider,
+  provide,
+  Token,
+} from '@deepkit/injector';
 import { EventListener, EventToken } from '@deepkit/event';
-import { AbstractClassType, ClassType, CustomError, ExtractClassType, isClass } from '@deepkit/core';
+import {
+  AbstractClassType,
+  ClassType,
+  CustomError,
+  ExtractClassType,
+  isClass,
+  isFunction,
+} from '@deepkit/core';
 import { WorkflowDefinition } from '@deepkit/workflow';
 import { PartialDeep } from 'type-fest';
 import {
@@ -10,18 +23,35 @@ import {
   ɵNG_MOD_DEF,
   ɵNG_PROV_DEF,
   ɵNgModuleType,
-  ɵɵregisterNgModuleType, ɵɵInjectableDeclaration,
+  ɵɵregisterNgModuleType,
+  Provider as NgProvider,
+  ɵɵInjectableDeclaration,
+  InjectionToken,
+  assertInInjectionContext,
+  ModuleWithProviders,
+  ɵɵdefineNgModule,
+  ɵɵdefineInjector,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
+  isType,
   reflect,
   ReflectionFunction,
-  ReflectionMethod, serializer,
+  ReflectionMethod,
+  serializer,
+  stringifyResolvedType,
+  stringifyType,
   Type,
   TypeClass,
+  uuid,
 } from '@deepkit/type';
 
-export type ExportType = AbstractClassType | string | AppModule<any> | Type | ProviderProvide<any>;
+export type ExportType =
+  | AbstractClassType
+  | string
+  | AppModule<any>
+  | Type
+  | ProviderProvide<any>;
 
 /** @reflection never */
 export interface ProviderScope {
@@ -29,8 +59,10 @@ export interface ProviderScope {
 }
 
 /** @reflection never */
-export type ProviderWithScope<T = any> = ClassType | (ProviderProvide<T> & ProviderScope)  | TagProvider<any>;
-
+export type ProviderWithScope<T = any> =
+  | ClassType
+  | (ProviderProvide<T> & ProviderScope)
+  | TagProvider<any>;
 
 /**
  * @reflection any
@@ -59,12 +91,6 @@ export interface ModuleDefinition {
    * Export providers (its token `provide` value) or modules you imported first.
    */
   exports?: ExportType[];
-
-  /**
-   * Module bootstrap class|function.
-   * This class is instantiated or function executed on bootstrap and can set up various injected services.
-   */
-  bootstrap?: ClassType | Function;
 
   /**
    * Configuration definition.
@@ -125,7 +151,12 @@ export interface RootModuleDefinition extends ModuleDefinition {
   /**
    * Import another module.
    */
-  imports?: (AppModule<any> | FunctionalModule)[];
+  imports?: (
+    | AppModule<any>
+    | FunctionalModule
+    | ClassType<any>
+    | ModuleWithProviders<any>
+  )[];
 }
 
 export interface CreateModuleDefinition extends ModuleDefinition {
@@ -167,32 +198,47 @@ export interface CreateModuleDefinition extends ModuleDefinition {
 
 export type ListenerType = EventListener<any> | ClassType;
 
+/** @reflection never */
 export type FunctionalModule = (module: AppModule<any>) => void;
 
-export class ConfigurationInvalidError extends CustomError {
-}
+export class ConfigurationInvalidError extends CustomError {}
 
 let moduleId = 0;
 
-export type FunctionalModuleFactory = (...args: any[]) => (module: AppModule<any>) => void;
+/** @reflection never */
+export type FunctionalModuleFactory = (
+  ...args: any[]
+) => (module: AppModule<any>) => void;
 
-export function getProviderToken(provider: ProviderWithScope): unknown {
+export function getNgProviderToken(
+  provider: ProviderWithScope,
+): ClassType | string {
   if (isClass(provider)) {
     return provider;
   }
   if (provider instanceof TagProvider) {
-    return getProviderToken(provider.provider);
+    return getNgProviderToken(provider.provider);
+  }
+  if (isType(provider.provide)) {
+    return stringifyType(provider.provide);
   }
   return provider.provide;
 }
 
+export const appModules = new Set<AppModule>();
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractClassType<T['config']> = any> extends InjectorModule<C, AppModule<any>> {
+export class AppModule<
+  T extends RootModuleDefinition = {},
+  C extends ExtractClassType<T['config']> = any,
+> extends InjectorModule<C, AppModule<any>> {
   public setupConfigs: ((module: AppModule<any>, config: any) => void)[] = [];
   // readonly [NG_FAC_DEF]: ɵɵFactoryDeclaration<this, never>;
 
-  public override imports: AppModule<any>[] = [];
-  public override providers: ProviderWithScope[] = [];
+  readonly ngImports: (ClassType | ModuleWithProviders<any>)[] = [];
+  // @ts-ignore
+  override readonly imports: AppModule<any>[] = [];
+  override providers: ProviderWithScope[] = [];
   public declarations: ClassType[] = [];
   public workflows: WorkflowDefinition<any>[] = [];
   public listeners: ListenerType[] = [];
@@ -200,14 +246,22 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
   constructor(
     public options: T,
     public name: string = '',
-    public setups: ((module: AppModule<any>, config: any) => void)[] = [],
-    public override id: number = moduleId++,
+    public setups: (() => void)[] = [],
+    public override id: string = uuid(),
   ) {
     super();
-    if (this.options.imports) for (const m of this.options.imports) this.addModuleImport(m);
+    if (this.options.imports)
+      for (const m of this.options.imports) {
+        if (isClass(m) || 'ngModule' in m) {
+          this.addNgModuleImport(m);
+        } else {
+          this.addModuleImport(m);
+        }
+      }
     if (this.options.providers) this.providers.push(...this.options.providers);
     if (this.options.exports) this.exports.push(...this.options.exports);
-    if (this.options.declarations) this.declarations.push(...this.options.declarations);
+    if (this.options.declarations)
+      this.declarations.push(...this.options.declarations);
     if (this.options.workflows) this.workflows.push(...this.options.workflows);
     if (this.options.listeners) this.listeners.push(...this.options.listeners);
 
@@ -224,17 +278,23 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
       // }
     }
 
-
     this.setup(() => this.registerNgModule());
-    this.setup(() => this.defineNgProviderDefs())
+
+    appModules.add(this);
+  }
+
+  protected addNgModuleImport(m: ClassType | ModuleWithProviders<any>) {
+    this.ngImports.push(m);
   }
 
   protected addModuleImport(m: AppModule<any> | FunctionalModule) {
     if (m instanceof AppModule) {
+      // @ts-ignore
       this.addImport(m);
     } else {
       const module = new AppModule({});
       m(module);
+      // @ts-ignore
       this.addImport(module);
     }
   }
@@ -243,33 +303,29 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
    * When all configuration loaders have been loaded, this method is called.
    * It allows to further manipulate the module state depending on the final config.
    */
-  process() {
-
-  }
+  process() {}
 
   /**
    * A hook that allows to react on a registered provider in some module.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  processProvider(module: AppModule<any>, token: Token, provider: ProviderWithScope) {
-
-  }
+  processProvider(
+    module: AppModule<any>,
+    token: Token,
+    provider: ProviderWithScope,
+  ) {}
 
   /**
    * A hook that allows to react on a registered controller in some module.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  processDeclaration(module: AppModule<any>, declaration: ClassType) {
-
-  }
+  processDeclaration(module: AppModule<any>, declaration: ClassType) {}
 
   /**
    * A hook that allows to react on a registered event listeners in some module.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  processListener(module: AppModule<any>, listener: AddedListener) {
-
-  }
+  processListener(module: AppModule<any>, listener: AddedListener) {}
 
   /**
    * After `process` and when all modules have been processed by the service container.
@@ -278,9 +334,7 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
    *
    * Last chance to set up the injector context, via this.setupProvider().
    */
-  postProcess() {
-
-  }
+  postProcess() {}
 
   /**
    * Renames this module instance.
@@ -332,68 +386,84 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
   /**
    * Allows to change the module after the configuration has been loaded, right before the application bootstraps.
    */
-  setup(callback: (module: AppModule<T>, config: C) => void): this {
-    this.setups.push(callback as any);
+  setup(callback: () => void): this {
+    this.setups.push(callback);
     return this;
   }
 
+  // @ts-ignore
   override getImports(): AppModule<any>[] {
-    return super.getImports() as AppModule<any>[];
+    return super.getImports() as unknown as AppModule<any>[];
   }
 
   getName(): string {
     return this.name;
   }
 
-  defineNgProviderDefs() {
+  defineNgInjectableDefs() {
     for (const provider of this.providers) {
-      Object.defineProperty(this, ɵNG_PROV_DEF, {
+      const token = getNgProviderToken(provider);
+
+      const classType = 'useClass' in provider ? provider.useClass : provider;
+      if (!isClass(classType)) continue;
+
+      const factory = () => {
+        if (!this.injector) {
+          throw new Error('Injector not built yet');
+        }
+        return this.injector.get(token);
+      };
+
+      Object.defineProperty(classType, 'ɵfac', {
+        configurable: true,
+        get: () => factory,
+      });
+
+      Object.defineProperty(classType, ɵNG_PROV_DEF, {
         configurable: true,
         get: (): ɵɵInjectableDeclaration<any> => {
-          const token = getProviderToken(provider)
-
           return {
             token,
-            providedIn: this.root ? 'root' : 'environment',
-            factory: () => {
-              if (!this.injector) {
-                throw new Error('Injector not built yet');
-              }
-              return this.injector.get(token);
-            },
+            providedIn: 'root',
+            /*providedIn: <any>(
+              (this.root ? 'root' : 'scope' in provider ? provider.scope || 'module' : this)
+            ),*/
+            // @ts-ignore
+            factory: classType['ɵfac'],
             value: 'useValue' in provider ? provider.useValue : undefined,
-          }
+          };
         },
       });
     }
   }
 
   registerNgModule(): void {
-    this.compileNgModuleDefs();
-    ɵɵregisterNgModuleType(this as unknown as ɵNgModuleType, String(this.id));
+    console.log('registerNgModule');
+    this.defineNgModuleDefs();
+    this.defineNgInjectableDefs();
+    ɵɵregisterNgModuleType(this as unknown as ɵNgModuleType, this.id);
   }
 
-  compileNgModuleDefs(): void {
-    Object.defineProperty(this, ɵNG_MOD_DEF, {
-      configurable: true,
-      get: (): ɵNgModuleDef<any> => {
-        return {
-          declarations: this.declarations,
-          imports: this.imports,
-          exports: this.exports,
-          id: this.id,
-        }
-      },
+  defineNgModuleDefs(): void {
+    // @ts-ignore
+    this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
+      type: this,
+      // id: this.id,
+      declarations: this.declarations,
+      // @ts-ignore
+      imports: [...this.imports, ...this.ngImports],
+      exports: this.exports,
     });
 
-    Object.defineProperty(this, ɵNG_INJ_DEF, {
+    // @ts-ignore
+    this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
+      providers: this.providers, // FIXME
+      imports: [...this.imports, ...this.ngImports],
+    });
+
+    Object.defineProperty(this, 'ɵfac', {
       configurable: true,
-      get: (): ɵɵInjectorDef<any> => {
-        return {
-          providers: this.providers, // FIXME
-          imports: this.imports, // FIXME
-        }
-      },
+      get: () => () => this,
     });
   }
 
@@ -409,7 +479,10 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
     }
 
     if (this.options.config) {
-      const configNormalized = getPartialSerializeFunction(reflect(this.options.config) as TypeClass, serializer.deserializeRegistry)(config);
+      const configNormalized = getPartialSerializeFunction(
+        reflect(this.options.config) as TypeClass,
+        serializer.deserializeRegistry,
+      )(config);
       Object.assign(this.config, configNormalized);
     }
 
@@ -418,7 +491,7 @@ export class AppModule<T extends RootModuleDefinition = {}, C extends ExtractCla
 }
 
 export interface AppModuleClass<C> {
-  new(config?: PartialDeep<C>): AppModule<any, C>;
+  new (config?: PartialDeep<C>): AppModule<any, C>;
 }
 
 /**
@@ -437,7 +510,10 @@ export interface AppModuleClass<C> {
  * });
  * ```
  */
-export function createModule<T extends CreateModuleDefinition>(options: T, name: string = ''): AppModuleClass<ExtractClassType<T['config']>> {
+export function createModule<T extends CreateModuleDefinition>(
+  options: T,
+  name: string = '',
+): AppModuleClass<ExtractClassType<T['config']>> {
   return class AnonAppModule extends AppModule<T> {
     constructor(config?: PartialDeep<ExtractClassType<T['config']>>) {
       super(options, name);
@@ -447,4 +523,3 @@ export function createModule<T extends CreateModuleDefinition>(options: T, name:
     }
   } as any;
 }
-

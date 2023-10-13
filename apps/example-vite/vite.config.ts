@@ -4,7 +4,6 @@ import { defineConfig, splitVendorChunkPlugin } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import angular from '@analogjs/vite-plugin-angular';
 import { deepkitType } from '@deepkit/vite';
-import liveReload from 'rollup-plugin-livereload';
 import { join } from 'node:path';
 
 export default defineConfig(({ mode, ssrBuild }) => {
@@ -40,7 +39,6 @@ export default defineConfig(({ mode, ssrBuild }) => {
       nxViteTsPaths(),
       visualizer() as Plugin,
       !ssrBuild && splitVendorChunkPlugin(),
-      !ssrBuild && liveReload({ delay: 500 }),
     ],
     test: {
       globals: true,

@@ -2,9 +2,7 @@ import { ɵisNgModule, Injectable } from '@angular/core';
 import { createModule, NG_INJ_DEF, NG_MOD_DEF } from './module';
 import { Injector } from '@deepkit/injector';
 
-test('instantiated ngkit module used in standalone component', () => {
-
-});
+test('instantiated ngkit module used in standalone component', () => {});
 
 test('ng module def', async () => {
   @Injectable({
@@ -36,4 +34,4 @@ test('ng module def', async () => {
   });
 
   console.log(ɵisNgModule(TestModule), { ngModuleDef });*/
-})
+});

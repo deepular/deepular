@@ -42,6 +42,7 @@ import {
   APP_INITIALIZER,
   Signal,
 } from '@angular/core';
+import { ngRegisterAppModules } from '@ngkit/injector';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
@@ -231,13 +232,18 @@ export async function startServer(
   const ngAppInit: Provider = {
     provide: APP_INITIALIZER,
     deps: [TransferState],
+    multi: true,
     useFactory(transferState: TransferState) {
-      rpcControllerSerializedClassTypes.forEach((serializedClassType, name) => {
-        transferState.set(
-          makeSerializedClassTypeStateKey(name),
-          serializedClassType,
+      return () => {
+        rpcControllerSerializedClassTypes.forEach(
+          (serializedClassType, name) => {
+            transferState.set(
+              makeSerializedClassTypeStateKey(name),
+              serializedClassType,
+            );
+          },
         );
-      });
+      };
     },
   };
 
@@ -247,6 +253,7 @@ export async function startServer(
       providers: [
         provideServerRendering(),
         ngAppInit,
+        ngRegisterAppModules,
         ...ngControllerProviders,
       ],
     },

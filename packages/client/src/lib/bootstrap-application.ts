@@ -25,6 +25,7 @@ import {
 
 import { ClientController } from './client-controller';
 import { TransferStateMissingForClientControllerMethodError } from './errors';
+import { ngRegisterAppModules } from '@ngkit/injector';
 
 export async function bootstrapApplication<T>(
   rootComponent: ClassType<T>,
@@ -181,7 +182,7 @@ export async function bootstrapApplication<T>(
   const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
     CORE_CONFIG,
     {
-      providers: [...controllerProviders],
+      providers: [...controllerProviders, ngRegisterAppModules],
     },
     appConfig,
   );

@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SignalController } from '@ngkit/core';
 
 import type { AppController } from './app.controller';
+import { FlowerModule } from './flower.module';
 
 @Component({
   selector: 'ngkit-app-root',
   standalone: true,
-  template: `<div>Count: {{ count.value() }}</div>
-    - <button (click)="count.refetch()">Update</button>`,
+  // FIXME: add type to declaration
+  // @ts-ignore
+  imports: [new FlowerModule()],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<div>Value: {{ count.value() }}</div>
+    <div>Loading: {{ count.loading() }}</div>
+    <button (click)="count.refetch()">Refetch</button>`,
 })
 export class AppComponent {
   readonly count = this.app.count();

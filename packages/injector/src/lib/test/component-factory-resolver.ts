@@ -7,7 +7,9 @@ export class NgKitComponentFactoryResolver extends ComponentFactoryResolver {
     super();
   }
 
-  override resolveComponentFactory<T>(component: Type<T>): NgKitComponentFactory<T> {
+  override resolveComponentFactory<T>(
+    component: Type<T>,
+  ): NgKitComponentFactory<T> {
     return undefined;
   }
 }
