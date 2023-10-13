@@ -27,7 +27,7 @@ export class ServeController implements Command {
 
     await server.listen();
 
-    server.printUrls()
+    server.printUrls();
 
     server.emitter?.on('message', payload => {
       console.log(payload);
@@ -116,9 +116,6 @@ export class ServeController implements Command {
   }
 
   async execute(@flag c?: string): Promise<void> {
-    await Promise.all([
-      this.startServer(),
-      this.startClient(),
-    ]);
+    await Promise.all([this.startServer(), this.startClient()]);
   }
 }

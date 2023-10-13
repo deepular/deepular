@@ -71,20 +71,6 @@ export class NgKitViteConfig {
     };
   }
 
-  createForServerSideRendering(): ViteConfig {
-    const viteConfig = this.createBase();
-
-    return mergeConfig(viteConfig, {
-      build: {
-        outDir: join(this.config.server.outDir, 'ssr'),
-        ssr: this.config.server.entry,
-        rollupOptions: {
-          input: this.config.server.entry,
-        },
-      },
-    } as ViteConfig);
-  }
-
   createForServer(): ViteConfig {
     const viteConfig = this.createBase();
 
@@ -143,7 +129,11 @@ export class NgKitViteConfig {
         },
       },
       plugins: [
-        this.config.watch && !this.config.client.hmr && fullReload(join(this.config.root, '**/*'), { delay: this.config.client.fullReloadDelay }),
+        this.config.watch &&
+          !this.config.client.hmr &&
+          fullReload(join(this.config.root, '**/*'), {
+            delay: this.config.client.fullReloadDelay,
+          }),
         chunkSplitPlugin({ strategy: 'unbundle' }),
       ],
     } as ViteConfig);

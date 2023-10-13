@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { readFile } from 'node:fs/promises';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { from, tap, Observable, firstValueFrom, catchError, of, BehaviorSubject } from 'rxjs';
+import { from, tap, Observable, firstValueFrom, catchError, of } from 'rxjs';
 import { HttpRouterRegistry, HttpRequest, HtmlResponse } from '@deepkit/http';
 import { ApplicationServer, FrameworkModule } from '@deepkit/framework';
 import { rpcClass, RpcKernel } from '@deepkit/rpc';
@@ -61,6 +61,7 @@ export async function startServer(
     documentPath,
     ...frameworkOptions
   }: NgKitServerOptions,
+  appConfig: ApplicationConfig = { providers: [] },
 ): Promise<App<any>> {
   const app = new App({
     imports: [
@@ -199,10 +200,13 @@ export async function startServer(
               }
 
               if (!value) {
-                result = result.pipe(tap(transferResult), catchError(err => {
-                  error.set(err);
-                  return of(err); // throw error ?
-                }));
+                result = result.pipe(
+                  tap(transferResult),
+                  catchError(err => {
+                    error.set(err);
+                    return of(null); // throw error ?
+                  }),
+                );
                 value = toSignal(result, { requireSync: true });
               }
 
@@ -237,11 +241,19 @@ export async function startServer(
     },
   };
 
-  const config: ApplicationConfig = mergeApplicationConfig(CORE_CONFIG, {
-    providers: [provideServerRendering(), ngAppInit, ...ngControllerProviders],
-  });
+  const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
+    CORE_CONFIG,
+    {
+      providers: [
+        provideServerRendering(),
+        ngAppInit,
+        ...ngControllerProviders,
+      ],
+    },
+    appConfig,
+  );
 
-  const bootstrap = () => bootstrapApplication(rootComponent, config);
+  const bootstrap = () => bootstrapApplication(rootComponent, finalAppConfig);
 
   let document: string | undefined;
 

@@ -5,14 +5,19 @@ import { startServer } from '@ngkit/server';
 
 import { AppController } from './app.controller';
 import { AppComponent } from './app.component';
+import { appConfig } from './app.config';
 
 const publicDir = join(__dirname, 'public');
 const documentPath = join(__dirname, '..', 'index.html');
 
 import.meta.hot?.accept();
 
-await startServer(AppComponent, {
-  controllers: [AppController],
-  documentPath,
-  publicDir,
-});
+await startServer(
+  AppComponent,
+  {
+    controllers: [AppController],
+    documentPath,
+    publicDir,
+  },
+  appConfig,
+);

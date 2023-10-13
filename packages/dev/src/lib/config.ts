@@ -20,7 +20,7 @@ export class NgKitConfigServer {
 export class NgKitConfigClient {
   readonly outDir: string = join(this.root, 'dist/public');
   readonly entry: string = join(this.root, 'index.html');
-  readonly hmr: boolean = false;
+  readonly hmr: boolean = true;
   /**
    * @description full reload delay in milliseconds
    * @default 2500
