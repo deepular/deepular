@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 import { App } from '@deepkit/app';
 
-import { ServeController } from './lib/cli';
+import { BuildController, ServeController } from './lib/cli';
 import { NgKitConfig } from './lib/config';
+import { NgKitViteConfig } from './lib/vite.config';
 import { readConfigFile } from './lib/read-config-file';
 import {
   FeaturesModule,
   PostCSSFeature,
   TailwindFeature,
 } from './lib/features';
-import { NgKitViteConfig } from './lib/vite.config';
 
 // TODO: merge cli flags
 const config = await readConfigFile();
@@ -22,5 +22,5 @@ await new App({
     PostCSSFeature,
     TailwindFeature,
   ],
-  controllers: [ServeController],
+  controllers: [ServeController, BuildController],
 }).run();

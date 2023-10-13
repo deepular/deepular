@@ -12,7 +12,7 @@ const documentPath = join(__dirname, '..', 'index.html');
 
 import.meta.hot?.accept();
 
-await startServer(
+void startServer(
   AppComponent,
   {
     controllers: [AppController],

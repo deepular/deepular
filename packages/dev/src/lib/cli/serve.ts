@@ -25,8 +25,6 @@ export class ServeController implements Command {
       ...this.viteConfig.client,
     });
 
-    server.printUrls();
-
     server.emitter?.on('error', payload => {
       console.error(payload);
     });

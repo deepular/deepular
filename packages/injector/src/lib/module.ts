@@ -153,7 +153,6 @@ export interface RootModuleDefinition extends ModuleDefinition {
    */
   imports?: (
     | AppModule<any>
-    | FunctionalModule
     | ClassType<any>
     | ModuleWithProviders<any>
   )[];
@@ -198,17 +197,7 @@ export interface CreateModuleDefinition extends ModuleDefinition {
 
 export type ListenerType = EventListener<any> | ClassType;
 
-/** @reflection never */
-export type FunctionalModule = (module: AppModule<any>) => void;
-
 export class ConfigurationInvalidError extends CustomError {}
-
-let moduleId = 0;
-
-/** @reflection never */
-export type FunctionalModuleFactory = (
-  ...args: any[]
-) => (module: AppModule<any>) => void;
 
 export function getNgProviderToken(
   provider: ProviderWithScope,
@@ -287,7 +276,7 @@ export class AppModule<
     this.ngImports.push(m);
   }
 
-  protected addModuleImport(m: AppModule<any> | FunctionalModule) {
+  protected addModuleImport(m: AppModule<any>) {
     if (m instanceof AppModule) {
       // @ts-ignore
       this.addImport(m);

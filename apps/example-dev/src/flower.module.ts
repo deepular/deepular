@@ -1,4 +1,5 @@
 import { createModule } from '@ngkit/injector';
+import { NgModule } from '@angular/core';
 
 import { FlowerComponent } from './flower.component';
 import { FlowerService } from './flower.service';

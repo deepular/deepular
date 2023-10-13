@@ -29,7 +29,9 @@ export class NgKitViteConfig {
       mode: this.config.mode,
       build: {
         modulePreload: false,
+        emptyOutDir: false,
         minify: false,
+        target: 'esnext',
         rollupOptions: {
           preserveEntrySignatures: 'strict',
           output: {
@@ -92,13 +94,14 @@ export class NgKitViteConfig {
       },
       build: {
         outDir: this.config.server.outDir,
-        // ssr: this.config.server.entry,
-        // rollupOptions: {
-        //   input: this.config.server.entry,
-        // },
-        // watch: {
-        //   exclude: [this.config.client.entry],
-        // },
+        target: 'esnext',
+        ssr: this.config.server.entry,
+        rollupOptions: {
+          input: this.config.server.entry,
+        },
+        watch: {
+          include: [join(this.config.root, '**/*')],
+        },
       },
       plugins: [this.config.watch && viteNodeHmrPlugin()],
     } as ViteConfig);
