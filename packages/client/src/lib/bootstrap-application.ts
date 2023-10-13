@@ -91,7 +91,8 @@ export async function bootstrapApplication<T>(
               ): SignalControllerMethod<unknown, unknown[]> => {
                 const loading$ = new BehaviorSubject(false);
                 const error$ = new BehaviorSubject<Error | null>(null);
-                let value$: BehaviorSubject<unknown> | Subject<unknown>;
+                let value$: Subject<unknown> | BehaviorSubject<unknown> = new Subject<unknown>();
+                let transferStateUsed: boolean = false;
 
                 const load = async (
                   ...newArgs: readonly unknown[]
@@ -117,25 +118,25 @@ export async function bootstrapApplication<T>(
                   }
                 };
 
-                if (!import.meta.hot?.data.refetch) {
+                if (!transferStateUsed) {
                   try {
                     const result = clientController.getTransferState(
                       methodName,
                       args,
                     );
+                    transferStateUsed = true;
                     value$ = new BehaviorSubject(result);
                   } catch (err) {
                     if (
                       err instanceof
                       TransferStateMissingForClientControllerMethodError
                     ) {
-                      value$ = new Subject();
                       void load(...args);
+                    } else {
+                      throw err;
                     }
-                    throw err;
                   }
                 } else {
-                  value$ = new Subject();
                   void load(...args);
                 }
 
