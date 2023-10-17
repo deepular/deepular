@@ -182,7 +182,7 @@ export async function bootstrapApplication<T>(
   const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
     CORE_CONFIG,
     {
-      providers: [...controllerProviders, ngRegisterAppModules],
+      providers: [...controllerProviders, ngRegisterAppModules(rootComponent)],
     },
     appConfig,
   );

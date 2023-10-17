@@ -151,11 +151,7 @@ export interface RootModuleDefinition extends ModuleDefinition {
   /**
    * Import another module.
    */
-  imports?: (
-    | AppModule<any>
-    | ClassType<any>
-    | ModuleWithProviders<any>
-  )[];
+  imports?: (AppModule<any> | ClassType<any> | ModuleWithProviders<any>)[];
 }
 
 export interface CreateModuleDefinition extends ModuleDefinition {
@@ -214,8 +210,6 @@ export function getNgProviderToken(
   return provider.provide;
 }
 
-export const appModules = new Set<AppModule>();
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class AppModule<
   T extends RootModuleDefinition = {},
@@ -268,8 +262,6 @@ export class AppModule<
     }
 
     this.setup(() => this.registerNgModule());
-
-    appModules.add(this);
   }
 
   protected addNgModuleImport(m: ClassType | ModuleWithProviders<any>) {
@@ -282,6 +274,7 @@ export class AppModule<
       this.addImport(m);
     } else {
       const module = new AppModule({});
+      // @ts-ignore
       m(module);
       // @ts-ignore
       this.addImport(module);

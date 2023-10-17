@@ -253,7 +253,7 @@ export async function startServer(
       providers: [
         provideServerRendering(),
         ngAppInit,
-        ngRegisterAppModules,
+        ngRegisterAppModules(rootComponent),
         ...ngControllerProviders,
       ],
     },

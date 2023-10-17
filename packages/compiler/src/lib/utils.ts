@@ -74,3 +74,81 @@ export function addImportIfMissing(
     return sourceFile;
   };
 }
+
+export function getDecorator<
+  N extends ts.Node & { readonly modifiers?: ts.NodeArray<ts.ModifierLike> },
+>(node: N, name: string): ts.Decorator | undefined {
+  return node.modifiers
+    ?.filter((modifier): modifier is ts.Decorator => ts.isDecorator(modifier))
+    .find(decorator => getDecoratorName(decorator) === name);
+}
+
+export function getDecoratorName(node: ts.Decorator): string | null {
+  return ts.isCallExpression(node.expression) &&
+    ts.isIdentifier(node.expression.expression)
+    ? node.expression.expression.text
+    : null;
+}
+
+export function getPropertyName(property: ts.ObjectLiteralElementLike): string {
+  if (!property.name || !ts.isIdentifier(property.name)) {
+    throw new Error('Missing property name');
+  }
+  return property.name.text;
+}
+
+export function getProperty<E extends ts.ObjectLiteralExpression>(
+  expression: E,
+  name: string,
+): ts.ObjectLiteralElementLike | undefined {
+  return expression.properties.find(
+    property => getPropertyName(property) === name,
+  );
+}
+
+export function resolveVariableReference(
+  typeChecker: ts.TypeChecker,
+  node: ts.Identifier,
+): ts.Type | null {
+  const symbol = typeChecker.getSymbolAtLocation(node);
+  if (symbol) {
+    const valueDeclaration = symbol.valueDeclaration;
+    if (valueDeclaration && ts.isVariableDeclaration(valueDeclaration)) {
+      if (valueDeclaration.initializer) {
+        return typeChecker.getTypeAtLocation(valueDeclaration.initializer);
+      }
+    }
+  }
+  return null;
+}
+
+export function getCurrentExportStatement(
+  sourceFile: ts.SourceFile,
+  className: string,
+): ts.ExportDeclaration | undefined {
+  let exportStatement: ts.ExportDeclaration | undefined;
+
+  ts.forEachChild(sourceFile, (node: ts.Node) => {
+    if (
+      ts.isExportDeclaration(node) &&
+      node.exportClause &&
+      ts.isNamedExports(node.exportClause)
+    ) {
+      // Check if the export statement exports the specific class.
+      const exportSymbol = node.exportClause.elements.find(
+        element => element.name.getText() === className,
+      );
+
+      if (exportSymbol) {
+        exportStatement = node;
+      }
+    }
+  });
+
+  return exportStatement;
+}
+
+export function nodeToSource(node: ts.Node, sourceFile: ts.SourceFile): string {
+  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
+}

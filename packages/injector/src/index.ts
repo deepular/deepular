@@ -1,2 +1,2 @@
 export * from './lib/module';
-export * from './lib/setup';
+export * from './lib/ng-register-app-modules';
