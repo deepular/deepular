@@ -43,7 +43,7 @@ export default defineConfig(({ mode, ssrBuild }) => {
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: ['src/test-ng-register-app-modules.ts'],
+      setupFiles: ['src/test-setup.ts'],
       include: ['**/*.spec.ts'],
       cache: {
         dir: `../../node_modules/.cache/vitest`,

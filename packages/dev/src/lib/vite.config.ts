@@ -52,15 +52,7 @@ export class NgKitViteConfig {
       },
       plugins: [
         nxViteTsPaths(),
-        angular({
-          tsconfig: this.config.tsconfig,
-          advanced: {
-            // runs AFTER angular compiler transformers
-            tsTransformers: {
-              before: [],
-            },
-          },
-        }),
+        angular({ tsconfig: this.config.tsconfig }),
         deepkitType({ tsConfig: this.config.tsconfig }),
       ],
       // test: {

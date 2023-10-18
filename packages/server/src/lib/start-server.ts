@@ -42,7 +42,8 @@ import {
   APP_INITIALIZER,
   Signal,
 } from '@angular/core';
-import { ngRegisterAppModules } from '@ngkit/injector';
+import { getImportedAppModulesInComponent } from '@ngkit/injector';
+import { InjectorModule } from '@deepkit/injector';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
@@ -78,6 +79,9 @@ export async function startServer(
     workflows,
     middlewares,
   });
+
+  app.appModule.addImport(...getImportedAppModulesInComponent(rootComponent) as unknown as InjectorModule<never, never>[])
+
   const router = app.get(HttpRouterRegistry);
   const { controllers: rpcControllers } = app.get(RpcKernel);
 
@@ -253,7 +257,6 @@ export async function startServer(
       providers: [
         provideServerRendering(),
         ngAppInit,
-        ngRegisterAppModules(rootComponent),
         ...ngControllerProviders,
       ],
     },

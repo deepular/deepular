@@ -210,6 +210,8 @@ export function getNgProviderToken(
   return provider.provide;
 }
 
+export const appModules = new Set<AppModule>();
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class AppModule<
   T extends RootModuleDefinition = {},
@@ -382,6 +384,26 @@ export class AppModule<
     return this.name;
   }
 
+  private getModules() {
+    return [];
+  }
+
+  private getCommands() {
+    return [];
+  }
+
+  private getMiddlewares() {
+    return [];
+  }
+
+  private getControllers() {
+    return [];
+  }
+
+  private processController() {
+    return [];
+  }
+
   defineNgInjectableDefs() {
     for (const provider of this.providers) {
       const token = getNgProviderToken(provider);
@@ -420,7 +442,6 @@ export class AppModule<
   }
 
   registerNgModule(): void {
-    console.log('registerNgModule');
     this.defineNgModuleDefs();
     this.defineNgInjectableDefs();
     ɵɵregisterNgModuleType(this as unknown as ɵNgModuleType, this.id);

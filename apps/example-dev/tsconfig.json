@@ -3,6 +3,5 @@
   "compilerOptions": {
     "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*.ts"],
-  "reflection": false
+  "include": ["src/**/*.ts"]
 }

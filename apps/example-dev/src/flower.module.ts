@@ -1,10 +1,19 @@
 import { createModule } from '@ngkit/injector';
 
-// import { FlowerComponent } from './flower.component';
+import { FlowerComponent } from './flower.component';
 import { FlowerService } from './flower.service';
 
+export class FlowerConfig {
+  readonly version: string;
+}
+
 export class FlowerModule extends createModule({
-  // declarations: [FlowerComponent],
+  config: FlowerConfig,
+  declarations: [FlowerComponent],
   providers: [FlowerService],
-  // exports: [FlowerComponent],
-}) {}
+  exports: [FlowerComponent],
+}) {
+  override process() {
+    console.log(this);
+  }
+}

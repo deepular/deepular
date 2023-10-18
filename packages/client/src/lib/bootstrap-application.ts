@@ -1,4 +1,3 @@
-import { ClassType } from '@deepkit/core';
 import { bootstrapApplication as _bootstrapApplication } from '@angular/platform-browser';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { RpcWebSocketClient } from '@deepkit/rpc';
@@ -13,8 +12,10 @@ import {
   ChangeDetectorRef,
   inject,
   signal,
+  Type,
 } from '@angular/core';
 
+import { setupRootInjector } from '@ngkit/injector';
 import {
   CORE_CONFIG,
   getProviderNameForType,
@@ -25,13 +26,14 @@ import {
 
 import { ClientController } from './client-controller';
 import { TransferStateMissingForClientControllerMethodError } from './errors';
-import { ngRegisterAppModules } from '@ngkit/injector';
 
 export async function bootstrapApplication<T>(
-  rootComponent: ClassType<T>,
+  rootComponent: Type<T>,
   controllers: readonly string[] = [],
   appConfig: ApplicationConfig = { providers: [] },
 ): Promise<void> {
+  setupRootInjector(rootComponent);
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
 
@@ -182,7 +184,7 @@ export async function bootstrapApplication<T>(
   const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
     CORE_CONFIG,
     {
-      providers: [...controllerProviders, ngRegisterAppModules(rootComponent)],
+      providers: [...controllerProviders],
     },
     appConfig,
   );
