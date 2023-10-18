@@ -11,7 +11,6 @@ import {
   TailwindFeature,
 } from './lib/features';
 
-
 // TODO: merge cli flags
 const config = await readConfigFile();
 
@@ -24,4 +23,6 @@ await new App({
     TailwindFeature,
   ],
   controllers: [ServeController, BuildController],
-}).loadConfigFromEnv().run();
+})
+  .loadConfigFromEnv()
+  .run();

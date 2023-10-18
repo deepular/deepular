@@ -9,6 +9,7 @@ import { viteNodeHmrPlugin } from 'vite-node/hmr';
 import type { Writable } from 'type-fest';
 
 import { NgKitConfig, ViteConfig } from './config';
+import { InjectControllerTransformer } from '@ngkit/compiler';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -52,7 +53,24 @@ export class NgKitViteConfig {
       },
       plugins: [
         nxViteTsPaths(),
-        angular({ tsconfig: this.config.tsconfig }),
+        angular({
+          jit: this.config.jit,
+          tsconfig: this.config.tsconfig,
+          advanced: {
+            tsTransformers: {
+              before: this.config.jit
+                ? [
+                    context => {
+                      const transformer = new InjectControllerTransformer(
+                        context,
+                      );
+                      return sf => transformer.transformSourceFile(sf);
+                    },
+                  ]
+                : [],
+            },
+          },
+        }),
         deepkitType({ tsConfig: this.config.tsconfig }),
       ],
       // test: {

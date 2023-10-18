@@ -1,29 +1,25 @@
 import { InjectorContext, InjectorModule } from '@deepkit/injector';
-import {
-  Type,
-  ɵComponentDef,
-  ɵNG_COMP_DEF,
-} from '@angular/core';
+import { Type, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
 
 import { AppModule, createModule } from './module';
 
-export function getComponentDependencies<T>(cmp: Type<T>): (Type<any> | AppModule)[] {
-  const cmpDef = cmp[
-    ɵNG_COMP_DEF as keyof typeof cmp
-  ] as ɵComponentDef<T>;
+export function getComponentDependencies<T>(
+  cmp: Type<T>,
+): (Type<any> | AppModule)[] {
+  const cmpDef = cmp[ɵNG_COMP_DEF as keyof typeof cmp] as ɵComponentDef<T>;
 
   return (
-    typeof cmpDef.dependencies === 'function'
+    ((typeof cmpDef.dependencies === 'function'
       ? cmpDef.dependencies()
-      : cmpDef.dependencies
-  ) as (Type<any> | AppModule)[] || [];
+      : cmpDef.dependencies) as (Type<any> | AppModule)[]) || []
+  );
 }
 
-export function getImportedAppModulesInComponent<T>(cmp: Type<T>): AppModule<any>[] {
+export function getImportedAppModulesInComponent<T>(
+  cmp: Type<T>,
+): AppModule<any>[] {
   const deps = getComponentDependencies(cmp);
-  return deps.filter(
-    (dep): dep is AppModule => dep instanceof AppModule,
-  );
+  return deps.filter((dep): dep is AppModule => dep instanceof AppModule);
 }
 
 export function setupRootInjector<T>(rootCmp: Type<T>) {
@@ -52,7 +48,5 @@ export function setupRootInjector<T>(rootCmp: Type<T>) {
 
   findModules(rootModule);
 
-  modules.forEach(appModule =>
-    appModule.setups.forEach(setup => setup()),
-  );
+  modules.forEach(appModule => appModule.setups.forEach(setup => setup()));
 }

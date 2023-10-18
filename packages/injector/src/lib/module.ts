@@ -31,6 +31,7 @@ import {
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
+  ɵɵsetNgModuleScope,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -451,7 +452,7 @@ export class AppModule<
     // @ts-ignore
     this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
       type: this,
-      // id: this.id,
+      id: this.id,
       declarations: this.declarations,
       // @ts-ignore
       imports: [...this.imports, ...this.ngImports],
@@ -462,6 +463,13 @@ export class AppModule<
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
       providers: this.providers, // FIXME
       imports: [...this.imports, ...this.ngImports],
+    });
+
+    ɵɵsetNgModuleScope(this, {
+      // @ts-ignore
+      imports: this.imports,
+      declarations: this.declarations,
+      exports: this.exports,
     });
 
     Object.defineProperty(this, 'ɵfac', {

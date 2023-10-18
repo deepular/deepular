@@ -80,7 +80,11 @@ export async function startServer(
     middlewares,
   });
 
-  app.appModule.addImport(...getImportedAppModulesInComponent(rootComponent) as unknown as InjectorModule<never, never>[])
+  app.appModule.addImport(
+    ...(getImportedAppModulesInComponent(
+      rootComponent,
+    ) as unknown as InjectorModule<never, never>[]),
+  );
 
   const router = app.get(HttpRouterRegistry);
   const { controllers: rpcControllers } = app.get(RpcKernel);
