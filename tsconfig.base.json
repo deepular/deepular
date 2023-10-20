@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "strict": true,
     "noImplicitOverride": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,

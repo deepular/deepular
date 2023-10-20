@@ -1,0 +1,21 @@
+diff --git a/node_modules/@angular/core/index.d.ts b/node_modules/@angular/core/index.d.ts
+index 721e9e1b3452b552111fada061e11b59ac369785..4aacab2ca5ca4606fe70ba2d27949c65f8743f5a 100755
+--- a/node_modules/@angular/core/index.d.ts
++++ b/node_modules/@angular/core/index.d.ts
+@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
+ import { Subject } from 'rxjs';
+ import { Subscribable } from 'rxjs';
+ import { Subscription } from 'rxjs';
++import { AppModule } from '@ngkit/injector';
+
+ /**
+  * @description
+@@ -1176,7 +1177,7 @@ export declare interface Component extends Directive {
+      * More information about standalone components, directives, and pipes can be found in [this
+      * guide](guide/standalone-components).
+      */
+-    imports?: (Type<any> | ReadonlyArray<any>)[];
++    imports?: (Type<any> | ReadonlyArray<any> | AppModule)[];
+     /**
+      * The set of schemas that declare elements to be allowed in a standalone component. Elements and
+      * properties that are neither Angular components nor directives must be declared in a schema.

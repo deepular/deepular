@@ -7,13 +7,12 @@ import { FlowerModule } from './flower.module';
 @Component({
   selector: 'ngkit-app-root',
   standalone: true,
-  // FIXME: AOT compilation doesn't work when using instantiated classes as imports
-  // imports: [new FlowerModule()],
+  imports: [new FlowerModule({ version: '0.0.0' })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<div>Value: {{ count.value() }}</div>
     <div>Loading: {{ count.loading() }}</div>
     <button (click)="count.refetch()">Refetch</button>
-<!--    <ngkit-flower></ngkit-flower>-->
+    <ngkit-flower></ngkit-flower>
   `,
 })
 export class AppComponent {

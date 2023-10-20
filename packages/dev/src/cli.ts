@@ -23,4 +23,6 @@ await new App({
     TailwindFeature,
   ],
   controllers: [ServeController, BuildController],
-}).run();
+})
+  .loadConfigFromEnv()
+  .run();

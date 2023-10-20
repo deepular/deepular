@@ -74,3 +74,34 @@ export function addImportIfMissing(
     return sourceFile;
   };
 }
+
+export function getDecorator<
+  N extends ts.Node & { readonly modifiers?: ts.NodeArray<ts.ModifierLike> },
+>(node: N, name: string): ts.Decorator | undefined {
+  return node.modifiers
+    ?.filter((modifier): modifier is ts.Decorator => ts.isDecorator(modifier))
+    .find(decorator => getDecoratorName(decorator) === name);
+}
+
+export function getDecoratorName(node: ts.Decorator): string | null {
+  return ts.isCallExpression(node.expression) &&
+    ts.isIdentifier(node.expression.expression)
+    ? node.expression.expression.text
+    : null;
+}
+
+export function getPropertyName(property: ts.ObjectLiteralElementLike): string {
+  if (!property.name || !ts.isIdentifier(property.name)) {
+    throw new Error('Missing property name');
+  }
+  return property.name.text;
+}
+
+export function getProperty<E extends ts.ObjectLiteralExpression>(
+  expression: E,
+  name: string,
+): ts.ObjectLiteralElementLike | undefined {
+  return expression.properties.find(
+    property => getPropertyName(property) === name,
+  );
+}

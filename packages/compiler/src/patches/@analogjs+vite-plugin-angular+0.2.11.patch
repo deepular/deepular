@@ -1,0 +1,121 @@
+diff --git a/node_modules/@analogjs/vite-plugin-angular/src/lib/angular-vite-plugin.js b/node_modules/@analogjs/vite-plugin-angular/src/lib/angular-vite-plugin.js
+index 7df0395..c3e6122 100644
+--- a/node_modules/@analogjs/vite-plugin-angular/src/lib/angular-vite-plugin.js
++++ b/node_modules/@analogjs/vite-plugin-angular/src/lib/angular-vite-plugin.js
+@@ -11,6 +11,8 @@ const host_1 = require("./host");
+ const angular_jit_plugin_1 = require("./angular-jit-plugin");
+ const angular_build_optimizer_plugin_1 = require("./angular-build-optimizer-plugin");
+ const devkit_1 = require("./utils/devkit");
++const { augmentProgramWithVersioning } = require('@ngtools/webpack/src/ivy/host');
++const { mergeTransformers, replaceBootstrap } = require('@ngtools/webpack/src/ivy/transformation');
+ /**
+  * TypeScript file extension regex
+  * Match .(c or m)ts, .ts extensions with an optional ? for query params
+@@ -71,7 +73,7 @@ function angular(options) {
+                         (_a = options === null || options === void 0 ? void 0 : options.tsconfig) !== null && _a !== void 0 ? _a : path.resolve(config.root || '.', process.env['NODE_ENV'] === 'test'
+                             ? './tsconfig.spec.json'
+                             : './tsconfig.app.json');
+-                    compilerCli = yield (0, devkit_1.loadEsmModule)('@angular/compiler-cli');
++                    compilerCli = yield (0, devkit_1.loadEsmModule)(process.env.NGKIT_COMPILER_PATH || '@ngkit/compiler');
+                     return {
+                         optimizeDeps: {
+                             include: ['rxjs/operators', 'rxjs'],
+@@ -311,49 +313,55 @@ function angular(options) {
+      * the source files and create a file emitter.
+      * This is shared between an initial build and a hot update.
+      */
+-    function buildAndAnalyze() {
+-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+-            let builder;
+-            let typeScriptProgram;
+-            let angularCompiler;
+-            if (!jit) {
+-                // Create the Angular specific program that contains the Angular compiler
+-                const angularProgram = new compilerCli.NgtscProgram(rootNames, compilerOptions, host, nextProgram);
+-                angularCompiler = angularProgram.compiler;
+-                typeScriptProgram = angularProgram.getTsProgram();
+-                augmentProgramWithVersioning(typeScriptProgram);
+-                builder = builderProgram =
+-                    ts.createEmitAndSemanticDiagnosticsBuilderProgram(typeScriptProgram, host, builderProgram);
+-                yield angularCompiler.analyzeAsync();
+-                nextProgram = angularProgram;
+-            }
+-            else {
+-                builder = builderProgram =
+-                    ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, compilerOptions, host, nextProgram);
+-                typeScriptProgram = builder.getProgram();
+-                nextProgram = builderProgram;
+-            }
+-            if (!watchMode) {
+-                // When not in watch mode, the startup cost of the incremental analysis can be avoided by
+-                // using an abstract builder that only wraps a TypeScript program.
+-                builder = ts.createAbstractBuilder(typeScriptProgram, host);
+-            }
+-            const getTypeChecker = () => builder.getProgram().getTypeChecker();
+-            fileEmitter = createFileEmitter(builder, mergeTransformers({
+-                before: [
+-                    replaceBootstrap(getTypeChecker),
+-                    ...(jit
+-                        ? [
+-                            compilerCli.constructorParametersDownlevelTransform(builder.getProgram()),
+-                            (0, devkit_1.createJitResourceTransformer)(getTypeChecker),
+-                        ]
+-                        : []),
+-                    ...pluginOptions.advanced.tsTransformers.before,
+-                ],
+-                after: pluginOptions.advanced.tsTransformers.after,
+-                afterDeclarations: pluginOptions.advanced.tsTransformers.afterDeclarations,
+-            }, jit ? {} : angularCompiler.prepareEmit().transformers), () => []);
+-        });
++    async function buildAndAnalyze() {
++        try {
++            return await tslib_1.__awaiter(this, void 0, void 0, function* () {
++                let builder;
++                let typeScriptProgram;
++                let angularCompiler;
++                if (!jit) {
++                    // Create the Angular specific program that contains the Angular compiler
++                    const angularProgram = new compilerCli.NgtscProgram(rootNames, compilerOptions, host, nextProgram);
++                    angularCompiler = angularProgram.compiler;
++                    typeScriptProgram = angularProgram.getTsProgram();
++                    augmentProgramWithVersioning(typeScriptProgram);
++                    builder = builderProgram =
++                      ts.createEmitAndSemanticDiagnosticsBuilderProgram(typeScriptProgram, host, builderProgram);
++                    yield angularCompiler.analyzeAsync();
++
++                    nextProgram = angularProgram;
++                }
++                else {
++                    builder = builderProgram =
++                      ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, compilerOptions, host, nextProgram);
++                    typeScriptProgram = builder.getProgram();
++                    nextProgram = builderProgram;
++                }
++                if (!watchMode) {
++                    // When not in watch mode, the startup cost of the incremental analysis can be avoided by
++                    // using an abstract builder that only wraps a TypeScript program.
++                    builder = ts.createAbstractBuilder(typeScriptProgram, host);
++                }
++                const getTypeChecker = () => builder.getProgram().getTypeChecker();
++                fileEmitter = createFileEmitter(builder, mergeTransformers({
++                    before: [
++                        replaceBootstrap(getTypeChecker),
++                        ...(jit
++                          ? [
++                              compilerCli.constructorParametersDownlevelTransform(builder.getProgram()),
++                              (0, devkit_1.createJitResourceTransformer)(getTypeChecker),
++                          ]
++                          : []),
++                        ...pluginOptions.advanced.tsTransformers.before,
++                    ],
++                    after: pluginOptions.advanced.tsTransformers.after,
++                    afterDeclarations: pluginOptions.advanced.tsTransformers.afterDeclarations,
++                }, jit ? {} : angularCompiler.prepareEmit().transformers), () => []);
++            });
++        } catch (e) {
++            console.log(e);
++            throw e;
++        }
+     }
+ }
+ exports.angular = angular;

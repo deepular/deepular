@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 import { getProviderNameForType, isControllerTypeName } from '@ngkit/core';
 
-import { addImportIfMissing } from '../utils';
+import { addImportIfMissing, getDecorator } from '../utils';
 
 export const DECORATOR_IDENTIFIER_NAME = 'Inject';
 
@@ -43,18 +43,11 @@ export class InjectControllerTransformer implements ts.CustomTransformer {
             const controllerName = controllerType.typeName
               .escapedText as string;
 
-            const hasExistingInjectControllerDecorator = parameter.modifiers
-              ?.filter((modifier): modifier is ts.Decorator =>
-                ts.isDecorator(modifier),
-              )
-              .find(
-                decorator =>
-                  (
-                    (decorator.expression as ts.CallExpression)
-                      .expression as ts.Identifier
-                  ).text === DECORATOR_IDENTIFIER_NAME,
-              );
-            if (hasExistingInjectControllerDecorator) {
+            const existingInjectControllerDecorator = getDecorator(
+              parameter,
+              DECORATOR_IDENTIFIER_NAME,
+            );
+            if (existingInjectControllerDecorator) {
               return parameter;
             }
 
@@ -67,21 +60,22 @@ export class InjectControllerTransformer implements ts.CustomTransformer {
               injectControllerProviderName,
             );
 
-            const injectDecorator = this.context.factory.createDecorator(
-              this.context.factory.createCallExpression(
-                this.context.factory.createIdentifier(
-                  DECORATOR_IDENTIFIER_NAME,
+            const injectControllerDecorator =
+              this.context.factory.createDecorator(
+                this.context.factory.createCallExpression(
+                  this.context.factory.createIdentifier(
+                    DECORATOR_IDENTIFIER_NAME,
+                  ),
+                  [],
+                  [controllerNameNode],
                 ),
-                [],
-                [controllerNameNode],
-              ),
-            );
+              );
 
             const modifiers = parameter.modifiers || [];
 
             return this.context.factory.updateParameterDeclaration(
               parameter,
-              [injectDecorator, ...modifiers],
+              [injectControllerDecorator, ...modifiers],
               parameter.dotDotDotToken,
               parameter.name,
               parameter.questionToken,

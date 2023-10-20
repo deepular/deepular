@@ -31,6 +31,7 @@ import {
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
+  ɵɵsetNgModuleScope,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -151,11 +152,7 @@ export interface RootModuleDefinition extends ModuleDefinition {
   /**
    * Import another module.
    */
-  imports?: (
-    | AppModule<any>
-    | ClassType<any>
-    | ModuleWithProviders<any>
-  )[];
+  imports?: (AppModule<any> | ClassType<any> | ModuleWithProviders<any>)[];
 }
 
 export interface CreateModuleDefinition extends ModuleDefinition {
@@ -268,8 +265,6 @@ export class AppModule<
     }
 
     this.setup(() => this.registerNgModule());
-
-    appModules.add(this);
   }
 
   protected addNgModuleImport(m: ClassType | ModuleWithProviders<any>) {
@@ -282,6 +277,7 @@ export class AppModule<
       this.addImport(m);
     } else {
       const module = new AppModule({});
+      // @ts-ignore
       m(module);
       // @ts-ignore
       this.addImport(module);
@@ -389,6 +385,26 @@ export class AppModule<
     return this.name;
   }
 
+  private getModules() {
+    return [];
+  }
+
+  private getCommands() {
+    return [];
+  }
+
+  private getMiddlewares() {
+    return [];
+  }
+
+  private getControllers() {
+    return [];
+  }
+
+  private processController() {
+    return [];
+  }
+
   defineNgInjectableDefs() {
     for (const provider of this.providers) {
       const token = getNgProviderToken(provider);
@@ -427,7 +443,6 @@ export class AppModule<
   }
 
   registerNgModule(): void {
-    console.log('registerNgModule');
     this.defineNgModuleDefs();
     this.defineNgInjectableDefs();
     ɵɵregisterNgModuleType(this as unknown as ɵNgModuleType, this.id);
@@ -437,7 +452,7 @@ export class AppModule<
     // @ts-ignore
     this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
       type: this,
-      // id: this.id,
+      id: this.id,
       declarations: this.declarations,
       // @ts-ignore
       imports: [...this.imports, ...this.ngImports],
@@ -448,6 +463,13 @@ export class AppModule<
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
       providers: this.providers, // FIXME
       imports: [...this.imports, ...this.ngImports],
+    });
+
+    ɵɵsetNgModuleScope(this, {
+      // @ts-ignore
+      imports: this.imports,
+      declarations: this.declarations,
+      exports: this.exports,
     });
 
     Object.defineProperty(this, 'ɵfac', {

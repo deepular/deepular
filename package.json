@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "install-compiler": "sh scripts/install-compiler.sh",
-    "postinstall": "deepkit-type-install && pnpm install-compiler && lefthook install"
+    "patch-compiler": "sh scripts/patch-compiler.sh",
+    "postinstall": "deepkit-type-install && pnpm run patch-compiler && lefthook install",
+    "patch-compiler-package": "patch-package --patch-dir packages/compiler/src/patches"
   },
   "private": true,
   "devDependencies": {
@@ -83,6 +84,7 @@
     "@ngtools/webpack": "^16.2.5",
     "@nx/vite": "^16.10.0",
     "deepmerge": "^4.3.1",
+    "patch-package": "^8.0.0",
     "postcss": "^8.4.31",
     "rollup-plugin-preserve-shebang": "^1.0.1",
     "tailwindcss": "^3.3.3",
@@ -106,8 +108,7 @@
   "pnpm": {
     "patchedDependencies": {
       "@deepkit/framework@1.0.1-alpha.103": "patches/@deepkit__framework@1.0.1-alpha.103.patch",
-      "@deepkit/type-compiler@1.0.1-alpha.102": "patches/@deepkit__type-compiler@1.0.1-alpha.102.patch",
-      "@angular/core@16.2.8": "patches/@angular__core@16.2.8.patch"
+      "@deepkit/type-compiler@1.0.1-alpha.102": "patches/@deepkit__type-compiler@1.0.1-alpha.102.patch"
     }
   },
   "resolutions": {

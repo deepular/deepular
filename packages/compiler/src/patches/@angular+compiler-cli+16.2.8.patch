@@ -1,0 +1,131 @@
+diff --git a/node_modules/@angular/compiler-cli/bundles/chunk-CWD5WGIF.js b/node_modules/@angular/compiler-cli/bundles/chunk-CWD5WGIF.js
+index 91a9edd..38f8710 100755
+--- a/node_modules/@angular/compiler-cli/bundles/chunk-CWD5WGIF.js
++++ b/node_modules/@angular/compiler-cli/bundles/chunk-CWD5WGIF.js
+@@ -1,3 +1,10 @@
++// Patched by NgKit
++
++      let NgKitProgram;
++      let NgKitCompilerHost;
++      void new Promise(async () => {
++        ({ NgKitProgram, NgKitCompilerHost } = await import(process.env.NGKIT_COMPILER_PATH || '@ngkit/compiler'));
++      });
+
+       import {createRequire as __cjsCompatRequire} from 'module';
+       const require = __cjsCompatRequire(import.meta.url);
+@@ -1792,6 +1799,22 @@ var StandaloneComponentScopeReader = class {
+             continue;
+           }
+           seen.add(ref.node);
++          if (ts.isNewExpression(ref.node)) {
++            dependencies.add({
++              kind: 2,
++              declarations: [],
++              imports: [],
++              exports: [],
++              schemas: [],
++              rawDeclarations: null,
++              rawImports: null,
++              rawExports: null,
++              decorator: null,
++              mayDeclareProviders: true,
++              ref,
++            });
++            continue;
++          }
+           const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+           if (dirMeta !== null) {
+             dependencies.add({ ...dirMeta, ref });
+@@ -7355,7 +7378,7 @@ var NgCompilerHost = class extends DelegatingCompilerHost2 {
+     }
+     const shimAdapter = new ShimAdapter(delegate, normalizedTsInputFiles, topLevelShimGenerators, perFileShimGenerators, oldProgram);
+     const shimTagger = new ShimReferenceTagger(perFileShimGenerators.map((gen) => gen.extensionPrefix));
+-    return new NgCompilerHost(delegate, inputFiles, rootDirs, shimAdapter, shimTagger, entryPoint, diagnostics);
++    return new NgKitCompilerHost(delegate, inputFiles, rootDirs, shimAdapter, shimTagger, entryPoint, diagnostics);
+   }
+   isShim(sf) {
+     return isShim(sf);
+@@ -7402,7 +7425,7 @@ var NgtscProgram = class {
+       verifySupportedTypeScriptVersion();
+     }
+     const reuseProgram = oldProgram == null ? void 0 : oldProgram.compiler.getCurrentProgram();
+-    this.host = NgCompilerHost.wrap(delegateHost, rootNames, options, reuseProgram != null ? reuseProgram : null);
++    this.host = NgKitCompilerHost.wrap(delegateHost, rootNames, options, reuseProgram != null ? reuseProgram : null);
+     if (reuseProgram !== void 0) {
+       retagAllTsFiles(reuseProgram);
+     }
+@@ -7612,7 +7635,7 @@ function mergeEmitResults(emitResults) {
+
+ // bazel-out/darwin_arm64-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
+ function createProgram({ rootNames, options, host, oldProgram }) {
+-  return new NgtscProgram(rootNames, options, host, oldProgram);
++  return new NgKitProgram(rootNames, options, host, oldProgram);
+ }
+
+ // bazel-out/darwin_arm64-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
+diff --git a/node_modules/@angular/compiler-cli/bundles/chunk-WJOCH3Z7.js b/node_modules/@angular/compiler-cli/bundles/chunk-WJOCH3Z7.js
+index a3560aa..1829fe6 100755
+--- a/node_modules/@angular/compiler-cli/bundles/chunk-WJOCH3Z7.js
++++ b/node_modules/@angular/compiler-cli/bundles/chunk-WJOCH3Z7.js
+@@ -513,7 +513,9 @@ var StaticInterpreter = class {
+   }
+   visitExpression(node, context) {
+     let result;
+-    if (node.kind === ts2.SyntaxKind.TrueKeyword) {
++    if (ts2.isNewExpression(node)) {
++      result = this.getReference(node, context);
++    } else if (node.kind === ts2.SyntaxKind.TrueKeyword) {
+       return true;
+     } else if (node.kind === ts2.SyntaxKind.FalseKeyword) {
+       return false;
+@@ -1022,7 +1024,7 @@ function joinModuleContext(existing, node, decl) {
+   if (decl.viaModule !== null && decl.viaModule !== existing.absoluteModuleName) {
+     return {
+       absoluteModuleName: decl.viaModule,
+-      resolutionContext: node.getSourceFile().fileName
++      resolutionContext: node.getSourceFile?.().fileName,
+     };
+   } else {
+     return EMPTY;
+@@ -3425,6 +3427,7 @@ var TraitCompiler = class {
+     }
+     const visit2 = (node) => {
+       if (this.reflector.isClass(node)) {
++        node = ts.isNewExpression(node) ? this.reflector.getDeclarationOfIdentifier(node.expression).node : node;
+         this.analyzeClass(node, preanalyze ? promises : null);
+       }
+       ts15.forEachChild(node, visit2);
+@@ -6167,7 +6170,7 @@ function validateAndFlattenComponentImports(imports, expr) {
+       flattened.push(...childImports);
+       diagnostics.push(...childDiagnostics);
+     } else if (ref instanceof Reference) {
+-      if (isNamedClassDeclaration(ref.node)) {
++      if (isNamedClassDeclaration(ref.node) || ts3.isNewExpression(ref.node)) {
+         flattened.push(ref);
+       } else {
+         diagnostics.push(createValueHasWrongTypeError(ref.getOriginForDiagnostics(expr), ref, `'imports' must be an array of components, directives, pipes, or NgModules.`).toDiagnostic());
+@@ -6942,6 +6945,9 @@ var ComponentDecoratorHandler = class {
+ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeReader) {
+   const diagnostics = [];
+   for (const ref of importRefs) {
++    if (ts.isNewExpression(ref.node)) {
++      continue;
++    }
+     const dirMeta = metaReader.getDirectiveMetadata(ref);
+     if (dirMeta !== null) {
+       if (!dirMeta.isStandalone) {
+diff --git a/node_modules/@angular/compiler-cli/package.json b/node_modules/@angular/compiler-cli/package.json
+index 1e0b67e..cb81714 100755
+--- a/node_modules/@angular/compiler-cli/package.json
++++ b/node_modules/@angular/compiler-cli/package.json
+@@ -40,6 +40,10 @@
+     "./private/tooling": {
+       "types": "./private/tooling.d.ts",
+       "default": "./bundles/private/tooling.js"
++    },
++    "./src/ngtsc/core": {
++      "types": "./src/ngtsc/core/index.d.ts",
++      "default": "./bundles/chunk-CWD5WGIF.js"
+     }
+   },
+   "dependencies": {

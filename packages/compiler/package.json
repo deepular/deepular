@@ -8,10 +8,12 @@
     "url": "https://github.com/marcus-sa/deepkit-community.git"
   },
   "bin": {
-    "ngkit-compiler-install": "./install.esm.js"
+    "ngkit-compiler-install": "./patch.esm.js",
+    "ngkit-patch": "./patch.esm.js"
   },
   "dependencies": {
-    "tslib": "2.6.2"
+    "tslib": "2.6.2",
+    "patch-package": "8.0.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^16.2.8",
