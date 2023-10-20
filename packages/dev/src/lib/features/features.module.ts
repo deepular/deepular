@@ -26,9 +26,9 @@ export class FeaturesModule extends createModule({ forRoot: true }) {
     }
 
     const featureName = featureMeta.name as keyof NgKitConfigFeatures;
-    let featureConfig = config.features[featureName];
+    let featureConfig: unknown = config.features[featureName];
     if (!featureConfig) return;
-    featureConfig === true ? featureImpl.getConfig?.() : featureConfig;
+    featureConfig = featureConfig === true ? featureImpl.getConfig?.() : featureConfig;
     // if (!featureConfig) {
     //   throw new Error(`Missing configuration for feature ${featureType.name}`);
     // }

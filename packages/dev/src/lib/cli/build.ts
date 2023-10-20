@@ -1,9 +1,5 @@
-import { cli, Command, flag } from '@deepkit/app';
-import { installSourcemapsSupport } from 'vite-node/source-map';
-import { build, createServer } from 'vite';
-import { ViteNodeServer } from 'vite-node/server';
-import { ViteNodeRunner } from 'vite-node/client';
-import { createHotContext, handleMessage } from 'vite-node/hmr';
+import { cli, Command } from '@deepkit/app';
+import { build } from 'vite';
 import { LoggerInterface } from '@deepkit/logger';
 
 import { NgKitConfig } from '../config';
@@ -67,7 +63,7 @@ export class BuildController implements Command {
     }
   }
 
-  async execute(@flag c?: string): Promise<void> {
+  async execute(): Promise<void> {
     await Promise.all([this.buildServer(), this.buildClient()]);
   }
 }

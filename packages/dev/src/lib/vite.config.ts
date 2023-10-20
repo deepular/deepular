@@ -117,9 +117,9 @@ export class NgKitViteConfig {
         rollupOptions: {
           input: this.config.server.entry,
         },
-        watch: {
+        watch: this.config.watch ? {
           include: [join(this.config.root, '**/*')],
-        },
+        } : undefined,
       },
       plugins: [this.config.watch && viteNodeHmrPlugin()],
     } as ViteConfig);
@@ -145,9 +145,9 @@ export class NgKitViteConfig {
         rollupOptions: {
           input: this.config.client.entry,
         },
-        watch: {
+        watch: this.config.watch ? {
           include: [join(this.config.root, '**/*')],
-        },
+        } : undefined,
       },
       plugins: [
         this.config.watch &&

@@ -34,7 +34,7 @@ export async function findDefaultConfigFilePath(
 
 export async function readConfigFile(
   path?: string,
-  override?: Partial<NgKitConfig>,
+  override: Partial<NgKitConfig> = {},
 ): Promise<NgKitConfig> {
   path ||= await findDefaultConfigFilePath();
   if (!path) return new NgKitConfig();
@@ -46,5 +46,5 @@ export async function readConfigFile(
   let config = await import(path);
   config = 'default' in config ? config.default : config;
   const root = dirname(path);
-  return cast<NgKitConfig>(deepmerge(new NgKitConfig(), { ...config, root }));
+  return cast<NgKitConfig>(deepmerge(deepmerge(new NgKitConfig(), { ...config, root }), override));
 }

@@ -12,8 +12,4 @@ export class FlowerModule extends createModule({
   declarations: [FlowerComponent],
   providers: [FlowerService],
   exports: [FlowerComponent],
-}) {
-  override process() {
-    console.log(this);
-  }
-}
+}) {}

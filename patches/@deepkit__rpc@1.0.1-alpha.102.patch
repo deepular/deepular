@@ -1,0 +1,27 @@
+diff --git a/dist/cjs/src/decorators.d.ts b/dist/cjs/src/decorators.d.ts
+index 72bcdb5a50ca51967923494060d90773d96da17e..3f1feb5860e0d5ee3bf9d6a9f7ca2caed6b952a0 100644
+--- a/dist/cjs/src/decorators.d.ts
++++ b/dist/cjs/src/decorators.d.ts
+@@ -19,7 +19,7 @@ export declare class RpcAction {
+ }
+ declare class RpcClass {
+     t: RpcController;
+-    controller(nameOrDefinition: string | ControllerDefinition<any>): void;
++    controller(nameOrDefinition?: string | ControllerDefinition<any>): void;
+     addAction(name: string, action: RpcAction): void;
+ }
+ export declare const rpcClass: ClassDecoratorResult<typeof RpcClass>;
+diff --git a/dist/cjs/src/decorators.js b/dist/cjs/src/decorators.js
+index f8e5b7f545ba41b1124095a1ce76c0c96a119db7..adc9233c734de1e56ee6f1e174a0dd4c5877acc7 100644
+--- a/dist/cjs/src/decorators.js
++++ b/dist/cjs/src/decorators.js
+@@ -39,6 +39,9 @@ class RpcClass {
+     addAction(name, action) {
+         this.t.actions.set(name, action);
+     }
++    onDecorator(classType) {
++        this.t.name ||= classType.name;
++    }
+ }
+ RpcClass.__type = [() => model_js_1.ControllerDefinition, 'nameOrDefinition', 'controller', 'name', () => RpcAction, 'action', 'addAction', 'PP&P"7!J2""0#P&2$P7%2&"0\'5'];
+ exports.rpcClass = (0, type_1.createClassDecoratorContext)(RpcClass);
