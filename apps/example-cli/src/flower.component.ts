@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { inject } from '@ngkit/core';
 
-import { FlowerService } from './flower.service';
+import { Flower } from './flower.service';
 
 @Component({
   selector: 'ngkit-flower',
-  template: '<b>{{ flower.get() }}</b>',
+  template: '<b>{{ flower.name }}</b>',
 })
 export class FlowerComponent {
-  constructor(private readonly flower: FlowerService) {}
+  readonly flower = inject<Flower>();
 }

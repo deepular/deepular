@@ -1,7 +1,8 @@
 import { createModule } from '@ngkit/injector';
+import { provide } from '@deepkit/injector';
 
 import { FlowerComponent } from './flower.component';
-import { FlowerService } from './flower.service';
+import { Flower, FlowerService } from './flower.service';
 
 export class FlowerConfig {
   readonly version: string;
@@ -10,6 +11,9 @@ export class FlowerConfig {
 export class FlowerModule extends createModule({
   config: FlowerConfig,
   declarations: [FlowerComponent],
-  providers: [FlowerService],
+  providers: [
+    FlowerService,
+    provide<Flower>({ useValue: { name: 'lily' } }),
+  ],
   exports: [FlowerComponent],
 }) {}

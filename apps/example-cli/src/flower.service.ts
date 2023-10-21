@@ -1,5 +1,9 @@
 export class FlowerService {
-  get() {
-    return 'tulip';
+  get(): Flower {
+    return { name: 'tulip' };
   }
+}
+
+export interface Flower {
+  readonly name: string;
 }

@@ -2,7 +2,6 @@ import {
   InjectorModule,
   ProviderProvide,
   TagProvider,
-  provide,
   Token,
 } from '@deepkit/injector';
 import { EventListener, EventToken } from '@deepkit/event';
@@ -12,26 +11,20 @@ import {
   CustomError,
   ExtractClassType,
   isClass,
-  isFunction,
 } from '@deepkit/core';
 import { WorkflowDefinition } from '@deepkit/workflow';
 import { PartialDeep } from 'type-fest';
 import {
-  ɵNgModuleDef,
-  ɵɵInjectorDef,
   ɵNG_INJ_DEF,
   ɵNG_MOD_DEF,
   ɵNG_PROV_DEF,
-  ɵNgModuleType,
   ɵɵregisterNgModuleType,
-  Provider as NgProvider,
   ɵɵInjectableDeclaration,
-  InjectionToken,
-  assertInInjectionContext,
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
   ɵɵsetNgModuleScope,
+  Provider,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -40,7 +33,6 @@ import {
   ReflectionFunction,
   ReflectionMethod,
   serializer,
-  stringifyResolvedType,
   stringifyType,
   Type,
   TypeClass,
@@ -196,6 +188,10 @@ export type ListenerType = EventListener<any> | ClassType;
 
 export class ConfigurationInvalidError extends CustomError {}
 
+export type FunctionalModule = (module: AppModule<any>) => void;
+
+export type FunctionalModuleFactory = (...args: any[]) => (module: AppModule<any>) => void;
+
 export function getNgProviderToken(
   provider: ProviderWithScope,
 ): ClassType | string {
@@ -225,6 +221,7 @@ export class AppModule<
   // @ts-ignore
   override readonly imports: AppModule<any>[] = [];
   override providers: ProviderWithScope[] = [];
+  readonly ngProviders: Provider[] = [];
   public declarations: ClassType[] = [];
   public workflows: WorkflowDefinition<any>[] = [];
   public listeners: ListenerType[] = [];
@@ -271,13 +268,12 @@ export class AppModule<
     this.ngImports.push(m);
   }
 
-  protected addModuleImport(m: AppModule<any>) {
+  protected addModuleImport(m: AppModule<any> | FunctionalModule) {
     if (m instanceof AppModule) {
       // @ts-ignore
       this.addImport(m);
     } else {
       const module = new AppModule({});
-      // @ts-ignore
       m(module);
       // @ts-ignore
       this.addImport(module);
@@ -405,51 +401,65 @@ export class AppModule<
     return [];
   }
 
-  defineNgInjectableDefs() {
+  getNgProvider(provider: ProviderWithScope): Provider {
+    if (provider instanceof TagProvider) {
+      return this.getNgProvider(provider.provider);
+    }
+
+    const token = getNgProviderToken(provider);
+
+    const classType = 'useClass' in provider ? provider.useClass : provider;
+    if (!isClass(provider)) {
+      return {
+        ...provider,
+        provide: token,
+      } as Provider;
+    }
+
+    const factory = () => {
+      if (!this.injector) {
+        throw new Error('Injector not built yet');
+      }
+      return this.injector.get(token);
+    };
+
+    Object.defineProperty(classType, 'ɵfac', {
+      configurable: true,
+      get: () => factory,
+    });
+
+    Object.defineProperty(classType, ɵNG_PROV_DEF, {
+      configurable: true,
+      get: (): ɵɵInjectableDeclaration<any> => {
+        const providedIn = <any>(
+          (this.root ? 'root' : 'scope' in provider ? provider.scope || 'module' : this)
+        );
+        return {
+          token,
+          providedIn,
+          factory,
+          value: 'useValue' in provider ? provider.useValue : undefined,
+        };
+      },
+    });
+
+    return classType as ClassType;
+  }
+
+  defineNgProviderDefs() {
     for (const provider of this.providers) {
-      const token = getNgProviderToken(provider);
-
-      const classType = 'useClass' in provider ? provider.useClass : provider;
-      if (!isClass(classType)) continue;
-
-      const factory = () => {
-        if (!this.injector) {
-          throw new Error('Injector not built yet');
-        }
-        return this.injector.get(token);
-      };
-
-      Object.defineProperty(classType, 'ɵfac', {
-        configurable: true,
-        get: () => factory,
-      });
-
-      Object.defineProperty(classType, ɵNG_PROV_DEF, {
-        configurable: true,
-        get: (): ɵɵInjectableDeclaration<any> => {
-          return {
-            token,
-            providedIn: 'root',
-            /*providedIn: <any>(
-              (this.root ? 'root' : 'scope' in provider ? provider.scope || 'module' : this)
-            ),*/
-            // @ts-ignore
-            factory: classType['ɵfac'],
-            value: 'useValue' in provider ? provider.useValue : undefined,
-          };
-        },
-      });
+      const ngProvider = this.getNgProvider(provider);
+      this.ngProviders.push(ngProvider);
     }
   }
 
   registerNgModule(): void {
+    this.defineNgProviderDefs();
     this.defineNgModuleDefs();
-    this.defineNgInjectableDefs();
-    ɵɵregisterNgModuleType(this as unknown as ɵNgModuleType, this.id);
+    ɵɵregisterNgModuleType(this as any, this.id);
   }
 
-  defineNgModuleDefs(): void {
-    // @ts-ignore
+  defineNgModuleDefs(this: this & any): void {
     this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
       type: this,
       id: this.id,
@@ -461,7 +471,7 @@ export class AppModule<
 
     // @ts-ignore
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
-      providers: this.providers, // FIXME
+      providers: this.ngProviders,
       imports: [...this.imports, ...this.ngImports],
     });
 
