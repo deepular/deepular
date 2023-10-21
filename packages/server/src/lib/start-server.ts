@@ -6,7 +6,7 @@ import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
 import { ApplicationConfig } from '@angular/core';
 
-import { SsrModule } from './ssr.module';
+import { ServerModule } from './server.module';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
@@ -24,7 +24,7 @@ export async function startServer(
     providers,
     workflows,
     middlewares,
-    // SsrModule
+    // ServerModule
     publicDir,
     documentPath,
     document,
@@ -39,7 +39,7 @@ export async function startServer(
         publicDir,
         ...frameworkOptions,
       }),
-      new SsrModule({
+      new ServerModule({
         rootComponent,
         app: appConfig,
         documentPath,

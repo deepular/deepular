@@ -1,8 +1,9 @@
 import { AppModule, ControllerConfig, createModule } from '@deepkit/app';
 import { getImportedAppModulesInComponent } from '@ngkit/injector';
-import { InjectorModule, provide } from '@deepkit/injector';
+import { InjectorContext, InjectorModule } from '@deepkit/injector';
 import {
-  APP_INITIALIZER, ApplicationConfig,
+  APP_INITIALIZER,
+  ApplicationConfig,
   mergeApplicationConfig,
   Provider,
   Signal,
@@ -34,45 +35,45 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ClassType } from '@deepkit/core';
 
 import { ServerConfig } from './config';
-import { SsrListener } from './server-listener';
+import { ServerListener } from './server-listener';
 
-type ControllerMetadata = NonNullable<ReturnType<typeof rpcClass['_fetch']>>
+type ControllerMetadata = NonNullable<ReturnType<(typeof rpcClass)['_fetch']>>;
 
-export class SsrModule extends createModule({
+export class ServerModule extends createModule({
   config: ServerConfig,
-  listeners: [SsrListener],
+  listeners: [ServerListener],
   forRoot: true,
 }) {
-  readonly rpcControllers = new Set<{module: AppModule, controller: ClassType, metadata: ControllerMetadata }>();
+  readonly rpcControllers = new Set<{
+    module: AppModule;
+    controller: ClassType;
+    metadata: ControllerMetadata;
+  }>();
   readonly ngControllerProviders = new Set<Provider>();
   readonly rpcControllerSerializedClassTypes = new Map<
     string,
     SerializedTypes
   >();
 
-  override process() {
+  override postProcess() {
     this.addImport(
       ...(getImportedAppModulesInComponent(
         this.config.rootComponent,
       ) as unknown as InjectorModule<never, never>[]),
     );
 
-    console.log(this.rpcControllers);
-
     this.rpcControllers.forEach(({ module, controller, metadata }) => {
       const controllerType = resolveRuntimeType(controller);
       const controllerReflectionClass = ReflectionClass.from(controllerType);
 
-      /*if (!module.injector) {
-        throw new Error(`Missing injector for module ${module.constructor.name}`);
-      }*/
-      const instance = this.injector!.get(controller);
-
       const controllerName = metadata.getPath();
-      const controllerReflectionMethods = controllerReflectionClass.getMethods();
+      const controllerReflectionMethods =
+        controllerReflectionClass.getMethods();
       const controllerMethodNames = controllerReflectionMethods.map(
         method => method.name,
       );
+
+      const injector = new InjectorContext(module).createChildScope('rpc');
 
       this.rpcControllerSerializedClassTypes.set(
         controllerName,
@@ -95,9 +96,13 @@ export class SsrModule extends createModule({
       this.ngControllerProviders.add({
         provide: serverControllerProviderName,
         deps: [TransferState],
-        useFactory(transferState: TransferState) {
+        useFactory: (transferState: TransferState) => {
+          const instance = injector.get(controllerType);
           return new Proxy(instance, {
-            get: (target, propertyName: string) => {
+            get: (
+              target: typeof instance,
+              propertyName: keyof typeof instance,
+            ) => {
               if (!controllerMethodNames.includes(propertyName)) return;
 
               const serialize = serializers.get(propertyName)!;
@@ -116,7 +121,10 @@ export class SsrModule extends createModule({
                   result = await firstValueFrom(result);
                 }
 
-                transferState.set(transferStateKey, serialize({ data: result }));
+                transferState.set(
+                  transferStateKey,
+                  serialize({ data: result }),
+                );
 
                 return result;
               };
@@ -134,8 +142,12 @@ export class SsrModule extends createModule({
         provide: signalControllerProviderName,
         deps: [TransferState],
         useFactory(transferState: TransferState) {
+          const instance = injector.get(controllerType);
           return new Proxy(instance, {
-            get: (target, propertyName: string) => {
+            get: (
+              target: typeof instance,
+              propertyName: keyof typeof instance,
+            ) => {
               if (!controllerMethodNames.includes(propertyName)) return;
 
               const serialize = serializers.get(propertyName)!;
@@ -199,7 +211,7 @@ export class SsrModule extends createModule({
           });
         },
       });
-    })
+    });
 
     const ngAppInit: Provider = {
       provide: APP_INITIALIZER,
@@ -227,11 +239,9 @@ export class SsrModule extends createModule({
       ],
     };
 
-    const finalAppConfig = this.config.app ? mergeApplicationConfig(
-      CORE_CONFIG,
-      serverConfig,
-      this.config.app,
-    ) : mergeApplicationConfig(CORE_CONFIG, serverConfig);
+    const finalAppConfig = this.config.app
+      ? mergeApplicationConfig(CORE_CONFIG, serverConfig, this.config.app)
+      : mergeApplicationConfig(CORE_CONFIG, serverConfig);
 
     this.configure({ app: finalAppConfig });
   }
@@ -243,9 +253,12 @@ export class SsrModule extends createModule({
     if (!controller) return;
 
     const controllerMetadata = rpcClass._fetch(controller);
-    console.log('processController', controller.name, controllerMetadata);
     if (!controllerMetadata) return;
 
-    this.rpcControllers.add({ module, controller, metadata: controllerMetadata });
+    this.rpcControllers.add({
+      module,
+      controller,
+      metadata: controllerMetadata,
+    });
   }
 }

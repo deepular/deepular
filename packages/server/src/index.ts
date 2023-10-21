@@ -1,3 +1,3 @@
 export * from './lib/start-server';
 export * from './lib/config';
-export *from'./lib/ssr.module';
+export * from './lib/server.module';

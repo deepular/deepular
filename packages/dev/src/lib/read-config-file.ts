@@ -46,5 +46,7 @@ export async function readConfigFile(
   let config = await import(path);
   config = 'default' in config ? config.default : config;
   const root = dirname(path);
-  return cast<NgKitConfig>(deepmerge(deepmerge(new NgKitConfig(), { ...config, root }), override));
+  return cast<NgKitConfig>(
+    deepmerge(deepmerge(new NgKitConfig(), { ...config, root }), override),
+  );
 }

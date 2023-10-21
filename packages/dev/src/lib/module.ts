@@ -8,12 +8,8 @@ import { BuildController, ServeController } from './cli';
 export class NgKitModule extends createModule({
   config: NgKitConfig,
   forRoot: true,
-  providers: [
-    NgKitViteConfig,
-    PostCSSFeature,
-    TailwindFeature,
-  ],
+  providers: [NgKitViteConfig, PostCSSFeature, TailwindFeature],
   controllers: [ServeController, BuildController],
 }) {
-  override imports = [new FeaturesModule()]
+  override imports = [new FeaturesModule()];
 }

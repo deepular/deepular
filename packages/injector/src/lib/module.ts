@@ -184,7 +184,7 @@ export interface CreateModuleDefinition extends ModuleDefinition {
    * or switch to functional modules
    *
    * ```typescript
-   * function myModule(module: SsrModule) {
+   * function myModule(module: AppModule) {
    *     module.addModuleImport(new AnotherModule);
    * }
    * ```
