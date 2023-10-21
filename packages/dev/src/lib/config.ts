@@ -43,7 +43,6 @@ export class NgKitConfig {
   readonly watch: boolean = false;
   readonly mode: 'development' | 'production' | string =
     process.env['NODE_ENV'] || 'development';
-  readonly jit: boolean = false;
   readonly server: NgKitConfigServer = new NgKitConfigServer(this.root);
   readonly client: NgKitConfigClient = new NgKitConfigClient(this.root);
   readonly features: NgKitConfigFeatures = new NgKitConfigFeatures();

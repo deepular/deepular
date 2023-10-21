@@ -53,24 +53,7 @@ export class NgKitViteConfig {
       },
       plugins: [
         nxViteTsPaths(),
-        angular({
-          jit: this.config.jit,
-          tsconfig: this.config.tsconfig,
-          advanced: {
-            tsTransformers: {
-              before: this.config.jit
-                ? [
-                    context => {
-                      const transformer = new InjectControllerTransformer(
-                        context,
-                      );
-                      return sf => transformer.transformSourceFile(sf);
-                    },
-                  ]
-                : [],
-            },
-          },
-        }),
+        angular({ tsconfig: this.config.tsconfig }),
         deepkitType({ tsConfig: this.config.tsconfig }),
       ],
       // test: {
