@@ -26,14 +26,6 @@ export class ServeController implements Command {
       ...this.viteConfig.client,
     });
 
-    server.emitter?.on('error', payload => {
-      console.error(payload);
-    });
-
-    server.emitter?.on('message', payload => {
-      console.log(payload);
-    });
-
     await server.listen();
   }
 
