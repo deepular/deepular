@@ -120,7 +120,7 @@ export async function bootstrapApplication<T>(
                     const data = newArgs.length
                       ? await target[methodName](...newArgs)
                       : await target[methodName](...args);
-                    if (!error()) {
+                    if (error()) {
                       error.set(null);
                     }
                     value$.next(data);
