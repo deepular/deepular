@@ -1,0 +1,27 @@
+{
+  "name": "@ngkit/testing",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcus-sa/deepkit-community.git"
+  },
+  "dependencies": {
+    "tslib": "2.6.2"
+  },
+  "peerDependencies": {
+    "@ngkit/core": "workspace:*",
+    "@deepkit/rpc": "^1.0.1-alpha.102",
+    "@deepkit/core": "^1.0.1-alpha.100",
+    "@deepkit/type": "^1.0.1-alpha.102",
+    "@angular/platform-browser": "^16.2.8",
+    "@angular/core": "^16.2.8",
+    "rxjs": "^7.8.1",
+    "zone.js": "^0.14.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

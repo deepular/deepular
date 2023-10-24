@@ -1,7 +1,7 @@
 {
-  "name": "core",
+  "name": "testing",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/core/src",
+  "sourceRoot": "packages/testing/src",
   "projectType": "library",
   "targets": {
     "build": {
@@ -40,11 +40,11 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "packages/core/**/*.ts",
-          "packages/core/package.json"
+          "packages/testing/**/*.ts",
+          "packages/testing/package.json"
         ]
       }
     }
   },
-  "tags": ["core"]
+  "tags": ["testing"]
 }

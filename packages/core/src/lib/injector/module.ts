@@ -412,6 +412,7 @@ export class AppModule<
 
     const classType = 'useClass' in provider ? provider.useClass : provider;
     if (!isClass(provider)) {
+      // TODO: angular doesn't know how to resolve deepkit dependencies
       return {
         ...provider,
         provide: token,

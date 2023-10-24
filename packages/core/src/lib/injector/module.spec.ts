@@ -1,7 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { screen } from '@testing-library/angular';
+import { render } from '@ngkit/testing';
 
-import { render } from '../../testing';
 import { createModule } from './module';
 
 test('exported declarations', async () => {
