@@ -1,4 +1,4 @@
-import { createModule } from '@ngkit/injector';
+import { createModule } from '@ngkit/core';
 import { provide } from '@deepkit/injector';
 
 import { FlowerComponent } from './flower.component';

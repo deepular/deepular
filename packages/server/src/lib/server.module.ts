@@ -1,5 +1,4 @@
 import { AppModule, ControllerConfig, createModule } from '@deepkit/app';
-import { getImportedAppModulesInComponent } from '@ngkit/injector';
 import { InjectorContext, InjectorModule } from '@deepkit/injector';
 import {
   APP_INITIALIZER,
@@ -14,11 +13,12 @@ import {
   CORE_CONFIG,
   getNgKitSerializer,
   getProviderNameForType,
-  makeSerializableStateKey,
+  makeSerializableControllerMethodStateKey,
   makeSerializedClassTypeStateKey,
   ServerControllerTypeName,
   SignalControllerMethod,
   SignalControllerTypeName,
+  getImportedAppModulesInComponent,
   unwrapType,
 } from '@ngkit/core';
 import { provideServerRendering } from '@angular/platform-server';
@@ -111,7 +111,7 @@ export class ServerModule extends createModule({
               return async (...args: []): Promise<unknown> => {
                 let result = await target[propertyName](...args);
 
-                const transferStateKey = makeSerializableStateKey(
+                const transferStateKey = makeSerializableControllerMethodStateKey(
                   controllerName,
                   propertyName,
                   args,
@@ -158,7 +158,7 @@ export class ServerModule extends createModule({
               ): SignalControllerMethod<unknown, unknown[]> => {
                 let result = target[propertyName](...args);
 
-                const transferStateKey = makeSerializableStateKey(
+                const transferStateKey = makeSerializableControllerMethodStateKey(
                   controllerName,
                   propertyName,
                   args,

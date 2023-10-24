@@ -24,10 +24,9 @@
     "baseUrl": ".",
     "paths": {
       "@ngkit/client": ["packages/client/src/index.ts"],
-      "@ngkit/core": ["packages/core/src/index.ts"],
       "@ngkit/compiler": ["packages/compiler/src/index.ts"],
+      "@ngkit/core": ["packages/core/src/index.ts"],
       "@ngkit/dev": ["packages/dev/src/index.ts"],
-      "@ngkit/injector": ["packages/injector/src/index.ts"],
       "@ngkit/server": ["packages/server/src/index.ts"]
     }
   },

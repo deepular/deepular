@@ -2,7 +2,7 @@ import { TransferState } from '@angular/core';
 import { deserializeType, ReflectionClass } from '@deepkit/type';
 import {
   getNgKitDeserializer,
-  makeDeserializableStateKey,
+  makeDeserializableControllerMethodStateKey,
   makeSerializedClassTypeStateKey,
   NgKitDeserializer,
   unwrapType,
@@ -44,7 +44,7 @@ export class ClientController {
   }
 
   getTransferState<T>(methodName: string, args: readonly unknown[]): T | null {
-    const transferStateKey = makeDeserializableStateKey(
+    const transferStateKey = makeDeserializableControllerMethodStateKey(
       this.controllerName,
       methodName,
       args,

@@ -1,6 +1,7 @@
-import { Signal } from '@angular/core';
+import { Signal, StateKey, makeStateKey } from '@angular/core';
 import { Observable } from 'rxjs';
 import { RemoteController } from '@deepkit/rpc';
+import { SerializedTypes } from '@deepkit/type';
 
 type InferObservable<T> = T extends Observable<infer U> ? U : T;
 
@@ -43,3 +44,30 @@ export const CONTROLLER_TYPE_NAMES = [
 export const isControllerTypeName = (
   name: string,
 ): name is ControllerTypeName => CONTROLLER_TYPE_NAMES.includes(name as never);
+
+export const makeControllerStateKey = <T>(
+  controllerName: string,
+  methodName: string,
+  args: readonly unknown[],
+) =>
+  makeStateKey<T>(`${controllerName}#${methodName}(${JSON.stringify(args)})`);
+
+export function makeSerializableControllerMethodStateKey(
+  controllerName: string,
+  methodName: string,
+  args: readonly unknown[],
+): StateKey<Uint8Array> {
+  return makeControllerStateKey(controllerName, methodName, args as unknown[]);
+}
+
+export function makeDeserializableControllerMethodStateKey(
+  controllerName: string,
+  methodName: string,
+  args: readonly unknown[],
+): StateKey<{ readonly type: 'Buffer'; readonly data: readonly number[] }> {
+  return makeControllerStateKey(controllerName, methodName, args as unknown[]);
+}
+
+export const makeSerializedClassTypeStateKey = (name: string) =>
+  makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);
+

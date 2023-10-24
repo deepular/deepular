@@ -15,8 +15,8 @@ import {
   Type,
 } from '@angular/core';
 
-import { setupRootInjector } from '@ngkit/injector';
 import {
+  setupRootInjector,
   CORE_CONFIG,
   getProviderNameForType,
   SignalControllerTypeName,
@@ -62,7 +62,13 @@ export async function bootstrapApplication<T>(
             get(target: any, propertyName: string): any {
               if (!clientController.methodNames.includes(propertyName)) return;
 
+              let transferStateUsed: boolean = false;
+
               return async (...args: readonly unknown[]): Promise<unknown> => {
+                const execute = () => target[propertyName](...args);
+
+                if (transferStateUsed) return await execute();
+
                 try {
                   return clientController.getTransferState(propertyName, args);
                 } catch (err) {
@@ -70,9 +76,13 @@ export async function bootstrapApplication<T>(
                     err instanceof
                     TransferStateMissingForClientControllerMethodError
                   ) {
-                    return await target[propertyName](...args);
+                    return await execute();
                   }
                   throw err;
+                } finally {
+                  if (!transferStateUsed) {
+                    transferStateUsed = true;
+                  }
                 }
               };
             },
