@@ -4,39 +4,31 @@ import { Type, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
 import { AppModule, createModule } from './module';
 
 export function getComponentDependencies<T>(
-  cmp: Type<T>,
-): (Type<any> | AppModule)[] {
-  const cmpDef = cmp[ɵNG_COMP_DEF as keyof typeof cmp] as ɵComponentDef<T>;
-
+  componentDef: ɵComponentDef<T>,
+): (Type<unknown> | AppModule)[] {
   return (
-    ((typeof cmpDef.dependencies === 'function'
-      ? cmpDef.dependencies()
-      : cmpDef.dependencies) as (Type<any> | AppModule)[]) || []
+    ((typeof componentDef.dependencies === 'function'
+      ? componentDef.dependencies()
+      : componentDef.dependencies) as (Type<unknown> | AppModule)[]) || []
   );
 }
 
-export function getImportedAppModulesInComponent<T>(
-  cmp: Type<T>,
-): AppModule<any>[] {
-  const deps = getComponentDependencies(cmp);
+export function getImportedModules<T>(
+  componentDef: ɵComponentDef<T>,
+): AppModule[] {
+  const deps = getComponentDependencies(componentDef);
   return deps.filter((dep): dep is AppModule => dep instanceof AppModule);
 }
 
-export function setupRootInjector<T>(rootCmp: Type<T>) {
-  const rootModules = getImportedAppModulesInComponent(rootCmp);
-
-  const rootModule = new (class RootAppModule extends createModule({}) {
-    override imports = rootModules;
-  })();
-
+export function setupModuleRootInjector(module: AppModule): void {
   const injectorContext = new InjectorContext(
-    rootModule as unknown as InjectorModule,
+    module as unknown as InjectorModule,
   );
   injectorContext.getRootInjector(); //trigger all injector builds
 
   const modules = new Set<AppModule>();
 
-  function findModules(module: AppModule<any>) {
+  function findModules(module: AppModule) {
     if (modules.has(module)) return;
     modules.add(module);
 
@@ -45,7 +37,7 @@ export function setupRootInjector<T>(rootCmp: Type<T>) {
     }
   }
 
-  findModules(rootModule);
+  findModules(module);
 
   for (const module of modules) {
     for (const setup of module.setups) {
@@ -54,4 +46,19 @@ export function setupRootInjector<T>(rootCmp: Type<T>) {
   }
 
   modules.forEach(module => module.setups.forEach(setup => setup()));
+}
+
+export function setupComponentRootInjector<T>(component: Type<T>): void {
+  const componentDef: ɵComponentDef<T> | undefined = component[ɵNG_COMP_DEF as keyof typeof component];
+  if (!componentDef?.standalone) {
+    throw new Error(`${component.name} is not a standalone component`);
+  }
+
+  const rootModules = getImportedModules(componentDef);
+
+  const rootModule = new (class RootModule extends createModule({}) {
+    override imports = rootModules;
+  })();
+
+  setupModuleRootInjector(rootModule);
 }

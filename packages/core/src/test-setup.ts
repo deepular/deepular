@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import '@angular/compiler';
 
 /**
- * Initialize TestBed for all tests inside of content
+ * Initialize TestBed for all tests
  */
 import { TestBed } from '@angular/core/testing';
 import {

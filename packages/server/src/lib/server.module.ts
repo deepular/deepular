@@ -18,7 +18,7 @@ import {
   ServerControllerTypeName,
   SignalControllerMethod,
   SignalControllerTypeName,
-  getImportedAppModulesInComponent,
+  getImportedModules,
   unwrapType,
 } from '@ngkit/core';
 import { provideServerRendering } from '@angular/platform-server';
@@ -57,7 +57,7 @@ export class ServerModule extends createModule({
 
   override postProcess() {
     this.addImport(
-      ...(getImportedAppModulesInComponent(
+      ...(getImportedModules(
         this.config.rootComponent,
       ) as unknown as InjectorModule<never, never>[]),
     );

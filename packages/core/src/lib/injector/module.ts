@@ -23,8 +23,9 @@ import {
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
+  ɵsetCurrentInjector,
   ɵɵsetNgModuleScope,
-  Provider,
+  Provider, inject, Injector, InjectionToken,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -209,19 +210,19 @@ export function getNgProviderToken(
   return provider.provide;
 }
 
-export const appModules = new Set<AppModule>();
+export const ɵNG_FAC_DEF = 'ɵfac' as const;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class AppModule<
   T extends RootModuleDefinition = {},
   C extends ExtractClassType<T['config']> = any,
-> extends InjectorModule<C, AppModule<any>> {
-  public setupConfigs: ((module: AppModule<any>, config: any) => void)[] = [];
+> extends InjectorModule<C, AppModule> {
+  public setupConfigs: ((module: AppModule, config: any) => void)[] = [];
   // readonly [NG_FAC_DEF]: ɵɵFactoryDeclaration<this, never>;
 
   readonly ngImports: (ClassType | ModuleWithProviders<any>)[] = [];
   // @ts-ignore
-  override readonly imports: AppModule<any>[] = [];
+  override readonly imports: AppModule[] = [];
   override providers: ProviderWithScope[] = [];
   readonly ngProviders: Provider[] = [];
   public declarations: ClassType[] = [];
@@ -245,8 +246,12 @@ export class AppModule<
       }
     if (this.options.providers) this.providers.push(...this.options.providers);
     if (this.options.exports) this.exports.push(...this.options.exports);
-    if (this.options.declarations)
-      this.declarations.push(...this.options.declarations);
+    if (this.options.declarations) {
+      for (const declaration of this.options.declarations) {
+        // throw an error if declaration is a standalone component or directive
+        this.declarations.push(declaration);
+      }
+    }
     if (this.options.workflows) this.workflows.push(...this.options.workflows);
     if (this.options.listeners) this.listeners.push(...this.options.listeners);
 
@@ -270,7 +275,7 @@ export class AppModule<
     this.ngImports.push(m);
   }
 
-  protected addModuleImport(m: AppModule<any> | FunctionalModule) {
+  protected addModuleImport(m: AppModule | FunctionalModule) {
     if (m instanceof AppModule) {
       // @ts-ignore
       this.addImport(m);
@@ -293,7 +298,7 @@ export class AppModule<
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   processProvider(
-    module: AppModule<any>,
+    module: AppModule,
     token: Token,
     provider: ProviderWithScope,
   ) {}
@@ -302,13 +307,13 @@ export class AppModule<
    * A hook that allows to react on a registered controller in some module.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  processDeclaration(module: AppModule<any>, declaration: ClassType) {}
+  processDeclaration(module: AppModule, declaration: ClassType) {}
 
   /**
    * A hook that allows to react on a registered event listeners in some module.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  processListener(module: AppModule<any>, listener: AddedListener) {}
+  processListener(module: AppModule, listener: AddedListener) {}
 
   /**
    * After `process` and when all modules have been processed by the service container.
@@ -375,8 +380,8 @@ export class AppModule<
   }
 
   // @ts-ignore
-  override getImports(): AppModule<any>[] {
-    return super.getImports() as unknown as AppModule<any>[];
+  override getImports(): AppModule[] {
+    return super.getImports() as unknown as AppModule[];
   }
 
   getName(): string {
@@ -410,23 +415,29 @@ export class AppModule<
 
     const token = getNgProviderToken(provider);
 
-    const classType = 'useClass' in provider ? provider.useClass : provider;
-    if (!isClass(provider)) {
-      // TODO: angular doesn't know how to resolve deepkit dependencies
-      return {
-        ...provider,
-        provide: token,
-      } as Provider;
-    }
-
     const factory = () => {
       if (!this.injector) {
         throw new Error('Injector not built yet');
       }
-      return this.injector.get(token);
+      return this.injector.get(provider);
     };
 
-    Object.defineProperty(classType, 'ɵfac', {
+    const classType = 'useClass' in provider ? provider.useClass : provider;
+    if (!isClass(provider)) {
+      const isExported = this.exports.some(export_ => export_.provide === token);
+      const providerToken = new InjectionToken(token as string, {
+        // @ts-ignore
+        providedIn: isExported ? this.root ? 'root' : this : null,
+        factory,
+      });
+      // TODO: angular doesn't know how to resolve deepkit dependencies
+      return {
+        ...provider,
+        provide: providerToken, // TODO: fix providedIn for token
+      } as Provider;
+    }
+
+    Object.defineProperty(classType, ɵNG_FAC_DEF, {
       configurable: true,
       get: () => factory,
     });
@@ -434,12 +445,11 @@ export class AppModule<
     Object.defineProperty(classType, ɵNG_PROV_DEF, {
       configurable: true,
       get: (): ɵɵInjectableDeclaration<any> => {
-        const providedIn = <any>(
-          (this.root ? 'root' : 'scope' in provider ? provider.scope || 'module' : this)
-        );
+        const isExported = this.exports.some(export_ => export_ === token);
         return {
           token,
-          providedIn,
+          // @ts-ignore
+          providedIn: isExported ? this.root ? 'root' : this : null,
           factory,
           value: 'useValue' in provider ? provider.useValue : undefined,
         };
@@ -474,7 +484,7 @@ export class AppModule<
 
     // @ts-ignore
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
-      providers: this.ngProviders,
+      // providers: this.ngProviders,
       imports: [...this.imports, ...this.ngImports],
     });
 
@@ -485,7 +495,7 @@ export class AppModule<
       exports: this.exports,
     });
 
-    Object.defineProperty(this, 'ɵfac', {
+    Object.defineProperty(this, ɵNG_FAC_DEF, {
       configurable: true,
       get: () => () => this,
     });

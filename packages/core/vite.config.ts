@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   cacheDir: '../../node_modules/.vite/core',
   plugins: [
     nxViteTsPaths(),
-    // angular(),
+    angular(),
     deepkitType(),
   ],
   test: {

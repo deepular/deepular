@@ -16,12 +16,12 @@ import {
 } from '@angular/core';
 
 import {
-  setupRootInjector,
   CORE_CONFIG,
   getProviderNameForType,
   SignalControllerTypeName,
   ServerControllerTypeName,
   SignalControllerMethod,
+  setupComponentRootInjector,
 } from '@ngkit/core';
 
 import { ClientController } from './client-controller';
@@ -32,7 +32,7 @@ export async function bootstrapApplication<T>(
   controllers: readonly string[] = [],
   appConfig: ApplicationConfig = { providers: [] },
 ): Promise<void> {
-  setupRootInjector(rootComponent);
+  setupComponentRootInjector(rootComponent);
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
