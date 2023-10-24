@@ -188,8 +188,10 @@ export type ListenerType = EventListener<any> | ClassType;
 
 export class ConfigurationInvalidError extends CustomError {}
 
+/** @reflection never */
 export type FunctionalModule = (module: AppModule<any>) => void;
 
+/** @reflection never */
 export type FunctionalModuleFactory = (...args: any[]) => (module: AppModule<any>) => void;
 
 export function getNgProviderToken(

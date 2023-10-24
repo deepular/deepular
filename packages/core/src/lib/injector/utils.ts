@@ -27,7 +27,6 @@ export function setupRootInjector<T>(rootCmp: Type<T>) {
 
   const rootModule = new (class RootAppModule extends createModule({}) {
     override imports = rootModules;
-    override exports = rootModules;
   })();
 
   const injectorContext = new InjectorContext(
@@ -48,5 +47,11 @@ export function setupRootInjector<T>(rootCmp: Type<T>) {
 
   findModules(rootModule);
 
-  modules.forEach(appModule => appModule.setups.forEach(setup => setup()));
+  for (const module of modules) {
+    for (const setup of module.setups) {
+      setup();
+    }
+  }
+
+  modules.forEach(module => module.setups.forEach(setup => setup()));
 }

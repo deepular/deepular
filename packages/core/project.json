@@ -15,6 +15,9 @@
         "rollupConfig": "{workspaceRoot}/packages/rollup.config.cjs",
         "project": "{projectRoot}/package.json",
         "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "additionalEntryPoints": [
+          "{projectRoot}/src/testing.ts"
+        ],
         "sourcemap": true,
         "format": [
           "esm"

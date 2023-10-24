@@ -19,6 +19,4 @@ test('RemoteController', () => {
   }
 
   const test: SignalController<TestController> = new TestController() as unknown as SignalController<TestController>;
-
-  test.
 })

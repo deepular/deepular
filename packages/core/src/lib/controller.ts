@@ -57,7 +57,7 @@ export function makeSerializableControllerMethodStateKey(
   methodName: string,
   args: readonly unknown[],
 ): StateKey<Uint8Array> {
-  return makeControllerStateKey(controllerName, methodName, args as unknown[]);
+  return makeControllerStateKey(controllerName, methodName, args);
 }
 
 export function makeDeserializableControllerMethodStateKey(
@@ -65,7 +65,7 @@ export function makeDeserializableControllerMethodStateKey(
   methodName: string,
   args: readonly unknown[],
 ): StateKey<{ readonly type: 'Buffer'; readonly data: readonly number[] }> {
-  return makeControllerStateKey(controllerName, methodName, args as unknown[]);
+  return makeControllerStateKey(controllerName, methodName, args);
 }
 
 export const makeSerializedClassTypeStateKey = (name: string) =>
