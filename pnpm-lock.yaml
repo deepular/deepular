@@ -5,7 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@angular/compiler-cli': 16.2.8
   typescript: 5.2.2
 
 patchedDependencies:
@@ -269,8 +268,8 @@ devDependencies:
     specifier: 10.9.1
     version: 10.9.1(@types/node@20.8.2)(typescript@5.2.2)
   type-fest:
-    specifier: 4.3.3
-    version: 4.3.3
+    specifier: 4.5.0
+    version: 4.5.0
   typescript:
     specifier: 5.2.2
     version: 5.2.2
@@ -321,7 +320,7 @@ packages:
     resolution: {integrity: sha512-ZHyMhhSZkulJiDyTvONJV2OwbxTdjbrJGfkUhv4k4f4HfV8ADUXlhanGjuqykxWG2CmDIsV09j/5b1lg2fYqww==}
     engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
     peerDependencies:
-      '@angular/compiler-cli': 16.2.8
+      '@angular/compiler-cli': ^16.0.0
       '@angular/localize': ^16.0.0
       '@angular/platform-server': ^16.0.0
       '@angular/service-worker': ^16.0.0
@@ -4610,7 +4609,7 @@ packages:
     resolution: {integrity: sha512-wq1dbbOUwrY/zkpZltcgmyEFANbJon79E5s4ueT3IT4NyiYh1uJeWa2vmB0kof7VP5Xhm/jutkJk336z67oLPg==}
     engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
     peerDependencies:
-      '@angular/compiler-cli': 16.2.8
+      '@angular/compiler-cli': ^16.0.0
       typescript: 5.2.2
       webpack: ^5.54.0
     dependencies:
@@ -15039,7 +15038,7 @@ packages:
     dependencies:
       find-up: 6.3.0
       read-pkg: 8.1.0
-      type-fest: 4.3.3
+      type-fest: 4.5.0
     dev: true
 
   /read-pkg-up@7.0.1:
@@ -15068,7 +15067,7 @@ packages:
       '@types/normalize-package-data': 2.4.1
       normalize-package-data: 6.0.0
       parse-json: 7.1.0
-      type-fest: 4.3.3
+      type-fest: 4.5.0
     dev: true
 
   /readable-stream@2.3.8:
@@ -16879,8 +16878,8 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /type-fest@4.3.3:
-    resolution: {integrity: sha512-bxhiFii6BBv6UiSDq7uKTMyADT9unXEl3ydGefndVLxFeB44LRbT4K7OJGDYSyDrKnklCC1Pre68qT2wbUl2Aw==}
+  /type-fest@4.5.0:
+    resolution: {integrity: sha512-diLQivFzddJl4ylL3jxSkEc39Tpw7o1QeEHIPxVwryDK2lpB7Nqhzhuo6v5/Ls08Z0yPSAhsyAWlv1/H0ciNmw==}
     engines: {node: '>=16'}
     dev: true
 
