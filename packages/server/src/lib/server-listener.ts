@@ -1,8 +1,4 @@
-import {
-  HtmlResponse,
-  RouteConfig,
-  httpWorkflow,
-} from '@deepkit/http';
+import { HtmlResponse, RouteConfig, httpWorkflow } from '@deepkit/http';
 import { readFile } from 'node:fs/promises';
 import {
   renderApplication,

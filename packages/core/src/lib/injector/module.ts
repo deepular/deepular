@@ -25,7 +25,14 @@ import {
   ɵɵdefineInjector,
   ɵsetCurrentInjector,
   ɵɵsetNgModuleScope,
-  Provider, inject, Injector, InjectionToken,
+  Provider,
+  inject,
+  Injector,
+  InjectionToken,
+  isStandalone,
+  ɵNG_COMP_DEF,
+  ɵNG_DIR_DEF,
+  ɵNG_PIPE_DEF,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -33,6 +40,7 @@ import {
   reflect,
   ReflectionFunction,
   ReflectionMethod,
+  resolveRuntimeType,
   serializer,
   stringifyType,
   Type,
@@ -193,7 +201,9 @@ export class ConfigurationInvalidError extends CustomError {}
 export type FunctionalModule = (module: AppModule<any>) => void;
 
 /** @reflection never */
-export type FunctionalModuleFactory = (...args: any[]) => (module: AppModule<any>) => void;
+export type FunctionalModuleFactory = (
+  ...args: any[]
+) => (module: AppModule<any>) => void;
 
 export function getNgProviderToken(
   provider: ProviderWithScope,
@@ -208,6 +218,10 @@ export function getNgProviderToken(
     return stringifyType(provider.provide);
   }
   return provider.provide;
+}
+
+export function isDeclaration(value: ProviderWithScope): boolean {
+  return ɵNG_COMP_DEF in value || ɵNG_DIR_DEF in value || ɵNG_PIPE_DEF in value;
 }
 
 export const ɵNG_FAC_DEF = 'ɵfac' as const;
@@ -247,10 +261,8 @@ export class AppModule<
     if (this.options.providers) this.providers.push(...this.options.providers);
     if (this.options.exports) this.exports.push(...this.options.exports);
     if (this.options.declarations) {
-      for (const declaration of this.options.declarations) {
-        // throw an error if declaration is a standalone component or directive
-        this.declarations.push(declaration);
-      }
+      // throw an error if declaration is a standalone component or directive
+      this.addDeclaration(...this.options.declarations);
     }
     if (this.options.workflows) this.workflows.push(...this.options.workflows);
     if (this.options.listeners) this.listeners.push(...this.options.listeners);
@@ -345,8 +357,14 @@ export class AppModule<
   }
 
   addDeclaration(...declaration: ClassType[]): this {
+    /*for (const decl of declaration) {
+      if (isStandalone(decl)) {
+        throw new Error(`Standalone components, directives and pipes are not supported`);
+      }
+    }*/
     this.assertInjectorNotBuilt();
     this.declarations.push(...declaration);
+    this.providers.push(...declaration);
     return this;
   }
 
@@ -408,68 +426,69 @@ export class AppModule<
     return [];
   }
 
+  getNgFactory<T>(provider: unknown): () => T {
+    return () => {
+      if (!this.injector) {
+        throw new Error('Injector not built yet');
+      }
+      return this.injector.get(provider) as T;
+    };
+  }
+
   getNgProvider(provider: ProviderWithScope): Provider {
     if (provider instanceof TagProvider) {
       return this.getNgProvider(provider.provider);
     }
 
-    const token = getNgProviderToken(provider);
-
-    const factory = () => {
-      if (!this.injector) {
-        throw new Error('Injector not built yet');
-      }
-      return this.injector.get(provider);
-    };
-
-    const classType = 'useClass' in provider ? provider.useClass : provider;
     if (!isClass(provider)) {
-      const isExported = this.exports.some(export_ => export_.provide === token);
-      const providerToken = new InjectionToken(token as string, {
-        // @ts-ignore
-        providedIn: isExported ? this.root ? 'root' : this : null,
-        factory,
-      });
-      // TODO: angular doesn't know how to resolve deepkit dependencies
-      return {
-        ...provider,
-        provide: providerToken, // TODO: fix providedIn for token
-      } as Provider;
+      return provider;
     }
 
-    Object.defineProperty(classType, ɵNG_FAC_DEF, {
-      configurable: true,
-      get: () => factory,
-    });
+    const token = getNgProviderToken(provider);
 
-    Object.defineProperty(classType, ɵNG_PROV_DEF, {
+    const factory = this.getNgFactory(provider);
+
+    this.overrideNgFactoryDef(provider);
+
+    Object.defineProperty(provider, ɵNG_PROV_DEF, {
       configurable: true,
       get: (): ɵɵInjectableDeclaration<any> => {
         const isExported = this.exports.some(export_ => export_ === token);
         return {
           token,
           // @ts-ignore
-          providedIn: isExported ? this.root ? 'root' : this : null,
+          providedIn: isExported ? (this.root ? 'root' : this) : null,
           factory,
           value: 'useValue' in provider ? provider.useValue : undefined,
         };
       },
     });
 
-    return classType as ClassType;
+    return provider;
   }
 
   defineNgProviderDefs() {
-    for (const provider of this.providers) {
-      const ngProvider = this.getNgProvider(provider);
-      this.ngProviders.push(ngProvider);
-    }
+    this.ngProviders.push(
+      ...this.providers
+        .filter(provider => !isDeclaration(provider))
+        .map(provider => this.getNgProvider(provider)),
+    );
   }
 
   registerNgModule(): void {
     this.defineNgProviderDefs();
     this.defineNgModuleDefs();
+    this.declarations.forEach(declaration =>
+      this.overrideNgFactoryDef(declaration),
+    );
     ɵɵregisterNgModuleType(this as any, this.id);
+  }
+
+  overrideNgFactoryDef(type: ClassType<unknown>): void {
+    Object.defineProperty(type, ɵNG_FAC_DEF, {
+      configurable: true,
+      get: () => this.getNgFactory(type),
+    });
   }
 
   defineNgModuleDefs(this: this & any): void {
@@ -484,7 +503,7 @@ export class AppModule<
 
     // @ts-ignore
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
-      // providers: this.ngProviders,
+      providers: this.ngProviders,
       imports: [...this.imports, ...this.ngImports],
     });
 

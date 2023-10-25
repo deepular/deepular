@@ -1,4 +1,8 @@
-import { ChangeDetectionStrategy, Component, ɵNG_COMP_DEF } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ɵNG_COMP_DEF,
+} from '@angular/core';
 import { SignalController } from '@ngkit/core';
 
 import type { AppController } from './app.controller';

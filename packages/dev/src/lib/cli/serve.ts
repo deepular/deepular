@@ -47,7 +47,7 @@ export class ServeController implements Command {
       base: server.config.base,
       async fetchModule(id) {
         return id.startsWith('/@fs/')
-          ? (await node.transformRequest(id)) as FetchResult
+          ? ((await node.transformRequest(id)) as FetchResult)
           : await node.fetchModule(id);
       },
       resolveId(id, importer) {

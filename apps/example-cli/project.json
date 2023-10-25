@@ -22,7 +22,7 @@
       ],
       "options": {
         "cwd": "{projectRoot}",
-        "envFile": "{workspaceRoot}/.env.build",
+        "envFile": "{workspaceRoot}/.env",
         "command": "node ../../dist/packages/dev/cli.esm.js build"
       }
     },
@@ -41,7 +41,7 @@
       ],
       "options": {
         "cwd": "{projectRoot}",
-        "envFile": "{workspaceRoot}/.env.build",
+        "envFile": "{workspaceRoot}/.env",
         "command": "node ../../dist/packages/dev/cli.esm.js serve"
       }
     },

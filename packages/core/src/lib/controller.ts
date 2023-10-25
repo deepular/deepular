@@ -71,3 +71,4 @@ export function makeDeserializableControllerMethodStateKey(
 export const makeSerializedClassTypeStateKey = (name: string) =>
   makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);
 
+export function makeRuntimeControllerProviderToken() {}

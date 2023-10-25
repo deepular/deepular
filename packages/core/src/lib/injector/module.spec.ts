@@ -1,4 +1,10 @@
-import { Component, Injectable, ɵNG_COMP_DEF, ɵNG_INJ_DEF, ɵNG_PROV_DEF } from '@angular/core';
+import {
+  Component,
+  Injectable,
+  ɵNG_COMP_DEF,
+  ɵNG_INJ_DEF,
+  ɵNG_PROV_DEF,
+} from '@angular/core';
 import { screen } from '@testing-library/angular';
 // nx-ignore-next-line
 import { render, setupModule } from '@ngkit/testing';
@@ -15,7 +21,7 @@ test('exported declarations', async () => {
 
   class TestModule extends createModule({
     declarations: [TestComponent],
-    exports: [TestComponent]
+    exports: [TestComponent],
   }) {}
 
   @Component({
@@ -29,7 +35,7 @@ test('exported declarations', async () => {
   await render(FixtureComponent);
 
   expect(screen.getByTestId('test')).toBeInTheDocument();
-})
+});
 
 // test that TestService is only available in TestComponent but not FixtureComponent because it's not exported from TestModule
 test('provider should only be available in module scope because it has not been exported', async () => {

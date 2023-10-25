@@ -6,11 +6,7 @@ import { deepkitType } from '@deepkit/vite';
 
 export default defineConfig(({ mode }) => ({
   cacheDir: '../../node_modules/.vite/core',
-  plugins: [
-    nxViteTsPaths(),
-    angular(),
-    deepkitType(),
-  ],
+  plugins: [nxViteTsPaths(), angular(), deepkitType()],
   test: {
     globals: true,
     cache: {

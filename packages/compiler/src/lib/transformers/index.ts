@@ -4,5 +4,5 @@ import type { CustomTransformer } from 'typescript';
 import { InjectControllerTransformer } from './inject-controller-transformer';
 
 export const customTransformers: readonly ClassType<CustomTransformer>[] = [
-  InjectControllerTransformer,
+  // InjectControllerTransformer,
 ] as const;

@@ -18,7 +18,6 @@ import {
   ServerControllerTypeName,
   SignalControllerMethod,
   SignalControllerTypeName,
-  getImportedModules,
   unwrapType,
 } from '@ngkit/core';
 import { provideServerRendering } from '@angular/platform-server';
@@ -56,12 +55,6 @@ export class ServerModule extends createModule({
   >();
 
   override postProcess() {
-    this.addImport(
-      ...(getImportedModules(
-        this.config.rootComponent,
-      ) as unknown as InjectorModule<never, never>[]),
-    );
-
     this.rpcControllers.forEach(({ module, controller, metadata }) => {
       const controllerType = resolveRuntimeType(controller);
       const controllerReflectionClass = ReflectionClass.from(controllerType);
@@ -111,11 +104,12 @@ export class ServerModule extends createModule({
               return async (...args: []): Promise<unknown> => {
                 let result = await target[propertyName](...args);
 
-                const transferStateKey = makeSerializableControllerMethodStateKey(
-                  controllerName,
-                  propertyName,
-                  args,
-                );
+                const transferStateKey =
+                  makeSerializableControllerMethodStateKey(
+                    controllerName,
+                    propertyName,
+                    args,
+                  );
 
                 if (result instanceof Observable) {
                   result = await firstValueFrom(result);
@@ -158,11 +152,12 @@ export class ServerModule extends createModule({
               ): SignalControllerMethod<unknown, unknown[]> => {
                 let result = target[propertyName](...args);
 
-                const transferStateKey = makeSerializableControllerMethodStateKey(
-                  controllerName,
-                  propertyName,
-                  args,
-                );
+                const transferStateKey =
+                  makeSerializableControllerMethodStateKey(
+                    controllerName,
+                    propertyName,
+                    args,
+                  );
 
                 const transferResult = (data: unknown) => {
                   transferState.set(transferStateKey, serialize({ data }));

@@ -11,9 +11,6 @@ export class FlowerConfig {
 export class FlowerModule extends createModule({
   config: FlowerConfig,
   declarations: [FlowerComponent],
-  providers: [
-    FlowerService,
-    provide<Flower>({ useValue: { name: 'lily' } }),
-  ],
+  providers: [FlowerService, provide<Flower>({ useValue: { name: 'lily' } })],
   exports: [FlowerComponent],
 }) {}

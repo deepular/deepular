@@ -20,7 +20,7 @@ export function getImportedModules<T>(
   return deps.filter((dep): dep is AppModule => dep instanceof AppModule);
 }
 
-export function setupModuleRootInjector(module: AppModule): void {
+export function setupModuleRootInjector(module: AppModule): InjectorContext {
   const injectorContext = new InjectorContext(
     module as unknown as InjectorModule,
   );
@@ -46,19 +46,31 @@ export function setupModuleRootInjector(module: AppModule): void {
   }
 
   modules.forEach(module => module.setups.forEach(setup => setup()));
+
+  return injectorContext;
 }
 
-export function setupComponentRootInjector<T>(component: Type<T>): void {
-  const componentDef: ɵComponentDef<T> | undefined = component[ɵNG_COMP_DEF as keyof typeof component];
+export function createStandaloneComponentModule<T>(
+  component: Type<T>,
+): AppModule {
+  const componentDef: ɵComponentDef<T> | undefined =
+    component[ɵNG_COMP_DEF as keyof typeof component];
   if (!componentDef?.standalone) {
     throw new Error(`${component.name} is not a standalone component`);
   }
 
-  const rootModules = getImportedModules(componentDef);
+  const imports = getImportedModules(componentDef);
 
-  const rootModule = new (class RootModule extends createModule({}) {
-    override imports = rootModules;
-  })();
+  const module = new (class RootModule extends createModule({}) {})();
 
+  module.addImport(...(imports as unknown as InjectorModule[]));
+
+  module.addDeclaration(component);
+
+  return module;
+}
+
+export function setupComponentRootInjector<T>(component: Type<T>): void {
+  const rootModule = createStandaloneComponentModule(component);
   setupModuleRootInjector(rootModule);
 }
