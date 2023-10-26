@@ -20,11 +20,13 @@ type SignalifyFn<T extends (...args: any[]) => any> = (
   Parameters<T>
 >;
 
-export type SignalController<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any
-    ? SignalifyFn<T[P]>
-    : never;
-};
+export type SignalController<T> = T extends string
+  ? any
+  : {
+      [P in keyof T]: T[P] extends (...args: any[]) => any
+        ? SignalifyFn<T[P]>
+        : never;
+    };
 
 export type ServerController<T> = RemoteController<T>;
 

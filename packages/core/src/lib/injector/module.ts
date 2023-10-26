@@ -33,6 +33,8 @@ import {
   ɵNG_COMP_DEF,
   ɵNG_DIR_DEF,
   ɵNG_PIPE_DEF,
+  ElementRef,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   getPartialSerializeFunction,
@@ -47,6 +49,8 @@ import {
   TypeClass,
   uuid,
 } from '@deepkit/type';
+
+import { provideNg } from './utils';
 
 export type ExportType =
   | AbstractClassType
@@ -226,7 +230,7 @@ export function isDeclaration(value: ProviderWithScope): boolean {
 
 export const ɵNG_FAC_DEF = 'ɵfac' as const;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// @ts-ignore
 export class AppModule<
   T extends RootModuleDefinition = {},
   C extends ExtractClassType<T['config']> = any,
@@ -246,7 +250,7 @@ export class AppModule<
   constructor(
     public options: T,
     public name: string = '',
-    public setups: (() => void)[] = [],
+    public setups: ((module: AppModule, config: C) => void)[] = [],
     public override id: string = uuid(),
   ) {
     super();
@@ -283,18 +287,24 @@ export class AppModule<
     this.setup(() => this.registerNgModule());
   }
 
+  private addNgComponentProviders() {
+    this.addProvider(
+      provideNg(ElementRef),
+      provideNg(ChangeDetectorRef),
+      provideNg(Injector),
+    );
+  }
+
   protected addNgModuleImport(m: ClassType | ModuleWithProviders<any>) {
     this.ngImports.push(m);
   }
 
-  protected addModuleImport(m: AppModule | FunctionalModule) {
+  protected addModuleImport(m: AppModule<any> | FunctionalModule) {
     if (m instanceof AppModule) {
-      // @ts-ignore
       this.addImport(m);
     } else {
-      const module = new AppModule({});
+      const module = new AppModule<any, any>({});
       m(module);
-      // @ts-ignore
       this.addImport(module);
     }
   }
@@ -334,7 +344,11 @@ export class AppModule<
    *
    * Last chance to set up the injector context, via this.setupProvider().
    */
-  postProcess() {}
+  postProcess() {
+    if (this.declarations.length) {
+      this.addNgComponentProviders();
+    }
+  }
 
   /**
    * Renames this module instance.
@@ -357,11 +371,6 @@ export class AppModule<
   }
 
   addDeclaration(...declaration: ClassType[]): this {
-    /*for (const decl of declaration) {
-      if (isStandalone(decl)) {
-        throw new Error(`Standalone components, directives and pipes are not supported`);
-      }
-    }*/
     this.assertInjectorNotBuilt();
     this.declarations.push(...declaration);
     this.providers.push(...declaration);
@@ -398,8 +407,14 @@ export class AppModule<
   }
 
   // @ts-ignore
-  override getImports(): AppModule[] {
-    return super.getImports() as unknown as AppModule[];
+  override addImport(...modules: AppModule<any>[]): this {
+    // @ts-ignore
+    return super.addImport(...modules);
+  }
+
+  override getImports(): (AppModule & InjectorModule)[] {
+    // @ts-ignore
+    return super.getImports();
   }
 
   getName(): string {

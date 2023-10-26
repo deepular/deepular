@@ -7,7 +7,9 @@
       "parserOptions": {
         "project": ["packages/core/tsconfig.*?.json"]
       },
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
     },
     {
       "files": ["*.ts", "*.tsx"],

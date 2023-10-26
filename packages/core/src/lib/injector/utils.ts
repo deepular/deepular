@@ -1,7 +1,9 @@
-import { InjectorContext, InjectorModule } from '@deepkit/injector';
-import { Type, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
+import { FactoryProvider } from '@deepkit/injector';
+import { inject, Type, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
+import { AbstractClassType } from '@deepkit/core';
 
 import { AppModule, createModule } from './module';
+import { ServiceContainer } from './service-container';
 
 export function getComponentDependencies<T>(
   componentDef: ɵComponentDef<T>,
@@ -20,39 +22,9 @@ export function getImportedModules<T>(
   return deps.filter((dep): dep is AppModule => dep instanceof AppModule);
 }
 
-export function setupModuleRootInjector(module: AppModule): InjectorContext {
-  const injectorContext = new InjectorContext(
-    module as unknown as InjectorModule,
-  );
-  injectorContext.getRootInjector(); //trigger all injector builds
-
-  const modules = new Set<AppModule>();
-
-  function findModules(module: AppModule) {
-    if (modules.has(module)) return;
-    modules.add(module);
-
-    for (const m of module.getImports()) {
-      findModules(m);
-    }
-  }
-
-  findModules(module);
-
-  for (const module of modules) {
-    for (const setup of module.setups) {
-      setup();
-    }
-  }
-
-  modules.forEach(module => module.setups.forEach(setup => setup()));
-
-  return injectorContext;
-}
-
 export function createStandaloneComponentModule<T>(
   component: Type<T>,
-): AppModule {
+): AppModule<any> {
   const componentDef: ɵComponentDef<T> | undefined =
     component[ɵNG_COMP_DEF as keyof typeof component];
   if (!componentDef?.standalone) {
@@ -61,16 +33,26 @@ export function createStandaloneComponentModule<T>(
 
   const imports = getImportedModules(componentDef);
 
-  const module = new (class RootModule extends createModule({}) {})();
-
-  module.addImport(...(imports as unknown as InjectorModule[]));
-
-  module.addDeclaration(component);
-
-  return module;
+  return new (class extends createModule<any>(
+    {
+      declarations: [component],
+      exports: [component],
+    },
+    component.name,
+  ) {
+    override imports = imports;
+  })();
 }
 
-export function setupComponentRootInjector<T>(component: Type<T>): void {
+export function setupRootComponent<T>(component: Type<T>): void {
   const rootModule = createStandaloneComponentModule(component);
-  setupModuleRootInjector(rootModule);
+  const serviceContainer = new ServiceContainer(rootModule);
+  serviceContainer.process();
+}
+
+export function provideNg<T>(token: AbstractClassType<T>): FactoryProvider<T> {
+  return {
+    provide: token,
+    useFactory: () => inject(token),
+  };
 }

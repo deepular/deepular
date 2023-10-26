@@ -21,7 +21,7 @@ import {
   SignalControllerTypeName,
   ServerControllerTypeName,
   SignalControllerMethod,
-  setupComponentRootInjector,
+  setupRootComponent,
 } from '@ngkit/core';
 
 import { ClientController } from './client-controller';
@@ -32,7 +32,7 @@ export async function bootstrapApplication<T>(
   controllers: readonly string[] = [],
   appConfig: ApplicationConfig = { providers: [] },
 ): Promise<void> {
-  setupComponentRootInjector(rootComponent);
+  setupRootComponent(rootComponent);
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);

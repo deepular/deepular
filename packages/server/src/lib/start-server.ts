@@ -7,7 +7,7 @@ import { App } from '@deepkit/app';
 import { ApplicationConfig } from '@angular/core';
 
 import { ServerModule } from './server.module';
-import { setupComponentRootInjector } from '@ngkit/core';
+import { setupRootComponent } from '@ngkit/core';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
@@ -34,7 +34,7 @@ export async function startServer(
   }: NgKitServerOptions,
   appConfig?: ApplicationConfig,
 ): Promise<App<any>> {
-  setupComponentRootInjector(rootComponent);
+  setupRootComponent(rootComponent);
 
   const app = new App({
     imports: [
