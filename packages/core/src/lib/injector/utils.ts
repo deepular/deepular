@@ -1,5 +1,5 @@
 import { FactoryProvider } from '@deepkit/injector';
-import { inject, Type, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
+import { inject, Type, ɵComponentDef, ɵNG_COMP_DEF, runInInjectionContext } from '@angular/core';
 import { AbstractClassType } from '@deepkit/core';
 
 import { AppModule, createModule } from './module';
@@ -22,6 +22,7 @@ export function getImportedModules<T>(
   return deps.filter((dep): dep is AppModule => dep instanceof AppModule);
 }
 
+// TODO: recursively create modules for imported standalone components
 export function createStandaloneComponentModule<T>(
   component: Type<T>,
 ): AppModule<any> {
@@ -50,9 +51,15 @@ export function setupRootComponent<T>(component: Type<T>): void {
   serviceContainer.process();
 }
 
-export function provideNg<T>(token: AbstractClassType<T>): FactoryProvider<T> {
+export function provideNgDeclarationDependency<T>(type: AbstractClassType<T>): FactoryProvider<T> {
   return {
-    provide: token,
-    useFactory: () => inject(token),
+    provide: type,
+    useFactory: () => {
+      try {
+        return inject(type);
+      } catch {
+        throw new Error(`${type.name} is only allowed as a dependency for declarations`);
+      }
+    },
   };
 }

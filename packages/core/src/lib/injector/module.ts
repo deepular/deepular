@@ -50,7 +50,7 @@ import {
   uuid,
 } from '@deepkit/type';
 
-import { provideNg } from './utils';
+import { provideNgDeclarationDependency } from './utils';
 
 export type ExportType =
   | AbstractClassType
@@ -235,7 +235,7 @@ export class AppModule<
   T extends RootModuleDefinition = {},
   C extends ExtractClassType<T['config']> = any,
 > extends InjectorModule<C, AppModule> {
-  public setupConfigs: ((module: AppModule, config: any) => void)[] = [];
+  public setupConfigs: ((module: AppModule<any>, config: any) => void)[] = [];
   // readonly [NG_FAC_DEF]: ɵɵFactoryDeclaration<this, never>;
 
   readonly ngImports: (ClassType | ModuleWithProviders<any>)[] = [];
@@ -250,11 +250,11 @@ export class AppModule<
   constructor(
     public options: T,
     public name: string = '',
-    public setups: ((module: AppModule, config: C) => void)[] = [],
+    public setups: ((module: AppModule<any>, config: any) => void)[] = [],
     public override id: string = uuid(),
   ) {
     super();
-    if (this.options.imports)
+    if (this.options.imports) {
       for (const m of this.options.imports) {
         if (isClass(m) || 'ngModule' in m) {
           this.addNgModuleImport(m);
@@ -262,6 +262,7 @@ export class AppModule<
           this.addModuleImport(m);
         }
       }
+    }
     if (this.options.providers) this.providers.push(...this.options.providers);
     if (this.options.exports) this.exports.push(...this.options.exports);
     if (this.options.declarations) {
@@ -289,9 +290,9 @@ export class AppModule<
 
   private addNgComponentProviders() {
     this.addProvider(
-      provideNg(ElementRef),
-      provideNg(ChangeDetectorRef),
-      provideNg(Injector),
+      provideNgDeclarationDependency(ElementRef),
+      provideNgDeclarationDependency(ChangeDetectorRef),
+      provideNgDeclarationDependency(Injector),
     );
   }
 

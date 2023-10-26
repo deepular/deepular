@@ -54,7 +54,12 @@ export class NgKitViteConfig {
       plugins: [
         nxViteTsPaths(),
         angular({ tsconfig: this.config.tsconfig }),
-        deepkitType({ tsConfig: this.config.tsconfig }),
+        deepkitType({
+          tsConfig: this.config.tsconfig,
+          compilerOptions: {
+            sourceMap: true,
+          },
+        }),
       ],
       // test: {
       //   globals: true,
