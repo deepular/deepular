@@ -1,7 +1,9 @@
 import { TransferState } from '@angular/core';
-import { deserializeType, ReflectionClass } from '@deepkit/type';
+import { deserializeType, ReflectionClass, TypeClass } from '@deepkit/type';
 import {
+  ControllerConsumerIndex,
   getNgKitDeserializer,
+  getProviderNameForType,
   makeDeserializableControllerMethodStateKey,
   makeSerializedClassTypeStateKey,
   NgKitDeserializer,
@@ -10,7 +12,14 @@ import {
 
 import { TransferStateMissingForClientControllerMethodError } from './errors';
 
-export class ClientController {
+export class InternalClientController {
+  static getProviderToken(type: TypeClass): string {
+    return getProviderNameForType(
+      InternalClientController.name,
+      type.typeName!,
+    );
+  }
+
   readonly deserializers: ReadonlyMap<string, NgKitDeserializer<unknown>>;
 
   readonly methodNames: readonly string[];
@@ -43,11 +52,16 @@ export class ClientController {
     this.methodNames = [...this.deserializers.keys()];
   }
 
-  getTransferState<T>(methodName: string, args: readonly unknown[]): T | null {
+  getTransferState<T>(
+    methodName: string,
+    args: readonly unknown[],
+    consumerIdx: ControllerConsumerIndex,
+  ): T | null {
     const transferStateKey = makeDeserializableControllerMethodStateKey(
       this.controllerName,
       methodName,
       args,
+      consumerIdx,
     );
 
     if (!this.transferState.hasKey(transferStateKey)) {

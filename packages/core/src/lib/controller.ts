@@ -51,26 +51,43 @@ export const makeControllerStateKey = <T>(
   controllerName: string,
   methodName: string,
   args: readonly unknown[],
+  consumerIdx: ControllerConsumerIndex,
 ) =>
-  makeStateKey<T>(`${controllerName}#${methodName}(${JSON.stringify(args)})`);
+  makeStateKey<T>(
+    `${controllerName}#${methodName}(${JSON.stringify(args)})${
+      consumerIdx.value
+    }`,
+  );
 
 export function makeSerializableControllerMethodStateKey(
   controllerName: string,
   methodName: string,
   args: readonly unknown[],
+  consumerIdx: ControllerConsumerIndex,
 ): StateKey<Uint8Array> {
-  return makeControllerStateKey(controllerName, methodName, args);
+  return makeControllerStateKey(controllerName, methodName, args, consumerIdx);
 }
 
 export function makeDeserializableControllerMethodStateKey(
   controllerName: string,
   methodName: string,
   args: readonly unknown[],
+  consumerIdx: ControllerConsumerIndex,
 ): StateKey<{ readonly type: 'Buffer'; readonly data: readonly number[] }> {
-  return makeControllerStateKey(controllerName, methodName, args);
+  return makeControllerStateKey(controllerName, methodName, args, consumerIdx);
 }
 
 export const makeSerializedClassTypeStateKey = (name: string) =>
   makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);
 
-export function makeRuntimeControllerProviderToken() {}
+export class ControllerConsumerIndex {
+  constructor(readonly value: number = 1) {}
+
+  next(): ControllerConsumerIndex {
+    return new ControllerConsumerIndex(this.value + 1);
+  }
+}
+
+export const serverControllerConsumerIndex = new ControllerConsumerIndex();
+
+export const signalControllerConsumerIndex = new ControllerConsumerIndex();

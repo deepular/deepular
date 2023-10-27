@@ -10,9 +10,11 @@ import { toSerializableDataType } from './type';
 
 export type NgKitDeserializer<T> = BSONDeserializer<{ readonly data: T }>;
 
+export type NgKitSerializer = BSONSerializer;
+
 export const ngKitSerializer = new BSONBinarySerializer();
 
-export function getNgKitSerializer(type: Type): BSONSerializer {
+export function getNgKitSerializer(type: Type): NgKitSerializer {
   const serializableType = toSerializableDataType(type);
   return getBSONSerializer(ngKitSerializer, serializableType);
 }

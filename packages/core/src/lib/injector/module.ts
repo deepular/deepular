@@ -23,13 +23,9 @@ import {
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
-  ɵsetCurrentInjector,
   ɵɵsetNgModuleScope,
   Provider,
-  inject,
   Injector,
-  InjectionToken,
-  isStandalone,
   ɵNG_COMP_DEF,
   ɵNG_DIR_DEF,
   ɵNG_PIPE_DEF,
@@ -42,7 +38,6 @@ import {
   reflect,
   ReflectionFunction,
   ReflectionMethod,
-  resolveRuntimeType,
   serializer,
   stringifyType,
   Type,
@@ -50,7 +45,7 @@ import {
   uuid,
 } from '@deepkit/type';
 
-import { provideNgDeclarationDependency } from './utils';
+import { provideNgDeclarationDependency, provideNgDependency } from './utils';
 
 export type ExportType =
   | AbstractClassType
@@ -288,11 +283,14 @@ export class AppModule<
     this.setup(() => this.registerNgModule());
   }
 
-  private addNgComponentProviders() {
+  private addNgProviders() {
+    this.addProvider(provideNgDependency(Injector));
+  }
+
+  private addNgDeclarationProviders() {
     this.addProvider(
       provideNgDeclarationDependency(ElementRef),
       provideNgDeclarationDependency(ChangeDetectorRef),
-      provideNgDeclarationDependency(Injector),
     );
   }
 
@@ -347,8 +345,9 @@ export class AppModule<
    */
   postProcess() {
     if (this.declarations.length) {
-      this.addNgComponentProviders();
+      this.addNgDeclarationProviders();
     }
+    this.addNgProviders();
   }
 
   /**

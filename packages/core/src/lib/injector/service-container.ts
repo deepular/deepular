@@ -8,6 +8,8 @@ import {
   deserialize,
   ReflectionClass,
   ReflectionFunction,
+  stringifyType,
+  Type,
   validate,
 } from '@deepkit/type';
 import { ClassType, getClassName, isClass } from '@deepkit/core';
@@ -15,12 +17,19 @@ import {
   Injector,
   InjectorContext,
   InjectorModule,
+  isClassProvider,
+  isFactoryProvider,
   ProviderWithScope,
   resolveToken,
   Token,
 } from '@deepkit/injector';
 
 import { AddedListener, AppModule, ConfigurationInvalidError } from './module';
+import { getProviderFactoryParameters } from './utils';
+import {
+  ServerControllerTypeName,
+  SignalControllerTypeName,
+} from '../controller';
 
 export interface ConfigLoader {
   load(

@@ -1,8 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ɵNG_COMP_DEF,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SignalController } from '@ngkit/core';
 
 import type { AppController } from './app.controller';
@@ -21,5 +17,5 @@ import { FlowerModule } from './flower.module';
 export class AppComponent {
   readonly count = this.app.count();
 
-  constructor(readonly app: SignalController<AppController>) {}
+  constructor(readonly app: SignalController<AppController>) {} // FIXME: we need the deepkit type compiler to emit at least "typeName" for type only imports
 }

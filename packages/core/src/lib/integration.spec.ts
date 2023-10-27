@@ -64,4 +64,4 @@ test('standalone directives imported in modules and used in components', () => {
   }
 });
 
-test('directives declared in module and used in component', () => {})
+test('directives declared in module and used in component', () => {});
