@@ -27,19 +27,19 @@ export class ClientControllersModule extends ControllersModule {
     super();
   }
 
-  getRemoteController<T>(type: TypeClass): RemoteController<T> {
-    return this.injector!.get(type.typeName!) as RemoteController<T>;
+  getRemoteController<T>(name: string): RemoteController<T> {
+    return this.injector!.get(name) as RemoteController<T>;
   }
 
-  getInternalClientController(type: TypeClass): InternalClientController {
+  getInternalClientController(name: string): InternalClientController {
     return this.injector!.get<InternalClientController>(
-      InternalClientController.getProviderToken(type),
+      InternalClientController.getProviderToken(name),
     );
   }
 
   protected addServerController(
     signalControllerType: Type,
-    controllerType: TypeClass,
+    controllerName: string,
   ): void {
     const serverControllerProvider: FactoryProvider<ServerController<unknown>> =
       {
@@ -47,8 +47,8 @@ export class ClientControllersModule extends ControllersModule {
         transient: true,
         useFactory: () => {
           const clientController =
-            this.getInternalClientController(controllerType);
-          const remoteController = this.getRemoteController(controllerType);
+            this.getInternalClientController(controllerName);
+          const remoteController = this.getRemoteController(controllerName);
           const consumerIdx = serverControllerConsumerIndex.next();
           return new Proxy(remoteController, {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,7 +93,7 @@ export class ClientControllersModule extends ControllersModule {
 
   protected addSignalController(
     signalControllerType: Type,
-    controllerType: TypeClass,
+    controllerName: string,
   ): void {
     const signalControllerProvider: FactoryProvider<SignalController<unknown>> =
       {
@@ -101,8 +101,8 @@ export class ClientControllersModule extends ControllersModule {
         transient: true,
         useFactory: () => {
           const clientController =
-            this.getInternalClientController(controllerType);
-          const remoteController = this.getRemoteController(controllerType);
+            this.getInternalClientController(controllerName);
+          const remoteController = this.getRemoteController(controllerName);
           const consumerIdx = signalControllerConsumerIndex.next();
           return new Proxy(remoteController, {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,21 +195,19 @@ export class ClientControllersModule extends ControllersModule {
   }
 
   override postProcess() {
-    for (const controllerType of this.controllerTypes) {
-      const controllerName = controllerType.typeName!;
-
+    for (const controllerName of this.controllerNames) {
       const remoteControllerProvider: FactoryProvider<
         RemoteController<unknown>
       > = {
-        provide: controllerType.typeName!,
-        useFactory: () => this.client.controller(controllerType.typeName!),
+        provide: controllerName,
+        useFactory: () => this.client.controller(controllerName),
       };
       this.addProvider(remoteControllerProvider);
       this.addExport(remoteControllerProvider);
 
       const clientControllerProvider: FactoryProvider<InternalClientController> =
         {
-          provide: InternalClientController.getProviderToken(controllerType),
+          provide: InternalClientController.getProviderToken(controllerName),
           useFactory: (transferState: TransferState) =>
             new InternalClientController(controllerName, transferState),
         };

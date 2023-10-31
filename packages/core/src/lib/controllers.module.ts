@@ -4,7 +4,7 @@ import {
 } from './controller';
 import { TransferState } from '@angular/core';
 import { isClassProvider, isFactoryProvider, Token } from '@deepkit/injector';
-import { Type, TypeClass } from '@deepkit/type';
+import { Type } from '@deepkit/type';
 import { isClass } from '@deepkit/core';
 
 import {
@@ -20,18 +20,18 @@ export abstract class ControllersModule extends createModule({
   exports: [TransferState],
   forRoot: true,
 }) {
-  protected readonly signalControllerTypes = new WeakMap<TypeClass, Type>();
-  protected readonly serverControllerTypes = new WeakMap<TypeClass, Type>();
-  protected readonly controllerTypes = new Set<TypeClass>();
+  protected readonly signalControllerTypes = new Map<string, Type>();
+  protected readonly serverControllerTypes = new Map<string, Type>();
+  protected readonly controllerNames = new Set<string>();
 
   protected abstract addServerController(
     serverControllerType: Type,
-    controllerType: TypeClass,
+    controllerName: string,
   ): void;
 
   protected abstract addSignalController(
     signalControllerType: Type,
-    controllerType: TypeClass,
+    controllerName: string,
   ): void;
 
   override processProvider(
@@ -52,12 +52,12 @@ export abstract class ControllersModule extends createModule({
       parameter => parameter.type.typeName === SignalControllerTypeName,
     );
     for (const parameter of parametersWithSignalController) {
-      const controllerType = parameter.type.typeArguments![0] as TypeClass;
-      if (!this.signalControllerTypes.has(controllerType)) {
-        this.signalControllerTypes.set(controllerType, parameter.type);
+      const controllerName = parameter.type.typeArguments![0].typeName!;
+      if (!this.signalControllerTypes.has(controllerName)) {
+        this.signalControllerTypes.set(controllerName, parameter.type);
       }
-      if (!this.controllerTypes.has(controllerType)) {
-        this.controllerTypes.add(controllerType);
+      if (!this.controllerNames.has(controllerName)) {
+        this.controllerNames.add(controllerName);
       }
     }
 
@@ -65,28 +65,28 @@ export abstract class ControllersModule extends createModule({
       parameter => parameter.type.typeName === ServerControllerTypeName,
     );
     for (const parameter of parametersWithServerController) {
-      const controllerType = parameter.type.typeArguments![0] as TypeClass;
-      if (!this.serverControllerTypes.has(controllerType)) {
-        this.serverControllerTypes.set(controllerType, parameter.type);
+      const controllerName = parameter.type.typeArguments![0].typeName!;
+      if (!this.serverControllerTypes.has(controllerName)) {
+        this.serverControllerTypes.set(controllerName, parameter.type);
       }
-      if (!this.controllerTypes.has(controllerType)) {
-        this.controllerTypes.add(controllerType);
+      if (!this.controllerNames.has(controllerName)) {
+        this.controllerNames.add(controllerName);
       }
     }
   }
 
   override postProcess() {
-    for (const controllerType of this.controllerTypes) {
+    for (const controllerName of this.controllerNames) {
       const signalControllerType =
-        this.signalControllerTypes.get(controllerType);
+        this.signalControllerTypes.get(controllerName);
       if (signalControllerType) {
-        this.addSignalController(signalControllerType, controllerType);
+        this.addSignalController(signalControllerType, controllerName);
       }
 
       const serverControllerType =
-        this.serverControllerTypes.get(controllerType);
+        this.serverControllerTypes.get(controllerName);
       if (serverControllerType) {
-        this.addServerController(serverControllerType, controllerType);
+        this.addServerController(serverControllerType, controllerName);
       }
     }
   }

@@ -8,7 +8,7 @@ import {
   SignalControllerMethod,
 } from '@ngkit/core';
 import { Signal, signal, TransferState } from '@angular/core';
-import { Type, TypeClass } from '@deepkit/type';
+import { Type } from '@deepkit/type';
 import { FactoryProvider } from '@deepkit/injector';
 import { catchError, firstValueFrom, from, Observable, of, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -38,12 +38,9 @@ export class ServerControllersModule extends ControllersModule {
 
   protected addServerController(
     serverControllerType: Type,
-    controllerTypeClass: TypeClass,
+    controllerName: string,
   ): void {
-    const { controller: controllerType, injector } = this.rpcControllers.get(
-      controllerTypeClass.typeName!,
-    )!;
-    const controllerName = controllerType.name;
+    const { controller: controllerType, injector } = this.rpcControllers.get(controllerName)!;
 
     const serverControllerProvider: FactoryProvider<ServerController<unknown>> =
       {
@@ -96,12 +93,9 @@ export class ServerControllersModule extends ControllersModule {
 
   protected addSignalController(
     signalControllerType: Type,
-    controllerTypeClass: TypeClass,
+    controllerName: string,
   ): void {
-    const { controller: controllerType, injector } = this.rpcControllers.get(
-      controllerTypeClass.typeName!,
-    )!;
-    const controllerName = controllerType.name;
+    const { controller: controllerType, injector } = this.rpcControllers.get(controllerName)!;
 
     const signalControllerProvider: FactoryProvider<SignalController<unknown>> =
       {

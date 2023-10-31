@@ -1,5 +1,5 @@
 import { TransferState } from '@angular/core';
-import { deserializeType, ReflectionClass, TypeClass } from '@deepkit/type';
+import { deserializeType, ReflectionClass } from '@deepkit/type';
 import {
   ControllerConsumerIndex,
   getNgKitDeserializer,
@@ -13,10 +13,10 @@ import {
 import { TransferStateMissingForClientControllerMethodError } from './errors';
 
 export class InternalClientController {
-  static getProviderToken(type: TypeClass): string {
+  static getProviderToken(controllerName: string): string {
     return getProviderNameForType(
       InternalClientController.name,
-      type.typeName!,
+      controllerName,
     );
   }
 
