@@ -17,17 +17,19 @@ import { ClassType } from '@deepkit/core';
 import { InternalServerController } from './internal-server-controller';
 
 import { ServerModule } from './server.module';
+import { RpcController } from './types';
 
 export class ServerControllersModule extends ControllersModule {
-  private readonly rpcControllers = new Map(
-    [...this.serverModule.rpcControllers].map(controller => [
-      controller.controller.name,
-      controller,
-    ]),
-  );
+  private readonly rpcControllers: ReadonlyMap<string, RpcController>;
 
   constructor(private readonly serverModule: ServerModule) {
     super();
+    this.rpcControllers = new Map(
+      [...this.serverModule.rpcControllers].map(controller => [
+        controller.controller.name,
+        controller,
+      ]),
+    );
   }
 
   getInternalServerController(type: ClassType): InternalServerController {
@@ -51,6 +53,7 @@ export class ServerControllersModule extends ControllersModule {
           const internalServerController =
             this.getInternalServerController(controllerType);
           const consumerIndex = serverControllerConsumerIndex.next();
+
           return new Proxy(controller, {
             get: (target: typeof controller, propertyName: string) => {
               if (!internalServerController.methodNames.includes(propertyName))
@@ -106,6 +109,7 @@ export class ServerControllersModule extends ControllersModule {
           const internalServerController =
             this.getInternalServerController(controllerType);
           const consumerIndex = signalControllerConsumerIndex.next();
+
           return new Proxy(controller, {
             get: (target: typeof controller, propertyName: string) => {
               if (!internalServerController.methodNames.includes(propertyName))
@@ -156,7 +160,7 @@ export class ServerControllersModule extends ControllersModule {
                       return of(null);
                     }),
                   );
-                  value = toSignal(result, { requireSync: true });
+                  value = toSignal(result);
                 }
 
                 return {

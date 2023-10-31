@@ -28,11 +28,10 @@ export class ServerModule extends createModule({
   >();
 
   override postProcess(): void {
-    this.rpcControllers.forEach(({ controller, metadata }) => {
+    this.rpcControllers.forEach(({ controller }) => {
       const controllerType = reflect(controller);
-      const controllerName = metadata.getPath();
       this.rpcControllerSerializedClassTypes.set(
-        controllerName,
+        controller.name,
         serializeType(controllerType),
       );
     });
