@@ -16,7 +16,7 @@
         "project": "{projectRoot}/package.json",
         "tsConfig": "{projectRoot}/tsconfig.lib.json",
         "assets": [
-          "{projectRoot}/src/patches/@analogjs+vite-plugin-angular+0.2.11.patch",
+          "{projectRoot}/src/patches/@analogjs+vite-plugin-angular+0.2.18.patch",
           "{projectRoot}/src/patches/@angular+compiler-cli+16.2.8.patch",
           "{projectRoot}/src/patches/@angular+core+16.2.8.patch"
         ],

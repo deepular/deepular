@@ -13,17 +13,17 @@
   },
   "peerDependencies": {
     "@ngkit/core": "workspace:*",
-    "@angular/core": "^16.2.8",
-    "@angular/platform-server": "^16.2.8",
-    "@angular/platform-browser": "^16.2.8",
-    "@deepkit/framework": "^1.0.1-alpha.103",
-    "@deepkit/app": "^1.0.1-alpha.102",
-    "@deepkit/core": "^1.0.1-alpha.100",
-    "@deepkit/rpc": "^1.0.1-alpha.102",
-    "@deepkit/type": "^1.0.1-alpha.102",
-    "@deepkit/http": "^1.0.1-alpha.102",
-    "zone.js": "^0.14.0",
-    "rxjs": "^7.8.1"
+    "@angular/core": "16.2.8",
+    "@angular/platform-server": "16.2.8",
+    "@angular/platform-browser": "16.2.8",
+    "@deepkit/framework": "1.0.1-alpha.106",
+    "@deepkit/app": "1.0.1-alpha.105",
+    "@deepkit/core": "1.0.1-alpha.105",
+    "@deepkit/rpc": "1.0.1-alpha.105",
+    "@deepkit/type": "1.0.1-alpha.105",
+    "@deepkit/http": "1.0.1-alpha.105",
+    "zone.js": "0.14.0",
+    "rxjs": "7.8.1"
   },
   "publishConfig": {
     "access": "public"

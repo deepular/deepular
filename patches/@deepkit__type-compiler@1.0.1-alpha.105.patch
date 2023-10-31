@@ -1,8 +1,18 @@
+diff --git a/deepkit-type-install.js b/deepkit-type-install.js
+index ce4753fba88e33ce6ec00150f6b09784f3da3237..a7fefeb5f0a10da36688e11a49d2ce60ff26a915 100755
+--- a/deepkit-type-install.js
++++ b/deepkit-type-install.js
+@@ -1,4 +1,4 @@
+-
++#!/usr/bin/env node
+ try {
+     require('./dist/cjs/install-transformer.js');
+ } catch (error) {}
 diff --git a/dist/cjs/src/compiler.js b/dist/cjs/src/compiler.js
-index 5e2146f4ed0fec7f18fa697db5c28b99697e9980..f1907f54e4d1189338bd684f0d0cbde0a2577c32 100644
+index e7d75375d8ff2553d21ae502d42881df82251c25..367c9660f3eef1f325f589ce1286549016c64b29 100644
 --- a/dist/cjs/src/compiler.js
 +++ b/dist/cjs/src/compiler.js
-@@ -1904,8 +1904,8 @@ class ReflectionTransformer {
+@@ -1912,8 +1912,8 @@ class ReflectionTransformer {
                          return node;
                      };
                      if (isIdentifier(parameter.name)) {
@@ -13,7 +23,7 @@ index 5e2146f4ed0fec7f18fa697db5c28b99697e9980..f1907f54e4d1189338bd684f0d0cbde0
                          }
                      }
 diff --git a/dist/esm/src/compiler.js b/dist/esm/src/compiler.js
-index c3bfed692cd456db794f84e9532149d897c6afce..0df2a5119af57b7bacf18bdbe777a9fb7ba2d61a 100644
+index 679c98b50e36c41b8911d7c561d5e19ec713ecbb..43d1bd0876dc8ff17e3900de08150d17a4733ffe 100644
 --- a/dist/esm/src/compiler.js
 +++ b/dist/esm/src/compiler.js
 @@ -15,7 +15,7 @@ import stripJsonComments from 'strip-json-comments';
@@ -25,7 +35,7 @@ index c3bfed692cd456db794f84e9532149d897c6afce..0df2a5119af57b7bacf18bdbe777a9fb
  // don't use from @deepkit/core since we don't want to have a dependency to @deepkit/core
  export function isObject(obj) {
      if (obj === null) {
-@@ -1872,8 +1872,8 @@ export class ReflectionTransformer {
+@@ -1880,8 +1880,8 @@ export class ReflectionTransformer {
                          return node;
                      };
                      if (isIdentifier(parameter.name)) {

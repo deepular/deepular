@@ -1,6 +1,5 @@
 import { createRequire } from 'node:module';
 import { join, relative, dirname } from 'node:path';
-import { writeFile, readFile } from 'node:fs/promises';
 
 const require = createRequire(import.meta.url);
 
@@ -41,6 +40,6 @@ for (const error of errors) {
   console.error(error);
 }
 
-if (warnings.length || errors.length) {
+if (errors.length) {
   process.exit(1);
 }
