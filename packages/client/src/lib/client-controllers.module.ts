@@ -28,7 +28,7 @@ export class ClientControllersModule extends ControllersModule {
   }
 
   getRemoteController<T>(type: TypeClass): RemoteController<T> {
-    return this.injector!.get(type) as RemoteController<T>;
+    return this.injector!.get(type.typeName!) as RemoteController<T>;
   }
 
   getInternalClientController(type: TypeClass): InternalClientController {
@@ -201,7 +201,7 @@ export class ClientControllersModule extends ControllersModule {
       const remoteControllerProvider: FactoryProvider<
         RemoteController<unknown>
       > = {
-        provide: controllerType,
+        provide: controllerType.typeName!,
         useFactory: () => this.client.controller(controllerType.typeName!),
       };
       this.addProvider(remoteControllerProvider);

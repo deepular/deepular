@@ -370,10 +370,16 @@ export class AppModule<
     return this.declarations;
   }
 
-  addDeclaration(...declaration: ClassType[]): this {
+  addDeclaration(...declarations: ClassType[]): this {
     this.assertInjectorNotBuilt();
-    this.declarations.push(...declaration);
-    this.providers.push(...declaration);
+    this.declarations.push(...declarations);
+    for (const declaration of declarations) {
+      this.providers.push({
+        provide: declaration,
+        transient: true,
+        useClass: declaration,
+      });
+    }
     return this;
   }
 

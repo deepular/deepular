@@ -9,9 +9,9 @@ pre-commit:
       glob: '*.{yaml,yml}'
       root: '.github'
       run: echo {staged_files} && actionlint
-    eslint:
-      glob: '*.{js,ts,jsx,tsx}'
-      run: yarn eslint --quiet --fix {staged_files} && git add {staged_files}
+    #    eslint:
+    #      glob: '*.{js,ts,jsx,tsx}'
+    #      run: yarn eslint --quiet --fix {staged_files} && git add {staged_files}
     prettier:
       glob: '*.{json,yml,yaml,html,graphql}'
       run: yarn prettier --write {staged_files} && git add {staged_files}

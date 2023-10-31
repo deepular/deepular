@@ -98,7 +98,6 @@ export class ServerControllersModule extends ControllersModule {
     signalControllerType: Type,
     controllerTypeClass: TypeClass,
   ): void {
-    console.log(this.rpcControllers, controllerTypeClass);
     const { controller: controllerType, injector } = this.rpcControllers.get(
       controllerTypeClass.typeName!,
     )!;

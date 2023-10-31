@@ -62,7 +62,6 @@ export async function startServer(
 
   const controllersModule = new ServerControllersModule(serverModule);
   setupRootComponent(rootComponent, [controllersModule]);
-  console.log(controllersModule.getProviders());
 
   const logger = app.get(Logger);
 

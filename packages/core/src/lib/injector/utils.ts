@@ -79,6 +79,7 @@ export function provideNgDeclarationDependency<T>(
 ): FactoryProvider<T> {
   return {
     provide: type,
+    transient: true,
     useFactory: () => {
       try {
         return inject(type);
@@ -96,6 +97,7 @@ export function provideNgDependency<T>(
 ): FactoryProvider<T> {
   return {
     provide: type,
+    transient: true,
     useFactory: () => inject(type),
   };
 }

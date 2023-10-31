@@ -6,4 +6,4 @@ import { appConfig } from './app.config';
 
 import.meta.hot?.accept();
 
-void bootstrapApplication(AppComponent, ['AppController'], appConfig);
+void bootstrapApplication(AppComponent, appConfig);

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "patch-compiler": "sh scripts/patch-compiler.sh",
-    "postinstall": "deepkit-type-install && pnpm run patch-compiler && lefthook install",
+    "postinstall": "deepkit-type-install && pnpm run patch-compiler && lefthook install && pnpm run link",
+    "link": "npm-local-development --no-watcher .",
     "patch-compiler-package": "patch-package --patch-dir packages/compiler/src/patches"
   },
   "private": true,
@@ -40,6 +41,7 @@
     "lefthook": "1.5.1",
     "node-gyp": "9.4.0",
     "node-gyp-build": "4.6.1",
+    "npm-local-development": "^0.4.2",
     "nx": "16.10.0",
     "prettier": "3.0.3",
     "release-it": "16.2.1",

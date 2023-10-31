@@ -81,7 +81,7 @@ export const makeSerializedClassTypeStateKey = (name: string) =>
   makeStateKey<SerializedTypes>(`SerializedClassType[${name}]`);
 
 export class ControllerConsumerIndex {
-  constructor(readonly value: number = 1) {}
+  constructor(readonly value: number = -1) {}
 
   next(): ControllerConsumerIndex {
     return new ControllerConsumerIndex(this.value + 1);
