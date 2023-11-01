@@ -1,17 +1,13 @@
-import {
-  Component,
-  Injectable,
-  ɵNG_COMP_DEF,
-  ɵNG_INJ_DEF,
-  ɵNG_PROV_DEF,
-} from '@angular/core';
-import { screen } from '@testing-library/angular';
 // nx-ignore-next-line
-import { render, setupModule } from '@ngkit/testing';
+import { render, setupTestingModule } from '@ngkit/testing';
+import { TestBed } from '@angular/core/testing';
+import { screen } from '@testing-library/angular';
+import { Component, Injectable, NgModule } from '@angular/core';
 
 import { createModule } from './module';
+import { setupRootComponent } from './utils';
 
-test('declarations exported in an imported module can be used in template', async () => {
+test('exported declarations can be used in parent module component', async () => {
   @Component({
     selector: 'ng-test',
     template: `<div data-testid="test">Test</div>`,
@@ -39,31 +35,14 @@ test('declarations exported in an imported module can be used in template', asyn
 test('angular providers', () => {});
 
 // test that TestService is only available in TestComponent but not FixtureComponent because it's not exported from TestModule
-test.todo(
-  'provider should only be available in module scope because it has not been exported' /*, async () => {
+test('provider in imported module should not be available in parent module when it has not been exported', () => {
   class TestService {
     value = 1;
   }
 
-  @Component({
-    selector: 'test',
-    template: `{{ test.value }}`,
-  })
-  class TestComponent {
-    constructor(protected test: TestService) {}
-  }
-
   class TestModule extends createModule({
-    declarations: [TestComponent],
     providers: [TestService],
-    // exports: [TestService],
   }) {}
-
-  const testBed = setupModule(new TestModule());
-
-  testBed.createComponent(TestComponent);
-
-  testBed.resetTestingModule();
 
   @Component({
     selector: 'fixture',
@@ -75,6 +54,79 @@ test.todo(
     constructor(protected test: TestService) {}
   }
 
-  await render(FixtureComponent);
-}*/,
-);
+  expect(() =>
+    setupRootComponent(FixtureComponent),
+  ).toThrowErrorMatchingInlineSnapshot(
+    '"Undefined dependency \\"test: TestService\\" of FixtureComponent(?). Type has no provider in no scope."',
+  );
+});
+
+test('providers in imported angular modules should be present in parent ngkit module', () => {
+  @Injectable()
+  class TestNgService {}
+
+  @NgModule({
+    providers: [TestNgService],
+  })
+  class TestNgModule {}
+
+  class TestService {
+    constructor(readonly test: TestNgService) {}
+  }
+
+  class TestModule extends createModule({
+    providers: [TestService],
+  }) {
+    override ngImports = [TestNgModule];
+  }
+
+  const injector = setupTestingModule(new TestModule()).getInjectorContext();
+
+  expect(injector.get(TestService).test).toBeInstanceOf(TestNgService);
+});
+
+test('exported declarations in imported angular modules should be present in parent ngkit module', () => {
+  @Component({
+    selector: 'ng-test',
+    template: `<span data-testid="ng-test">TestNgComponent</span>`,
+  })
+  class TestNgComponent {}
+
+  @NgModule({
+    declarations: [TestNgComponent],
+    exports: [TestNgComponent],
+  })
+  class TestNgModule {}
+
+  @Component({
+    selector: 'test',
+    template: `<ng-test />`,
+  })
+  class TestComponent {
+    constructor() {}
+  }
+
+  class TestModule extends createModule({
+    declarations: [TestComponent],
+  }) {
+    override ngImports = [TestNgModule];
+  }
+
+  setupTestingModule(new TestModule());
+
+  const component = TestBed.createComponent(TestComponent);
+  expect(component.nativeElement).toMatchInlineSnapshot(`
+      <div
+        id="root1"
+        ng-version="16.2.8"
+      >
+        <ng-test>
+          <span
+            data-testid="ng-test"
+          >
+            TestNgComponent
+          </span>
+        </ng-test>
+      </div>
+    `);
+});

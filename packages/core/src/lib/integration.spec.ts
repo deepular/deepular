@@ -1,8 +1,8 @@
+// nx-ignore-next-line
+import { render, setupTestingModule } from '@ngkit/testing';
+import { createModule } from '@ngkit/core';
 import { Component, ElementRef } from '@angular/core';
 import { NgIf } from '@angular/common';
-// nx-ignore-next-line
-import { render, setupModule } from '@ngkit/testing';
-import { createModule } from '@ngkit/core';
 
 test('fails to resolve declaration specific dependencies for providers', () => {
   class TestService {
@@ -22,7 +22,7 @@ test('fails to resolve declaration specific dependencies for providers', () => {
 
   const module = new TestModule();
 
-  const svc = setupModule(module);
+  const svc = setupTestingModule(module);
 
   const injector = svc.getInjector(module);
 

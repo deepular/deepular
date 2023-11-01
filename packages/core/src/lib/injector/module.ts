@@ -17,9 +17,7 @@ import { PartialDeep } from 'type-fest';
 import {
   ɵNG_INJ_DEF,
   ɵNG_MOD_DEF,
-  ɵNG_PROV_DEF,
   ɵɵregisterNgModuleType,
-  ɵɵInjectableDeclaration,
   ModuleWithProviders,
   ɵɵdefineNgModule,
   ɵɵdefineInjector,
@@ -45,7 +43,11 @@ import {
   uuid,
 } from '@deepkit/type';
 
-import { provideNgDeclarationDependency, provideNgDependency } from './utils';
+import {
+  provideNgDeclarationDependency,
+  provideNgDependency,
+  convertNgModule,
+} from './utils';
 
 export type ExportType =
   | AbstractClassType
@@ -152,7 +154,7 @@ export interface RootModuleDefinition extends ModuleDefinition {
   /**
    * Import another module.
    */
-  imports?: (AppModule<any> | ClassType<any> | ModuleWithProviders<any>)[];
+  imports?: AppModule[];
 }
 
 export interface CreateModuleDefinition extends ModuleDefinition {
@@ -225,6 +227,8 @@ export function isDeclaration(value: ProviderWithScope): boolean {
 
 export const ɵNG_FAC_DEF = 'ɵfac' as const;
 
+export type NgModuleType<T> = ClassType<T> | ModuleWithProviders<T>;
+
 // @ts-ignore
 export class AppModule<
   T extends RootModuleDefinition = {},
@@ -233,7 +237,7 @@ export class AppModule<
   public setupConfigs: ((module: AppModule<any>, config: any) => void)[] = [];
   // readonly [NG_FAC_DEF]: ɵɵFactoryDeclaration<this, never>;
 
-  readonly ngImports: (ClassType | ModuleWithProviders<any>)[] = [];
+  readonly ngImports: NgModuleType<any>[] = [];
   // @ts-ignore
   override readonly imports: AppModule[] = [];
   override providers: ProviderWithScope[] = [];
@@ -251,11 +255,7 @@ export class AppModule<
     super();
     if (this.options.imports) {
       for (const m of this.options.imports) {
-        if (isClass(m) || 'ngModule' in m) {
-          this.addNgModuleImport(m);
-        } else {
-          this.addModuleImport(m);
-        }
+        this.addModuleImport(m);
       }
     }
     if (this.options.providers) this.providers.push(...this.options.providers);
@@ -294,8 +294,9 @@ export class AppModule<
     );
   }
 
-  protected addNgModuleImport(m: ClassType | ModuleWithProviders<any>) {
-    this.ngImports.push(m);
+  protected addNgImport(ngModule: NgModuleType<any>) {
+    const module = convertNgModule(ngModule);
+    this.addImport(module);
   }
 
   protected addModuleImport(m: AppModule<any> | FunctionalModule) {
@@ -447,7 +448,7 @@ export class AppModule<
     return [];
   }
 
-  getNgFactory<T>(provider: unknown): () => T {
+  protected getNgFactory<T>(provider: unknown): () => T {
     return () => {
       if (!this.injector) {
         throw new Error('Injector not built yet');
@@ -456,7 +457,7 @@ export class AppModule<
     };
   }
 
-  getNgProvider(provider: ProviderWithScope): Provider {
+  protected getNgProvider(provider: ProviderWithScope): Provider {
     if (provider instanceof TagProvider) {
       return this.getNgProvider(provider.provider);
     }
@@ -465,30 +466,12 @@ export class AppModule<
       return provider;
     }
 
-    const token = getNgProviderToken(provider);
-
-    const factory = this.getNgFactory(provider);
-
     this.overrideNgFactoryDef(provider);
-
-    Object.defineProperty(provider, ɵNG_PROV_DEF, {
-      configurable: true,
-      get: (): ɵɵInjectableDeclaration<any> => {
-        const isExported = this.exports.some(export_ => export_ === token);
-        return {
-          token,
-          // @ts-ignore
-          providedIn: isExported ? (this.root ? 'root' : this) : null,
-          factory,
-          value: 'useValue' in provider ? provider.useValue : undefined,
-        };
-      },
-    });
 
     return provider;
   }
 
-  defineNgProviderDefs() {
+  protected defineNgProviderDefs() {
     this.ngProviders.push(
       ...this.providers
         .filter(provider => !isDeclaration(provider))
@@ -496,7 +479,15 @@ export class AppModule<
     );
   }
 
-  registerNgModule(): void {
+  protected convertNgModuleImports() {
+    for (const ngModule of this.ngImports) {
+      const module = convertNgModule(ngModule);
+      this.addImport(module);
+    }
+  }
+
+  protected registerNgModule(): void {
+    this.convertNgModuleImports();
     this.defineNgProviderDefs();
     this.defineNgModuleDefs();
     this.declarations.forEach(declaration =>
@@ -505,32 +496,29 @@ export class AppModule<
     ɵɵregisterNgModuleType(this as any, this.id);
   }
 
-  overrideNgFactoryDef(type: ClassType<unknown>): void {
+  protected overrideNgFactoryDef(type: ClassType<unknown>): void {
     Object.defineProperty(type, ɵNG_FAC_DEF, {
       configurable: true,
       get: () => this.getNgFactory(type),
     });
   }
 
-  defineNgModuleDefs(this: this & any): void {
+  protected defineNgModuleDefs(this: this & any): void {
     this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
       type: this,
       id: this.id,
       declarations: this.declarations,
-      // @ts-ignore
-      imports: [...this.imports, ...this.ngImports],
+      imports: this.ngImports,
       exports: this.exports,
     });
 
-    // @ts-ignore
     this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
       providers: this.ngProviders,
-      imports: [...this.imports, ...this.ngImports],
+      imports: this.ngImports,
     });
 
     ɵɵsetNgModuleScope(this, {
-      // @ts-ignore
-      imports: this.imports,
+      imports: this.ngImports,
       declarations: this.declarations,
       exports: this.exports,
     });

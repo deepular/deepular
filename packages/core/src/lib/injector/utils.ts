@@ -3,7 +3,15 @@ import {
   isClassProvider,
   isFactoryProvider,
 } from '@deepkit/injector';
-import { inject, ɵComponentDef, ɵNG_COMP_DEF } from '@angular/core';
+import {
+  inject,
+  ɵComponentDef,
+  ɵNG_COMP_DEF,
+  ɵNG_INJ_DEF,
+  ɵNG_MOD_DEF,
+  ɵNgModuleDef,
+  ɵɵInjectorDef,
+} from '@angular/core';
 import { AbstractClassType, ClassType, isClass } from '@deepkit/core';
 import {
   reflect,
@@ -13,7 +21,12 @@ import {
   TypeParameter,
 } from '@deepkit/type';
 
-import { AppModule, createModule, ProviderWithScope } from './module';
+import {
+  AppModule,
+  createModule,
+  NgModuleType,
+  ProviderWithScope,
+} from './module';
 import { ServiceContainer } from './service-container';
 
 export function getComponentDependencies<T>(
@@ -53,6 +66,55 @@ export function createStandaloneComponentModule<T>(
     component.name,
   ) {
     override imports = imports;
+  })();
+}
+
+export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
+  const ngModuleDef = ngModule[ɵNG_MOD_DEF as keyof typeof ngModule] as
+    | ɵNgModuleDef<unknown>
+    | undefined;
+  if (!ngModuleDef) {
+    throw new Error(`${ngModule} is not a NgModule`);
+  }
+  const injectorDef = ngModule[ɵNG_INJ_DEF as keyof typeof ngModule] as
+    | ɵɵInjectorDef<unknown>
+    | undefined;
+
+  const ngImports =
+    typeof ngModuleDef.imports === 'function'
+      ? ngModuleDef.imports()
+      : ngModuleDef.imports;
+
+  const declarations =
+    typeof ngModuleDef.declarations === 'function'
+      ? ngModuleDef.declarations()
+      : ngModuleDef.declarations;
+
+  const exports =
+    typeof ngModuleDef.exports === 'function'
+      ? ngModuleDef.exports()
+      : ngModuleDef.exports;
+
+  const providers = (injectorDef?.providers || []).map(provider =>
+    isClass(provider)
+      ? provider
+      : 'provide' in provider
+      ? provider.provide
+      : (provider as any),
+  );
+
+  const ngModuleClassType =
+    'ngModule' in ngModule ? ngModule.ngModule : ngModule;
+
+  return new (class extends createModule(
+    {
+      declarations,
+      providers,
+      exports: [...providers, ...exports],
+    },
+    ngModuleClassType.name,
+  ) {
+    override ngImports = ngImports;
   })();
 }
 

@@ -1,5 +1,5 @@
 import {
-  render as ngRender,
+  render as _render,
   RenderComponentOptions,
   RenderResult,
 } from '@testing-library/angular';
@@ -12,5 +12,5 @@ export async function render<T>(
   options?: RenderComponentOptions<T>,
 ): Promise<RenderResult<T>> {
   setupRootComponent(component);
-  return await ngRender(component, options);
+  return await _render(component, options);
 }

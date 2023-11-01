@@ -14,7 +14,7 @@ import { sleep } from '@deepkit/core';
 
 describe('ServerControllersModule', () => {
   describe('addServerController', () => {
-    test('rpc controller method', async () => {
+    test('server controller method works', async () => {
       const method = vitest.fn();
 
       class TestRpcController {
