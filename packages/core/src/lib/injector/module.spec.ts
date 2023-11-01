@@ -11,7 +11,7 @@ import { render, setupModule } from '@ngkit/testing';
 
 import { createModule } from './module';
 
-test('exported declarations', async () => {
+test('declarations exported in an imported module can be used in template', async () => {
   @Component({
     selector: 'ng-test',
     template: `<div data-testid="test">Test</div>`,
