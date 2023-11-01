@@ -66,11 +66,11 @@ describe('ServerControllersModule', () => {
       const mockValue = Math.random();
       method.mockResolvedValueOnce(mockValue);
 
-      const result = await serverController.method();
+      const result = await serverController.method({ test: '' });
 
       expect(result).toBe(mockValue);
       expect(transferStateSetSpy).toHaveBeenCalledWith(
-        'TestRpcController#method([])0',
+        'TestRpcController#method([{"test":""}])0',
         { data: mockValue },
       );
     });
@@ -132,15 +132,16 @@ describe('ServerControllersModule', () => {
       await TestBed.runInInjectionContext(async () => {
         const { value, error, loading } = signalController.method();
 
-        expect(value()).toMatchInlineSnapshot('undefined');
-        expect(error()).toMatchInlineSnapshot('null');
-        expect(loading()).toMatchInlineSnapshot('false');
+        expect(value()).toBe(undefined)
+        expect(error()).toBe(null);
+        expect(loading()).toBe(true);
 
         // wait for promise to have been resolved
         await sleep(0);
 
         expect(value()).toBe(mockValue);
-        expect(error()).toMatchInlineSnapshot('null');
+        expect(error()).toBe(null);
+        expect(loading()).toBe(false);
         expect(transferStateSetSpy).toHaveBeenCalledWith(
           'TestRpcController#method([])0',
           { data: mockValue },
