@@ -10,6 +10,8 @@ import {
   ɵNG_INJ_DEF,
   ɵNG_MOD_DEF,
   ɵNgModuleDef,
+  ɵɵdefineInjector,
+  ɵɵdefineNgModule,
   ɵɵInjectorDef,
 } from '@angular/core';
 import { AbstractClassType, ClassType, isClass } from '@deepkit/core';
@@ -21,13 +23,13 @@ import {
   TypeParameter,
 } from '@deepkit/type';
 
+import { ServiceContainer } from './service-container';
 import {
   AppModule,
   createModule,
   NgModuleType,
   ProviderWithScope,
 } from './module';
-import { ServiceContainer } from './service-container';
 
 export function getComponentDependencies<T>(
   componentDef: ɵComponentDef<T>,
@@ -37,6 +39,32 @@ export function getComponentDependencies<T>(
       ? componentDef.dependencies()
       : componentDef.dependencies) as (ClassType<unknown> | AppModule)[]) || []
   );
+}
+
+export function setNgModuleDef(
+  type: any,
+  def: Parameters<typeof ɵɵdefineNgModule>[0],
+) {
+  type[ɵNG_MOD_DEF] = ɵɵdefineNgModule(def);
+}
+
+export function setInjectorDef(
+  type: any,
+  def: Parameters<typeof ɵɵdefineInjector>[0],
+) {
+  type[ɵNG_INJ_DEF] = ɵɵdefineInjector(def);
+}
+
+export function getNgModuleDef(type: any): ɵNgModuleDef<any> | null {
+  return type[ɵNG_MOD_DEF] || null;
+}
+
+export function getInjectorDef(type: any): ɵɵInjectorDef<any> | null {
+  return type[ɵNG_INJ_DEF] || null;
+}
+
+export function getComponentDef<T>(type: ClassType<T>): ɵComponentDef<T> | null {
+  return type[ɵNG_COMP_DEF as keyof typeof type] || null;
 }
 
 export function getImportedModules<T>(
@@ -50,8 +78,7 @@ export function getImportedModules<T>(
 export function createStandaloneComponentModule<T>(
   component: ClassType<T>,
 ): AppModule<any> {
-  const componentDef: ɵComponentDef<T> | undefined =
-    component[ɵNG_COMP_DEF as keyof typeof component];
+  const componentDef = getComponentDef(component);
   if (!componentDef?.['standalone']) {
     throw new Error(`${component.name} is not a standalone component`);
   }
@@ -70,15 +97,11 @@ export function createStandaloneComponentModule<T>(
 }
 
 export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
-  const ngModuleDef = ngModule[ɵNG_MOD_DEF as keyof typeof ngModule] as
-    | ɵNgModuleDef<unknown>
-    | undefined;
+  const ngModuleDef = getNgModuleDef(ngModule);
   if (!ngModuleDef) {
     throw new Error(`${ngModule} is not a NgModule`);
   }
-  const injectorDef = ngModule[ɵNG_INJ_DEF as keyof typeof ngModule] as
-    | ɵɵInjectorDef<unknown>
-    | undefined;
+  const injectorDef = getInjectorDef(ngModule);
 
   const ngImports =
     typeof ngModuleDef.imports === 'function'

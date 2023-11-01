@@ -15,12 +15,8 @@ import {
 import { WorkflowDefinition } from '@deepkit/workflow';
 import { PartialDeep } from 'type-fest';
 import {
-  ɵNG_INJ_DEF,
-  ɵNG_MOD_DEF,
   ɵɵregisterNgModuleType,
   ModuleWithProviders,
-  ɵɵdefineNgModule,
-  ɵɵdefineInjector,
   ɵɵsetNgModuleScope,
   Provider,
   Injector,
@@ -47,6 +43,8 @@ import {
   provideNgDeclarationDependency,
   provideNgDependency,
   convertNgModule,
+  setNgModuleDef,
+  setInjectorDef,
 } from './utils';
 
 export type ExportType =
@@ -503,22 +501,26 @@ export class AppModule<
     });
   }
 
-  protected defineNgModuleDefs(this: this & any): void {
-    this[ɵNG_MOD_DEF] = ɵɵdefineNgModule({
+  protected defineNgModuleDefs(): void {
+    const imports = this.ngImports.map(ngImport =>
+      'ngModule' in ngImport ? ngImport.ngModule : ngImport,
+    );
+
+    setNgModuleDef(this, {
       type: this,
       id: this.id,
       declarations: this.declarations,
-      imports: this.ngImports,
+      imports,
       exports: this.exports,
     });
 
-    this[ɵNG_INJ_DEF] = ɵɵdefineInjector({
+    setInjectorDef(this, {
       providers: this.ngProviders,
-      imports: this.ngImports,
+      imports,
     });
 
     ɵɵsetNgModuleScope(this, {
-      imports: this.ngImports,
+      imports,
       declarations: this.declarations,
       exports: this.exports,
     });
