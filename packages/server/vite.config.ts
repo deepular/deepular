@@ -1,12 +1,21 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { angular } from '@analogjs/vite-plugin-angular/src/lib/angular-vite-plugin';
 import { deepkitType } from '@deepkit/vite';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => ({
   cacheDir: '../../node_modules/.vite/server',
-  plugins: [nxViteTsPaths(), deepkitType({ compilerOptions: { sourceMap: true } })],
+  plugins: [
+    nxViteTsPaths(),
+    deepkitType({
+      tsConfig: join(__dirname, 'tsconfig.json'),
+      compilerOptions: { sourceMap: true },
+    }),
+  ],
   test: {
     globals: true,
     cache: {
