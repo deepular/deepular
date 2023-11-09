@@ -20,7 +20,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { InternalClientController } from './internal-client-controller';
-import { TransferStateMissingForClientControllerMethodError } from './errors';
+import { TransferStateMissingForClientControllerMethodException } from './errors';
 
 export class ClientControllersModule extends ControllersModule {
   constructor(private readonly client: RpcClient) {
@@ -50,17 +50,14 @@ export class ClientControllersModule extends ControllersModule {
             this.getInternalClientController(controllerName);
           const remoteController = this.getRemoteController(controllerName);
           const consumerIdx = serverControllerConsumerIndex.next();
+
           return new Proxy(remoteController, {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get(target: any, propertyName: string): any {
               if (!clientController.methodNames.includes(propertyName)) return;
 
-              let transferStateUsed: boolean = false;
-
               return async (...args: readonly unknown[]): Promise<unknown> => {
                 const execute = () => target[propertyName](...args);
-
-                if (transferStateUsed) return await execute();
 
                 try {
                   return clientController.getTransferState(
@@ -71,15 +68,11 @@ export class ClientControllersModule extends ControllersModule {
                 } catch (err) {
                   if (
                     err instanceof
-                    TransferStateMissingForClientControllerMethodError
+                    TransferStateMissingForClientControllerMethodException
                   ) {
                     return await execute();
                   }
                   throw err;
-                } finally {
-                  if (!transferStateUsed) {
-                    transferStateUsed = true;
-                  }
                 }
               };
             },
@@ -104,6 +97,7 @@ export class ClientControllersModule extends ControllersModule {
             this.getInternalClientController(controllerName);
           const remoteController = this.getRemoteController(controllerName);
           const consumerIdx = signalControllerConsumerIndex.next();
+
           return new Proxy(remoteController, {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get: (target: any, methodName: string) => {
@@ -116,7 +110,6 @@ export class ClientControllersModule extends ControllersModule {
                 const error = signal<Error | null>(null);
                 let value$: Subject<unknown> | BehaviorSubject<unknown> =
                   new Subject<unknown>();
-                let transferStateUsed: boolean = false;
 
                 const changeDetectorRef = inject(ChangeDetectorRef);
                 // TODO: we need current component reference
@@ -148,27 +141,22 @@ export class ClientControllersModule extends ControllersModule {
                   }
                 };
 
-                if (!transferStateUsed) {
-                  try {
-                    const result = clientController.getTransferState(
-                      methodName,
-                      args,
-                      consumerIdx,
-                    );
-                    transferStateUsed = true;
-                    value$ = new BehaviorSubject(result);
-                  } catch (err) {
-                    if (
-                      err instanceof
-                      TransferStateMissingForClientControllerMethodError
-                    ) {
-                      void load(...args);
-                    } else {
-                      throw err;
-                    }
+                try {
+                  const result = clientController.getTransferState(
+                    methodName,
+                    args,
+                    consumerIdx,
+                  );
+                  value$ = new BehaviorSubject(result);
+                } catch (err) {
+                  if (
+                    err instanceof
+                    TransferStateMissingForClientControllerMethodException
+                  ) {
+                    void load(...args);
+                  } else {
+                    throw err;
                   }
-                } else {
-                  void load(...args);
                 }
 
                 const value = toSignal(value$.asObservable(), {

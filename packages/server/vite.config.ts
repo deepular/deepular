@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
     cache: {
       dir: '../../node_modules/.vitest',
     },
+    passWithNoTests: true,
     environment: 'jsdom',
     setupFiles: ['src/test-setup.ts'],
     include: ['src/**/*.spec.ts'],

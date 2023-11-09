@@ -1,131 +1,118 @@
-import { describe, test, expect, vitest } from 'vitest';
+import { describe, test, expect, vitest, beforeEach, Mock } from 'vitest';
 import { InjectorContext } from '@deepkit/injector';
 import { Injector } from '@deepkit/injector';
-import { reflect, typeOf } from '@deepkit/type';
+import { typeOf } from '@deepkit/type';
 import { TransferState } from '@angular/core';
-import { TestBed, tick } from '@angular/core/testing';
-import { BSONSerializer } from '@deepkit/bson';
+import { TestBed } from '@angular/core/testing';
 import { ServerController, SignalController } from '@ngkit/core';
+// nx-ignore-next-line
+import { tick } from '@ngkit/testing';
 
 import { ServerControllersModule } from './server-controllers.module';
 import { ServerModule } from './server.module';
-import { InternalServerController } from './internal-server-controller';
-import { sleep } from '@deepkit/core';
 
-describe('ServerControllersModule', () => {
-  describe('addServerController', () => {
-    test('server controller method works', async () => {
-      const method = vitest.fn();
+interface TestRpcController {
+  method(arg1?: any): number;
+}
 
-      class TestRpcController {
-        method = method;
-      }
+describe('server controllers', () => {
+  let method: Mock;
+  let transferState: {
+    set: Mock;
+  };
+  let internalServerController: {
+    methodNames: readonly string[];
+    serializers: ReadonlyMap<string, Mock>;
+  };
+  let serverControllersModule: ServerControllersModule & any;
 
-      const rpcController = {
-        controller: TestRpcController,
-        injector: InjectorContext.forProviders([TestRpcController]),
-      };
+  beforeEach(() => {
+    method = vitest.fn();
 
-      const serverControllersModule: ServerControllersModule & any =
-        new ServerControllersModule({
-          rpcControllers: new Set([rpcController]),
-        } as ServerModule);
+    class TestRpcController {
+      method = method;
+    }
 
-      const transferState = new TransferState();
+    const rpcController = {
+      controller: TestRpcController,
+      injector: InjectorContext.forProviders([TestRpcController]),
+    };
 
-      const transferStateSetSpy = vitest.spyOn(transferState, 'set');
+    serverControllersModule = new ServerControllersModule({
+        rpcControllers: new Set([rpcController]),
+      } as ServerModule);
 
-      serverControllersModule.addProvider({
-        provide: TransferState,
-        transient: true,
-        useValue: transferState,
-      });
+    transferState = {
+      set: vitest.fn(),
+    }
 
+    serverControllersModule.addProvider({
+      provide: TransferState,
+      transient: true,
+      useValue: transferState,
+    });
+
+    const serialize = vitest.fn().mockImplementation(args => args);
+
+    internalServerController = {
+      methodNames: ['method'],
+      serializers: new Map([['method', serialize]]),
+    };
+
+    vitest
+      .spyOn(serverControllersModule, 'getInternalServerController')
+      .mockReturnValue(internalServerController);
+  });
+
+  describe('server controller method', () => {
+    let serverController: ServerController<TestRpcController>;
+
+    beforeEach(() => {
       const serverControllerType =
         typeOf<ServerController<TestRpcController>>();
 
       serverControllersModule.addServerController(
         serverControllerType,
-        TestRpcController.name,
+        'TestRpcController',
       );
-
-      const serialize = vitest.fn().mockImplementation(args => args);
-
-      vitest
-        .spyOn(serverControllersModule, 'getInternalServerController')
-        .mockReturnValue({
-          methodNames: ['method'],
-          serializers: new Map([['method', serialize]]),
-        } as InternalServerController);
 
       const injector = Injector.fromModule(serverControllersModule);
 
-      const serverController =
+      serverController =
         injector.get<ServerController<TestRpcController>>(serverControllerType);
+    })
 
-      const mockValue = Math.random();
-      method.mockResolvedValueOnce(mockValue);
+    test('works', async () => {
+      const value = Math.random();
+      method.mockResolvedValueOnce(value);
 
-      const result = await serverController.method({ test: '' });
+      await expect(serverController.method({ test: '' })).resolves.toEqual(value);
 
-      expect(result).toBe(mockValue);
-      expect(transferStateSetSpy).toHaveBeenCalledWith(
+      expect(transferState.set).toHaveBeenCalledWith(
         'TestRpcController#method([{"test":""}])0',
-        { data: mockValue },
+        { data: value },
       );
     });
   });
 
-  describe('addSignalController', () => {
-    test('rpc controller method returns a promise', async () => {
-      const method = vitest.fn();
+  describe('signal controller method', () => {
+    let signalController: SignalController<TestRpcController>;
 
-      class TestRpcController {
-        method = method;
-      }
-
-      const rpcController = {
-        controller: TestRpcController,
-        injector: InjectorContext.forProviders([TestRpcController]),
-      };
-
-      const serverControllersModule: ServerControllersModule & any =
-        new ServerControllersModule({
-          rpcControllers: new Set([rpcController]),
-        } as ServerModule);
-
-      const transferState = new TransferState();
-
-      const transferStateSetSpy = vitest.spyOn(transferState, 'set');
-
-      serverControllersModule.addProvider({
-        provide: TransferState,
-        transient: true,
-        useValue: transferState,
-      });
-
-      const signalControllerType =
-        typeOf<SignalController<TestRpcController>>();
+    beforeEach(() => {
+      const signalControllerType = typeOf<SignalController<TestRpcController>>();
 
       serverControllersModule.addSignalController(
         signalControllerType,
-        TestRpcController.name,
+        'TestRpcController'
       );
-
-      const serialize = vitest.fn().mockImplementation(args => args);
-
-      vitest
-        .spyOn(serverControllersModule, 'getInternalServerController')
-        .mockReturnValue({
-          methodNames: ['method'],
-          serializers: new Map([['method', serialize]]),
-        } as InternalServerController);
 
       const injector = Injector.fromModule(serverControllersModule);
 
-      const signalController =
+      signalController =
         injector.get<SignalController<TestRpcController>>(signalControllerType);
+    });
 
+    test('result', async () => {
       const mockValue = Math.random();
       method.mockResolvedValueOnce(mockValue);
 
@@ -136,13 +123,12 @@ describe('ServerControllersModule', () => {
         expect(error()).toBe(null);
         expect(loading()).toBe(true);
 
-        // wait for promise to have been resolved
-        await sleep(0);
+        await tick();
 
-        expect(value()).toBe(mockValue);
+        expect(value()).toEqual(mockValue);
         expect(error()).toBe(null);
         expect(loading()).toBe(false);
-        expect(transferStateSetSpy).toHaveBeenCalledWith(
+        expect(transferState.set).toHaveBeenCalledWith(
           'TestRpcController#method([])0',
           { data: mockValue },
         );

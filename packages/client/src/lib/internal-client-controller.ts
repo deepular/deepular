@@ -10,7 +10,7 @@ import {
   unwrapType,
 } from '@ngkit/core';
 
-import { TransferStateMissingForClientControllerMethodError } from './errors';
+import { TransferStateMissingForClientControllerMethodException } from './errors';
 
 export class InternalClientController {
   static getProviderToken(controllerName: string): string {
@@ -65,7 +65,7 @@ export class InternalClientController {
     );
 
     if (!this.transferState.hasKey(transferStateKey)) {
-      throw new TransferStateMissingForClientControllerMethodError(
+      throw new TransferStateMissingForClientControllerMethodException(
         this,
         methodName,
       );
