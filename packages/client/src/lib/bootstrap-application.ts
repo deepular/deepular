@@ -2,31 +2,37 @@ import { bootstrapApplication as _bootstrapApplication } from '@angular/platform
 import { RpcWebSocketClient } from '@deepkit/rpc';
 import {
   ApplicationConfig,
-  FactoryProvider,
   ɵNG_COMP_DEF,
   mergeApplicationConfig,
   ɵComponentDef,
   Type,
-  APP_INITIALIZER,
-  TransferState,
 } from '@angular/core';
 
-import { CORE_CONFIG, setupRootComponent } from '@ngkit/core';
+import { CORE_CONFIG, createRouteConfig, Routes, setupRootComponent } from '@ngkit/core';
 
 import { ClientControllersModule } from './client-controllers.module';
 
+export interface Config extends Partial<ApplicationConfig> {
+  readonly routes: Routes;
+}
+
 export async function bootstrapApplication<T>(
   rootComponent: Type<T>,
-  appConfig: ApplicationConfig = { providers: [] },
+  { routes }: Config,
 ): Promise<void> {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
 
-  setupRootComponent(rootComponent, [new ClientControllersModule(client)]);
+  setupRootComponent(rootComponent, {
+    modules: [new ClientControllersModule(client)],
+    routes,
+  });
 
-  const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
+  const routeConfig = createRouteConfig(routes);
+
+  const finalAppConfig = mergeApplicationConfig(
     CORE_CONFIG,
-    appConfig,
+    routeConfig,
   );
 
   // const refetchers = import.meta.hot?.data.refetchers;

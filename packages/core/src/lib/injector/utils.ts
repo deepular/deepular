@@ -30,6 +30,7 @@ import {
   NgModuleType,
   ProviderWithScope,
 } from './module';
+import { processRoute, Routes } from '../router';
 
 export function getComponentDependencies<T>(
   componentDef: ɵComponentDef<T>,
@@ -143,16 +144,19 @@ export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
 
 export function setupRootComponent<T>(
   component: ClassType<T>,
-  modules: readonly AppModule[] = [],
+  { modules, routes }: { modules?: readonly AppModule[]; routes?: Routes; } = {},
 ): ServiceContainer {
   const rootModule = createStandaloneComponentModule(component);
   const serviceContainer = new ServiceContainer(rootModule);
-  if (modules.length) {
-    for (const module of modules) {
-      if (!module.root) {
-        throw new Error('Only root modules are allowed');
-      }
-      serviceContainer.appModule.addImport(module);
+  modules?.forEach(module => {
+    if (!module.root) {
+      throw new Error('Only root modules are allowed');
+    }
+    serviceContainer.appModule.addImport(module);
+  })
+  if (routes) {
+    for (const route of routes) {
+      processRoute(route, serviceContainer);
     }
   }
   serviceContainer.process();

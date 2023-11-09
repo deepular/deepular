@@ -29,21 +29,15 @@ describe('ControllersModule', () => {
 
     test('adds server controller type', () => {
       class TestControllersModule extends ControllersModule {
-        protected addServerController(
-          serverControllerType: Type,
-          controllerType: TypeClass,
-        ): void {}
+        protected addServerController(): void {}
 
-        protected addSignalController(
-          signalControllerType: Type,
-          controllerType: TypeClass,
-        ): void {}
+        protected addSignalController(): void {}
       }
 
       const controllersModule: TestControllersModule & any =
         new TestControllersModule();
 
-      type TestController = {};
+      interface TestController {}
 
       class TestService {
         constructor(test: ServerController<TestController>) {}

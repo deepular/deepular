@@ -2,8 +2,10 @@ import 'zone.js';
 import { bootstrapApplication } from '@ngkit/client';
 
 import { AppComponent } from './app.component';
-import { appConfig } from './app.config';
+import { routes } from './routes';
 
 import.meta.hot?.accept();
 
-void bootstrapApplication(AppComponent, appConfig);
+void bootstrapApplication(AppComponent, {
+  routes
+});

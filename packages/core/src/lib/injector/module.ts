@@ -38,6 +38,8 @@ import {
   TypeClass,
   uuid,
 } from '@deepkit/type';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterState, RouterStateSnapshot } from '@angular/router';
+
 
 import {
   provideNgDeclarationDependency,
@@ -46,7 +48,6 @@ import {
   setNgModuleDef,
   setInjectorDef,
 } from './utils';
-
 export type ExportType =
   | AbstractClassType
   | string
@@ -285,6 +286,16 @@ export class AppModule<
     this.addProvider(provideNgDependency(Injector));
   }
 
+  private addNgRouterProviders() {
+    this.addProvider(
+      provideNgDependency(ActivatedRouteSnapshot),
+      provideNgDependency(ActivatedRoute),
+      provideNgDependency(RouterStateSnapshot),
+      provideNgDependency(RouterState),
+      provideNgDependency(Router),
+    );
+  }
+
   private addNgDeclarationProviders() {
     this.addProvider(
       provideNgDeclarationDependency(ElementRef),
@@ -345,6 +356,7 @@ export class AppModule<
   postProcess() {
     if (this.declarations.length) {
       this.addNgDeclarationProviders();
+      this.addNgRouterProviders();
     }
     this.addNgProviders();
   }

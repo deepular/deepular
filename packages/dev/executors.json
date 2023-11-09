@@ -2,10 +2,12 @@
   "$schema": "https://json-schema.org/schema",
   "executors": {
     "serve": {
-      "implementation": "./serve.esm.js"
+      "implementation": "./serve.esm.js",
+      "schema": "./schema.json"
     },
     "build": {
-      "implementation": "./build.esm.js"
+      "implementation": "./build.esm.js",
+      "schema": "./schema.json"
     }
   }
 }
