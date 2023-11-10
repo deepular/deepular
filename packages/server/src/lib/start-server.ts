@@ -5,10 +5,10 @@ import { RootModuleDefinition } from '@deepkit/app';
 import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
 import { setupRootComponent } from '@ngkit/core';
+import { ApplicationConfig } from '@angular/core';
 
 import { ServerModule } from './server.module';
 import { ServerControllersModule } from './server-controllers.module';
-import { ApplicationConfig } from '@angular/core';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
