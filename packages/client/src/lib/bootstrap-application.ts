@@ -2,32 +2,36 @@ import { bootstrapApplication as _bootstrapApplication } from '@angular/platform
 import { RpcWebSocketClient } from '@deepkit/rpc';
 import {
   ApplicationConfig,
-  FactoryProvider,
   ɵNG_COMP_DEF,
-  mergeApplicationConfig,
   ɵComponentDef,
   Type,
-  APP_INITIALIZER,
-  TransferState,
 } from '@angular/core';
 
-import { CORE_CONFIG, setupRootComponent } from '@ngkit/core';
+import {
+  CORE_CONFIG,
+  setupRootComponent,
+  mergeApplicationConfig,
+  provideRouter,
+} from '@ngkit/core';
 
 import { ClientControllersModule } from './client-controllers.module';
 
 export async function bootstrapApplication<T>(
   rootComponent: Type<T>,
-  appConfig: ApplicationConfig = { providers: [] },
+  router: ReturnType<typeof provideRouter>,
+  appConfig?: ApplicationConfig,
 ): Promise<void> {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
 
-  setupRootComponent(rootComponent, [new ClientControllersModule(client)]);
+  const clientControllersModule = new ClientControllersModule(client);
+  setupRootComponent(rootComponent, {
+    modules: [clientControllersModule],
+  });
 
-  const finalAppConfig: ApplicationConfig = mergeApplicationConfig(
-    CORE_CONFIG,
-    appConfig,
-  );
+  const ngAppConfig = mergeApplicationConfig(CORE_CONFIG, appConfig, {
+    providers: [router(clientControllersModule)],
+  });
 
   // const refetchers = import.meta.hot?.data.refetchers;
 
@@ -37,7 +41,7 @@ export async function bootstrapApplication<T>(
     delete import.meta.hot.data.destroy;
   }
 
-  const appRef = await _bootstrapApplication(rootComponent, finalAppConfig);
+  const appRef = await _bootstrapApplication(rootComponent, ngAppConfig);
 
   if (import.meta.hot) {
     import.meta.hot!.data.refetch = false;

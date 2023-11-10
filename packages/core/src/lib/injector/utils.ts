@@ -63,7 +63,9 @@ export function getInjectorDef(type: any): ɵɵInjectorDef<any> | null {
   return type[ɵNG_INJ_DEF] || null;
 }
 
-export function getComponentDef<T>(type: ClassType<T>): ɵComponentDef<T> | null {
+export function getComponentDef<T>(
+  type: ClassType<T>,
+): ɵComponentDef<T> | null {
   return type[ɵNG_COMP_DEF as keyof typeof type] || null;
 }
 
@@ -143,18 +145,16 @@ export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
 
 export function setupRootComponent<T>(
   component: ClassType<T>,
-  modules: readonly AppModule[] = [],
+  { modules }: { modules?: readonly AppModule[] } = {},
 ): ServiceContainer {
   const rootModule = createStandaloneComponentModule(component);
   const serviceContainer = new ServiceContainer(rootModule);
-  if (modules.length) {
-    for (const module of modules) {
-      if (!module.root) {
-        throw new Error('Only root modules are allowed');
-      }
-      serviceContainer.appModule.addImport(module);
+  modules?.forEach(module => {
+    if (!module.root) {
+      throw new Error('Only root modules are allowed');
     }
-  }
+    serviceContainer.appModule.addImport(module);
+  });
   serviceContainer.process();
   return serviceContainer;
 }

@@ -1,8 +1,6 @@
 import ts from 'typescript';
 import { NgCompilerHost } from '@angular/compiler-cli/src/ngtsc/core';
 
-import { transformSourceFile } from './utils';
-
 export class NgKitCompilerHost extends NgCompilerHost {
   static override wrap = NgCompilerHost.wrap;
 

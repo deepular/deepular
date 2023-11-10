@@ -10,7 +10,15 @@ import {
 import { Signal, signal, TransferState } from '@angular/core';
 import { Type } from '@deepkit/type';
 import { FactoryProvider } from '@deepkit/injector';
-import { catchError, finalize, firstValueFrom, from, Observable, of, tap } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  firstValueFrom,
+  from,
+  Observable,
+  of,
+  tap,
+} from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ClassType } from '@deepkit/core';
 
@@ -20,16 +28,14 @@ import { ServerModule } from './server.module';
 import { RpcController } from './types';
 
 export class ServerControllersModule extends ControllersModule {
-  private readonly rpcControllers: ReadonlyMap<string, RpcController>;
+  private rpcControllers: ReadonlyMap<string, RpcController>;
 
   constructor(private readonly serverModule: ServerModule) {
     super();
-    this.rpcControllers = new Map(
-      [...this.serverModule.rpcControllers].map(controller => [
-        controller.controller.name,
-        controller,
-      ]),
-    );
+  }
+
+  clone(): ServerControllersModule {
+    return new ServerControllersModule(this.serverModule);
   }
 
   getInternalServerController(type: ClassType): InternalServerController {
@@ -163,7 +169,7 @@ export class ServerControllersModule extends ControllersModule {
                       error.set(err);
                       return of(null);
                     }),
-                    finalize(() => loading.set(false))
+                    finalize(() => loading.set(false)),
                   );
                   value = toSignal(result);
                 }
@@ -190,6 +196,13 @@ export class ServerControllersModule extends ControllersModule {
   }
 
   override postProcess() {
+    this.rpcControllers = new Map(
+      [...this.serverModule.rpcControllers].map(controller => [
+        controller.controller.name,
+        controller,
+      ]),
+    );
+
     this.rpcControllers.forEach(({ controller }) => {
       const serverControllerProvider: FactoryProvider<InternalServerController> =
         {

@@ -24,6 +24,8 @@ export abstract class ControllersModule extends createModule({
   protected readonly serverControllerTypes = new Map<string, Type>();
   protected readonly controllerNames = new Set<string>();
 
+  abstract clone(): ControllersModule;
+
   protected abstract addServerController(
     serverControllerType: Type,
     controllerName: string,
@@ -35,8 +37,8 @@ export abstract class ControllersModule extends createModule({
   ): void;
 
   override processProvider(
-    _module: AppModule,
-    _token: Token,
+    _module: AppModule | undefined,
+    _token: Token | undefined,
     provider: ProviderWithScope,
   ) {
     if (

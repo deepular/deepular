@@ -7,9 +7,7 @@
   "targets": {
     "build": {
       "executor": "@nx/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/{projectRoot}",
         "main": "{projectRoot}/src/index.ts",
@@ -21,6 +19,11 @@
             "glob": "executors.json",
             "input": "{projectRoot}",
             "output": ""
+          },
+          {
+            "glob": "schema.json",
+            "input": "{projectRoot}",
+            "output": ""
           }
         ],
         "additionalEntryPoints": [
@@ -29,9 +32,7 @@
           "{projectRoot}/src/executors/serve.ts"
         ],
         "sourcemap": true,
-        "format": [
-          "esm"
-        ],
+        "format": ["esm"],
         "external": "all",
         "generateExportsField": true,
         "compiler": "tsc"

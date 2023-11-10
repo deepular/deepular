@@ -1,5 +1,3 @@
-import { Type, TypeClass } from '@deepkit/type';
-
 import { ControllersModule } from './controllers.module';
 import { AppModule } from './injector';
 import { ServerController, SignalController } from './controller';
@@ -11,6 +9,10 @@ describe('ControllersModule', () => {
         protected addServerController(): void {}
 
         protected addSignalController(): void {}
+
+        clone(): ControllersModule {
+          return new TestControllersModule();
+        }
       }
 
       const controllersModule: TestControllersModule & any =
@@ -29,21 +31,19 @@ describe('ControllersModule', () => {
 
     test('adds server controller type', () => {
       class TestControllersModule extends ControllersModule {
-        protected addServerController(
-          serverControllerType: Type,
-          controllerType: TypeClass,
-        ): void {}
+        protected addServerController(): void {}
 
-        protected addSignalController(
-          signalControllerType: Type,
-          controllerType: TypeClass,
-        ): void {}
+        protected addSignalController(): void {}
+
+        clone(): ControllersModule {
+          return new TestControllersModule();
+        }
       }
 
       const controllersModule: TestControllersModule & any =
         new TestControllersModule();
 
-      type TestController = {};
+      interface TestController {}
 
       class TestService {
         constructor(test: ServerController<TestController>) {}

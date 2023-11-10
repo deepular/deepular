@@ -38,6 +38,13 @@ import {
   TypeClass,
   uuid,
 } from '@deepkit/type';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  Router,
+  RouterState,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 import {
   provideNgDeclarationDependency,
@@ -307,6 +314,11 @@ export class AppModule<
     }
   }
 
+  // @ts-ignore
+  override setParent(parent: AppModule): this {
+    return super.setParent(parent as unknown as InjectorModule);
+  }
+
   /**
    * When all configuration loaders have been loaded, this method is called.
    * It allows to further manipulate the module state depending on the final config.
@@ -371,13 +383,13 @@ export class AppModule<
 
   addDeclaration(...declarations: ClassType[]): this {
     this.assertInjectorNotBuilt();
-    this.declarations.push(...declarations);
     for (const declaration of declarations) {
       this.providers.push({
         provide: declaration,
         transient: true,
         useClass: declaration,
       });
+      this.declarations.push(declaration);
     }
     return this;
   }

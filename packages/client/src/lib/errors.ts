@@ -1,6 +1,6 @@
 import type { InternalClientController } from './internal-client-controller';
 
-export class TransferStateMissingForClientControllerMethodError extends Error {
+export class TransferStateMissingForClientControllerMethodException extends Error {
   constructor(
     readonly target: InternalClientController,
     readonly methodName: string,

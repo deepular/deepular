@@ -1,0 +1,15 @@
+diff --git a/dist/esm/src/client/client-websocket.js b/dist/esm/src/client/client-websocket.js
+index c79c2b0246bbfdbd77af23d415fd34f16283c8fd..f992faa9bd3844cf36928464581fc87dfab255dd 100644
+--- a/dist/esm/src/client/client-websocket.js
++++ b/dist/esm/src/client/client-websocket.js
+@@ -55,9 +55,8 @@ export class RpcWebSocketClientAdapter {
+         this.url = url;
+     }
+     async connect(connection) {
+-        const wsPackage = 'ws';
+         if (!webSocketConstructor) {
+-            webSocketConstructor = 'undefined' === typeof WebSocket ? (await import(wsPackage)).WebSocket : WebSocket;
++            webSocketConstructor = 'undefined' === typeof WebSocket ? (await import('ws')).WebSocket : WebSocket;
+         }
+         const socket = new webSocketConstructor(this.url);
+         socket.binaryType = 'arraybuffer';

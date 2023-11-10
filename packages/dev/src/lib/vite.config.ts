@@ -9,7 +9,6 @@ import { viteNodeHmrPlugin } from 'vite-node/hmr';
 import type { Writable } from 'type-fest';
 
 import { NgKitConfig, ViteConfig } from './config';
-import { InjectControllerTransformer } from '@ngkit/compiler';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -90,13 +89,6 @@ export class NgKitViteConfig {
           usePolling: false,
           awaitWriteFinish: true,
         },
-        /*proxy: {
-          '/public': {
-            target: 'http://localhost:4200',
-            changeOrigin: true,
-            rewrite: path => path.replace(/^\/public/, '')
-          }
-        },*/
       },
       build: {
         outDir: this.config.server.outDir,

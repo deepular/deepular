@@ -3,11 +3,15 @@ import { InjectorContext } from '@deepkit/injector';
 import {
   APP_INITIALIZER,
   ApplicationConfig,
-  mergeApplicationConfig,
   Provider,
   TransferState,
 } from '@angular/core';
-import { CORE_CONFIG, makeSerializedClassTypeStateKey } from '@ngkit/core';
+import {
+  ControllersModule,
+  CORE_CONFIG,
+  makeSerializedClassTypeStateKey,
+  mergeApplicationConfig,
+} from '@ngkit/core';
 import { provideServerRendering } from '@angular/platform-server';
 import { reflect, SerializedTypes, serializeType } from '@deepkit/type';
 import { rpcClass } from '@deepkit/rpc';
@@ -26,6 +30,8 @@ export class ServerModule extends createModule({
     string,
     SerializedTypes
   >();
+
+  controllersModule: ControllersModule | undefined;
 
   override postProcess(): void {
     this.rpcControllers.forEach(({ controller }) => {
@@ -58,11 +64,17 @@ export class ServerModule extends createModule({
       providers: [provideServerRendering(), ngAppInit],
     };
 
-    const finalAppConfig = this.config.app
-      ? mergeApplicationConfig(CORE_CONFIG, serverConfig, this.config.app)
-      : mergeApplicationConfig(CORE_CONFIG, serverConfig);
+    if (!this.controllersModule) {
+      throw new Error('Missing ControllersModule');
+    }
 
-    this.configure({ app: finalAppConfig });
+    const appConfig = mergeApplicationConfig(
+      CORE_CONFIG,
+      serverConfig,
+      this.config.app,
+      { providers: [this.config.router(this.controllersModule)] },
+    );
+    this.configure({ app: appConfig });
   }
 
   override processController(
