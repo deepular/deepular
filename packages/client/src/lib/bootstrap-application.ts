@@ -10,7 +10,8 @@ import {
 import {
   CORE_CONFIG,
   setupRootComponent,
-  mergeApplicationConfig, provideRouter,
+  mergeApplicationConfig,
+  provideRouter,
 } from '@ngkit/core';
 
 import { ClientControllersModule } from './client-controllers.module';
@@ -28,10 +29,8 @@ export async function bootstrapApplication<T>(
     modules: [clientControllersModule],
   });
 
-  const ngAppConfig = mergeApplicationConfig(
-    CORE_CONFIG,
-    appConfig,
-    { providers: [router(clientControllersModule)],
+  const ngAppConfig = mergeApplicationConfig(CORE_CONFIG, appConfig, {
+    providers: [router(clientControllersModule)],
   });
 
   // const refetchers = import.meta.hot?.data.refetchers;

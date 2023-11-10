@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRoute, RouterState } from '@angular/router';
 
 @Component({
   selector: 'home',
   standalone: true,
-  template: `Hello {{ route.data }}`,
+  template: `Hello {{ route.snapshot.data['data'] }}`,
 })
 export class HomeComponent {
-  constructor(protected readonly route: ActivatedRouteSnapshot) {}
+  constructor(protected readonly route: ActivatedRoute) {}
 }

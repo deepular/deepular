@@ -1,14 +1,17 @@
 import { describe } from 'vitest';
 import { Component } from '@angular/core';
 import {
+  ActivatedRoute,
   ActivatedRouteSnapshot,
   RouterOutlet,
-  RouterStateSnapshot, UrlSegment,
+  RouterStateSnapshot,
+  UrlSegment,
 } from '@angular/router';
 import { render, screen } from '@testing-library/angular';
-import { assert } from '@deepkit/type';
+import { ControllersModule, createModule, ServiceContainer } from '@ngkit/core';
+import { assert, Type } from '@deepkit/type';
 
-import { NgKitRoute } from './process';
+import { NgKitRoute, processRoutes } from './process';
 import {
   CanActivate,
   CanActivateChild,
@@ -16,7 +19,7 @@ import {
   CanMatch,
   Resolve,
   Route,
-  RouterStateTransitionSnapshot,
+  RouterStateTransition,
 } from './types';
 
 @Component({
@@ -63,9 +66,13 @@ describe('route', () => {
         path: '',
         component: TestComponent,
         providers: [TestGuard],
-        canActivate: [(
-          guard: TestGuard, route: ActivatedRouteSnapshot, state: RouterStateSnapshot,
-        ) => guard.canActivate(route, state)],
+        canActivate: [
+          (
+            guard: TestGuard,
+            route: ActivatedRouteSnapshot,
+            state: RouterStateSnapshot,
+          ) => guard.canActivate(route, state),
+        ],
       });
 
       const { navigate } = await render(RootComponent, {
@@ -73,12 +80,15 @@ describe('route', () => {
       });
 
       await navigate('/');
-    })
+    });
   });
 
   describe('canActivateChild', () => {
     class TestGuard implements CanActivateChild {
-      canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+      canActivateChild(
+        childRoute: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot,
+      ) {
         assert<ActivatedRouteSnapshot>(childRoute);
         assert<RouterStateSnapshot>(state);
         return true;
@@ -104,9 +114,13 @@ describe('route', () => {
         path: '',
         component: TestComponent,
         providers: [TestGuard],
-        canActivateChild: [(
-          guard: TestGuard, childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot,
-        ) => guard.canActivateChild(childRoute, state)],
+        canActivateChild: [
+          (
+            guard: TestGuard,
+            childRoute: ActivatedRouteSnapshot,
+            state: RouterStateSnapshot,
+          ) => guard.canActivateChild(childRoute, state),
+        ],
       });
 
       const { navigate } = await render(RootComponent, {
@@ -114,15 +128,19 @@ describe('route', () => {
       });
 
       await navigate('/');
-    })
+    });
   });
 
   describe('canDeactivate', () => {
     class TestGuard implements CanDeactivate<TestComponent> {
-      canDeactivate(component: TestComponent, currentRoute: ActivatedRouteSnapshot, stateTransition: RouterStateTransitionSnapshot) {
+      canDeactivate(
+        component: TestComponent,
+        currentRoute: ActivatedRouteSnapshot,
+        stateTransition: RouterStateTransition,
+      ) {
         assert<TestComponent>(component);
         assert<ActivatedRouteSnapshot>(currentRoute);
-        assert<RouterStateTransitionSnapshot>(stateTransition);
+        assert<RouterStateTransition>(stateTransition);
         return true;
       }
     }
@@ -146,9 +164,14 @@ describe('route', () => {
         path: '',
         component: TestComponent,
         providers: [TestGuard],
-        canDeactivate: [(
-          guard: TestGuard, component: TestComponent, currentRoute: ActivatedRouteSnapshot, stateTransition: RouterStateTransitionSnapshot,
-        ) => guard.canDeactivate(component, currentRoute, stateTransition)],
+        canDeactivate: [
+          (
+            guard: TestGuard,
+            component: TestComponent,
+            currentRoute: ActivatedRouteSnapshot,
+            stateTransition: RouterStateTransition,
+          ) => guard.canDeactivate(component, currentRoute, stateTransition),
+        ],
       });
 
       const { navigate } = await render(RootComponent, {
@@ -156,7 +179,7 @@ describe('route', () => {
       });
 
       await navigate('/');
-    })
+    });
   });
 
   describe('canMatch', () => {
@@ -187,11 +210,10 @@ describe('route', () => {
         path: '',
         component: TestComponent,
         providers: [TestGuard],
-        canMatch: [(
-          guard: TestGuard,
-          route: Route,
-          segments: readonly UrlSegment[],
-        ) => guard.canMatch(route, segments)],
+        canMatch: [
+          (guard: TestGuard, route: Route, segments: readonly UrlSegment[]) =>
+            guard.canMatch(route, segments),
+        ],
       });
 
       const { navigate } = await render(RootComponent, {
@@ -199,7 +221,7 @@ describe('route', () => {
       });
 
       await navigate('/');
-    })
+    });
   });
 
   describe('resolve', () => {
@@ -282,5 +304,30 @@ describe('route', () => {
     await navigate('/');
 
     expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+
+  test('loadComponent + resolve', async () => {
+    @Component({
+      selector: 'test',
+      standalone: true,
+      template: `<span data-testid="data">{{ route.snapshot.data['data'] }}</span>`,
+    })
+    class TestComponent {
+      constructor(readonly route: ActivatedRoute) {}
+    }
+
+    const route = NgKitRoute.process({
+      path: '',
+      loadComponent: async () => TestComponent,
+      resolve: { data: () => 'test' },
+    });
+
+    const { navigate } = await render(RootComponent, {
+      routes: [route],
+    });
+
+    await navigate('/');
+
+    expect(screen.getByTestId('data')).toHaveTextContent('test');
   });
 });

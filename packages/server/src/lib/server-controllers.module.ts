@@ -34,6 +34,10 @@ export class ServerControllersModule extends ControllersModule {
     super();
   }
 
+  clone(): ServerControllersModule {
+    return new ServerControllersModule(this.serverModule);
+  }
+
   getInternalServerController(type: ClassType): InternalServerController {
     return this.injector!.get<InternalServerController>(
       InternalServerController.getProviderToken(type),

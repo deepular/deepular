@@ -27,6 +27,10 @@ export class ClientControllersModule extends ControllersModule {
     super();
   }
 
+  clone(): ClientControllersModule {
+    return new ClientControllersModule(this.client);
+  }
+
   getRemoteController<T>(name: string): RemoteController<T> {
     return this.injector!.get(name) as RemoteController<T>;
   }

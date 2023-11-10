@@ -292,16 +292,6 @@ export class AppModule<
     this.addProvider(provideNgDependency(Injector));
   }
 
-  private addNgRouterProviders() {
-    this.addProvider(
-      provideNgDependency(ActivatedRouteSnapshot),
-      provideNgDependency(ActivatedRoute),
-      provideNgDependency(RouterStateSnapshot),
-      provideNgDependency(RouterState),
-      provideNgDependency(Router),
-    );
-  }
-
   private addNgDeclarationProviders() {
     this.addProvider(
       provideNgDeclarationDependency(ElementRef),
@@ -367,7 +357,6 @@ export class AppModule<
   postProcess() {
     if (this.declarations.length) {
       this.addNgDeclarationProviders();
-      this.addNgRouterProviders();
     }
     this.addNgProviders();
   }

@@ -9,6 +9,10 @@ describe('ControllersModule', () => {
         protected addServerController(): void {}
 
         protected addSignalController(): void {}
+
+        clone(): ControllersModule {
+          return new TestControllersModule();
+        }
       }
 
       const controllersModule: TestControllersModule & any =
@@ -30,6 +34,10 @@ describe('ControllersModule', () => {
         protected addServerController(): void {}
 
         protected addSignalController(): void {}
+
+        clone(): ControllersModule {
+          return new TestControllersModule();
+        }
       }
 
       const controllersModule: TestControllersModule & any =

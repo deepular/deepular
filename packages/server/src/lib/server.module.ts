@@ -72,7 +72,7 @@ export class ServerModule extends createModule({
       CORE_CONFIG,
       serverConfig,
       this.config.app,
-      { providers: [this.config.router(this.controllersModule)] }
+      { providers: [this.config.router(this.controllersModule)] },
     );
     this.configure({ app: appConfig });
   }

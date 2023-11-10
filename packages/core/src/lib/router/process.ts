@@ -1,56 +1,62 @@
 import {
-  ActivatedRouteSnapshot,
   CanActivateChildFn as NgCanActivateChildFn,
   CanActivateFn as NgCanActivateFn,
-  CanDeactivateFn as NgCanDeactivateFn,
-  provideRouter as provideNgRouter,
-  Route as NgRoute,
   RouterFeatures,
-  RouterStateSnapshot,
   Routes as NgRoutes,
+  Route as NgRoute,
+  ActivatedRoute,
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
   UrlSegment,
+  provideRouter as provideNgRouter,
 } from '@angular/router';
 import { EnvironmentProviders } from '@angular/core';
-import { ClassType, getClassName, isClass } from '@deepkit/core';
-import {
-  reflect,
-  TypeFunction,
-  isSameType,
-  Type,
-} from '@deepkit/type';
+import { ClassType, isClass } from '@deepkit/core';
+import { TypeFunction, Type, reflect, isSameType } from '@deepkit/type';
 
 import {
   AppModule,
   createModule,
   createStandaloneComponentModule,
+  provideNgDependency,
   ServiceContainer,
-  setupRootComponent,
 } from '../injector';
 import {
-  activatedRouteSnapshotType,
   NgCanMatchFn,
   ResolveFn,
-  Route, routerStateSnapshotType, routerStateTransitionSnapshotType,
+  Route,
   Routes,
+  activatedRouteSnapshotType,
   routeType,
   urlSegmentsType,
+  routerStateSnapshotType,
+  routerStateTransitionType,
 } from './types';
 import { maybeUnwrapDefaultExport } from './utils';
 import { ControllersModule } from '../controllers.module';
 
-export class RouteModule extends createModule({}) {
-  readonly children = new Set<RouteModule>();
+const routeModuleProviders = [
+  provideNgDependency(ActivatedRoute),
+  provideNgDependency(Router),
+];
+
+export class RouteModule extends createModule({
+  providers: routeModuleProviders,
+}) {
+  componentModule?: AppModule;
+  readonly controllersModule?: ControllersModule;
 
   constructor(
     readonly current: Route,
-    controllersModule?: ControllersModule,
+    _controllersModule?: ControllersModule,
     parent?: NgKitRoute,
   ) {
     super();
     this.name = current.path || 'index';
-    if (controllersModule) {
-      // FIXME: doesn't work because module injector has already been built
-      this.addImport(controllersModule);
+    if (_controllersModule) {
+      this.controllersModule = _controllersModule.clone();
+      this.addImport(this.controllersModule);
     }
     if (current.providers) {
       this.addProvider(...current.providers);
@@ -59,14 +65,37 @@ export class RouteModule extends createModule({}) {
       this.addImport(...current.imports);
     }
     if (parent) {
-      // this might not work because the parent has already been built
+      this.name = `${parent.module.name}-${this.name}`;
       this.setParent(parent.module);
-      parent.module.addChild(this);
     }
   }
 
-  addChild(module: RouteModule): void {
-    this.children.add(module);
+  // so that ControllersModule can detect which controllers are used
+  processCallback(cb: (...args: any[]) => any) {
+    this.controllersModule?.processProvider(undefined, undefined, {
+      provide: cb,
+      useFactory: cb,
+    });
+  }
+
+  processComponent(component: ClassType): void {
+    if (this.componentModule) {
+      throw new Error('Standalone component module already created');
+    }
+
+    this.componentModule = createStandaloneComponentModule(component);
+
+    if (!this.injector) {
+      this.addImport(this.componentModule);
+    } else {
+      if (this.controllersModule) {
+        this.componentModule.addImport(this.controllersModule.clone());
+      }
+      this.componentModule.addProvider(...this.getProviders());
+      // FIXME: ServiceNotFoundError: Service 'HomeComponent' in RouteModule not found. Make sure it is provided.
+      // this.componentModule.setParent(this);
+      new ServiceContainer(this.componentModule).process();
+    }
   }
 }
 
@@ -84,7 +113,11 @@ export class NgKitRoute {
     this.serviceContainer = new ServiceContainer(this.module);
   }
 
-  static process(route: Route, controllersModule?: ControllersModule, parent?: NgKitRoute) {
+  static process(
+    route: Route,
+    controllersModule?: ControllersModule,
+    parent?: NgKitRoute,
+  ) {
     return new NgKitRoute(route, controllersModule, parent).process();
   }
 
@@ -93,20 +126,15 @@ export class NgKitRoute {
       const loadComponent = this.route.loadComponent;
       this.route.loadComponent = async () => {
         const component = maybeUnwrapDefaultExport(await loadComponent());
-        const componentModule = createStandaloneComponentModule(component);
-        this.componentServiceContainer = new ServiceContainer(componentModule);
-        // FIXME: doesn't work because module injector has already been built
-        componentModule.setParent(this.module);
-        this.componentServiceContainer.process();
+        this.module.processComponent(component);
         return component;
       };
     } else if (this.route.component) {
-      const componentModule = createStandaloneComponentModule(this.route.component);
-      this.module.addImport(componentModule);
+      this.module.processComponent(this.route.component);
     }
   }
 
-  private processRouteChildren() {
+  private processChildren() {
     if (this.route.loadChildren) {
       const loadChildren = this.route.loadChildren;
       this.route.loadChildren = async () => {
@@ -119,55 +147,66 @@ export class NgKitRoute {
     }
   }
 
-  private resolveRouteFunction<Fn extends (...args: any) => any>(
-    fn: Fn,
+  private resolveCallback<Fn extends (...args: any) => any>(
+    cb: Fn,
     deps: readonly [type: Type, value: unknown][] = [],
   ): ReturnType<Fn> {
-    const fnType = reflect(fn) as TypeFunction;
-    const args = fnType.parameters.map(parameter => {
+    const cbType = reflect(cb) as TypeFunction;
+    const args = cbType.parameters.map(parameter => {
       const dep = deps.find(dep => isSameType(parameter.type, dep[0]));
       return dep?.[1] || this.module.injector!.get(parameter.type);
     });
-    return fn(...args);
+    return cb(...args);
   }
 
-  private processRouteGuards() {
+  private processGuards() {
     if (this.route.canActivate) {
       this.route.canActivate = this.route.canActivate.map(canActivate => {
         if (isClass(canActivate)) {
-          if (!this.module.isProvided(canActivate)) {
-            this.module.addProvider(canActivate);
-          }
           return (...args: Parameters<NgCanActivateFn>) => {
             const guard = this.module.injector!.get(canActivate);
             return guard.canActivate(...args);
           };
         }
 
-        return (childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot) => this.resolveRouteFunction(canActivate, [
-          [activatedRouteSnapshotType, childRoute],
-          [routerStateSnapshotType, state],
-        ]);
+        this.module.processCallback(canActivate);
+
+        return (
+          childRoute: ActivatedRouteSnapshot,
+          state: RouterStateSnapshot,
+        ) =>
+          this.resolveCallback(canActivate, [
+            [activatedRouteSnapshotType, childRoute],
+            [routerStateSnapshotType, state],
+          ]);
       });
     }
 
     if (this.route.canActivateChild) {
-      this.route.canActivateChild = this.route.canActivateChild.map(canActivateChild => {
-        if (isClass(canActivateChild)) {
-          if (!this.module.isProvided(canActivateChild)) {
-            this.module.addProvider(canActivateChild);
+      this.route.canActivateChild = this.route.canActivateChild.map(
+        canActivateChild => {
+          if (isClass(canActivateChild)) {
+            if (!this.module.isProvided(canActivateChild)) {
+              this.module.addProvider(canActivateChild);
+            }
+            return (...args: Parameters<NgCanActivateChildFn>) => {
+              const guard = this.module.injector!.get(canActivateChild);
+              return guard.canActivateChild(...args);
+            };
           }
-          return (...args: Parameters<NgCanActivateChildFn>) => {
-            const guard = this.module.injector!.get(canActivateChild);
-            return guard.canActivateChild(...args);
-          };
-        }
 
-        return (childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot) => this.resolveRouteFunction(canActivateChild, [
-          [activatedRouteSnapshotType, childRoute],
-          [routerStateSnapshotType, state],
-        ]);
-      });
+          this.module.processCallback(canActivateChild);
+
+          return (
+            childRoute: ActivatedRouteSnapshot,
+            state: RouterStateSnapshot,
+          ) =>
+            this.resolveCallback(canActivateChild, [
+              [activatedRouteSnapshotType, childRoute],
+              [routerStateSnapshotType, state],
+            ]);
+        },
+      );
     }
 
     if (this.route.canDeactivate) {
@@ -176,17 +215,33 @@ export class NgKitRoute {
           if (!this.module.isProvided(canDeactivate)) {
             this.module.addProvider(canDeactivate);
           }
-          return (component: unknown, currentRoute: ActivatedRouteSnapshot, current: RouterStateSnapshot, next: RouterStateSnapshot) => {
+          return (
+            component: unknown,
+            currentRoute: ActivatedRouteSnapshot,
+            current: RouterStateSnapshot,
+            next: RouterStateSnapshot,
+          ) => {
             const guard = this.module.injector!.get(canDeactivate);
-            return guard.canDeactivate(component, currentRoute, { current, next });
+            return guard.canDeactivate(component, currentRoute, {
+              current,
+              next,
+            });
           };
         }
 
-        return (component: unknown, currentRoute: ActivatedRouteSnapshot, current: RouterStateSnapshot, next: RouterStateSnapshot) => this.resolveRouteFunction(canDeactivate, [
-          [reflect(component), component],
-          [activatedRouteSnapshotType, currentRoute],
-          [routerStateTransitionSnapshotType, { current, next }],
-        ]);
+        this.module.processCallback(canDeactivate);
+
+        return (
+          component: unknown,
+          currentRoute: ActivatedRouteSnapshot,
+          current: RouterStateSnapshot,
+          next: RouterStateSnapshot,
+        ) =>
+          this.resolveCallback(canDeactivate, [
+            [reflect(component), component],
+            [activatedRouteSnapshotType, currentRoute],
+            [routerStateTransitionType, { current, next }],
+          ]);
       });
     }
 
@@ -202,18 +257,24 @@ export class NgKitRoute {
           };
         }
 
-        return (route: Route, segments: UrlSegment[]) => this.resolveRouteFunction(canMatch, [
-          [routeType, route],
-          [urlSegmentsType, segments],
-        ]);
+        this.module.processCallback(canMatch);
+
+        return (route: Route, segments: UrlSegment[]) =>
+          this.resolveCallback(canMatch, [
+            [routeType, route],
+            [urlSegmentsType, segments],
+          ]);
       });
     }
   }
 
-  private processRouteResolvers() {
+  private processResolvers() {
     if (this.route.resolve) {
       for (const [key, resolve] of Object.entries(this.route.resolve)) {
-        const ngResolve = this.route.resolve as Record<string, ResolveFn<unknown>>;
+        const ngResolve = this.route.resolve as Record<
+          string,
+          ResolveFn<unknown>
+        >;
         if (isClass(resolve)) {
           this.module.addProvider(resolve);
 
@@ -225,24 +286,27 @@ export class NgKitRoute {
             return resolver.resolve(route, state);
           };
         } else {
+          this.module.processCallback(resolve);
+
           ngResolve[key] = (
             route: ActivatedRouteSnapshot,
             state: RouterStateSnapshot,
-          ) => this.resolveRouteFunction(resolve, [
-            [activatedRouteSnapshotType, route],
-            [routerStateSnapshotType, state],
-          ]);
+          ) =>
+            this.resolveCallback(resolve, [
+              [activatedRouteSnapshotType, route],
+              [routerStateSnapshotType, state],
+            ]);
         }
       }
     }
   }
 
   process(): NgRoute {
-    this.processRouteChildren();
+    this.processChildren();
 
-    this.processRouteGuards();
+    this.processGuards();
 
-    this.processRouteResolvers();
+    this.processResolvers();
 
     this.processComponent();
 
@@ -252,7 +316,11 @@ export class NgKitRoute {
   }
 }
 
-export function processRoutes(routes: Routes, controllersModule?: ControllersModule, parent?: NgKitRoute): void {
+export function processRoutes(
+  routes: Routes,
+  controllersModule?: ControllersModule,
+  parent?: NgKitRoute,
+): void {
   for (const route of routes) {
     NgKitRoute.process(route, controllersModule, parent);
   }
@@ -265,5 +333,5 @@ export function provideRouter(
   return (controllersModule: ControllersModule) => {
     processRoutes(routes, controllersModule);
     return provideNgRouter(routes as NgRoutes, ...features);
-  }
+  };
 }

@@ -7,7 +7,8 @@ import {
 // nx-ignore-next-line
 import { processRoutes, Routes, setupRootComponent } from '@ngkit/core';
 
-export interface RenderOptions<T> extends Omit<RenderComponentOptions<T>, 'routes'> {
+export interface RenderOptions<T>
+  extends Omit<RenderComponentOptions<T>, 'routes'> {
   readonly routes?: Routes;
 }
 

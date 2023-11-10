@@ -1,6 +1,6 @@
 import { provideRouter, Routes, ServerController } from '@ngkit/core';
 
-import { HomeController } from './pages/home/home.controller';
+import type { HomeController } from './pages/home/home.controller';
 
 export const router = provideRouter([
   {
@@ -8,7 +8,8 @@ export const router = provideRouter([
     loadComponent: () =>
       import('./pages/home/home.component').then(m => m.HomeComponent),
     resolve: {
-      data: (controller: ServerController<HomeController>) => controller.fetchData(),
+      data: (controller: ServerController<HomeController>) =>
+        controller.fetchData(),
     },
   },
-])
+]);

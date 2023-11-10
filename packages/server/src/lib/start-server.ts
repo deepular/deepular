@@ -14,7 +14,7 @@ export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
   readonly document?: string;
   readonly documentPath?: string;
-  readonly router: ReturnType<typeof provideRouter>
+  readonly router: ReturnType<typeof provideRouter>;
 }
 
 export async function startServer(

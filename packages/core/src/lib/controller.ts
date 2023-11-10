@@ -3,7 +3,10 @@ import { Observable } from 'rxjs';
 import { RemoteController } from '@deepkit/rpc';
 import { SerializedTypes } from '@deepkit/type';
 
-type InferObservable<T> = T extends Observable<infer U> ? U : T;
+export type InferObservable<T> = T extends Observable<infer U> ? U : T;
+
+export type UnwrapFunctionReturnType<T extends (...args: any[]) => any> =
+  InferObservable<Awaited<ReturnType<T>>>;
 
 export interface SignalControllerMethod<T, A extends unknown[]> {
   readonly value: Signal<T>;
@@ -15,10 +18,7 @@ export interface SignalControllerMethod<T, A extends unknown[]> {
 
 export type SignalifyFn<T extends (...args: any[]) => any> = (
   ...args: Parameters<T>
-) => SignalControllerMethod<
-  InferObservable<Awaited<ReturnType<T>>>,
-  Parameters<T>
->;
+) => SignalControllerMethod<UnwrapFunctionReturnType<T>, Parameters<T>>;
 
 export type SignalController<T> = {
   [P in keyof T]: T[P] extends (...args: any[]) => any

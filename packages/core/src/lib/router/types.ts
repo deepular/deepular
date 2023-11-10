@@ -4,15 +4,20 @@ import {
   ResolveFn as NgResolveFn,
   CanActivateChildFn as NgCanActivateChildFn,
   UrlSegment,
-  UrlTree, DefaultExport, ActivatedRouteSnapshot, RouterStateSnapshot,
+  UrlTree,
+  DefaultExport,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
 } from '@angular/router';
 import { ClassType } from '@deepkit/core';
 import { Observable } from 'rxjs';
 import { TypeArray, TypeClass, TypeObjectLiteral, typeOf } from '@deepkit/type';
 
 import { AppModule, ProviderWithScope } from '../injector';
+import { UnwrapFunctionReturnType } from '../controller';
+import { Signal } from '@angular/core';
 
-export interface RouterStateTransitionSnapshot {
+export interface RouterStateTransition {
   readonly current: RouterStateSnapshot;
   readonly next: RouterStateSnapshot;
 }
@@ -37,7 +42,15 @@ export type CanActivateChildGuard =
   | ClassType<CanActivateChild>
   | CanActivateChildFn;
 
-export type NgCanDeactivateFn<T> = (component: T, currentRoute: ActivatedRouteSnapshot, stateTransition: RouterStateTransitionSnapshot) => Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree;
+export type NgCanDeactivateFn<T> = (
+  component: T,
+  currentRoute: ActivatedRouteSnapshot,
+  stateTransition: RouterStateTransition,
+) =>
+  | Observable<boolean | UrlTree>
+  | Promise<boolean | UrlTree>
+  | boolean
+  | UrlTree;
 
 export type CanDeactivateFn<T> = (
   ...args: any[]
@@ -60,9 +73,7 @@ export type NgCanMatchFn = (
   | boolean
   | UrlTree;
 
-export type CanMatchFn = (
-  ...args: any[]
-) => ReturnType<NgCanMatchFn>;
+export type CanMatchFn = (...args: any[]) => ReturnType<NgCanMatchFn>;
 
 export interface CanMatch {
   canMatch: NgCanMatchFn;
@@ -82,9 +93,15 @@ export type ResolveData = {
     | ((...args: readonly any[]) => any);
 };
 
-export type LoadChildrenCallback = () => Promise<DefaultExport<Routes> | Routes> | DefaultExport<Routes> | Routes;
+export type LoadChildrenCallback = () =>
+  | Promise<DefaultExport<Routes> | Routes>
+  | DefaultExport<Routes>
+  | Routes;
 
-export type LoadComponentCallback = () => Promise<DefaultExport<ClassType> | ClassType> | DefaultExport<ClassType> | ClassType;
+export type LoadComponentCallback = () =>
+  | Promise<DefaultExport<ClassType> | ClassType>
+  | DefaultExport<ClassType>
+  | ClassType;
 
 export interface Route
   extends Omit<
@@ -118,8 +135,15 @@ export const routeType = typeOf<Route>() as TypeObjectLiteral;
 
 export const urlSegmentsType = typeOf<UrlSegment[]>() as TypeArray;
 
-export const activatedRouteSnapshotType = typeOf<ActivatedRouteSnapshot>() as TypeClass;
+export const activatedRouteSnapshotType =
+  typeOf<ActivatedRouteSnapshot>() as TypeClass;
 
-export const routerStateSnapshotType = typeOf<RouterStateSnapshot>() as TypeClass;
+export const routerStateSnapshotType =
+  typeOf<RouterStateSnapshot>() as TypeClass;
 
-export const routerStateTransitionSnapshotType = typeOf<RouterStateTransitionSnapshot>() as TypeObjectLiteral;
+export const routerStateTransitionType =
+  typeOf<RouterStateTransition>() as TypeObjectLiteral;
+
+// export type RouteDataSnapshot<T, R extends Resolve<T>> = UnwrapFunctionReturnType<R['resolve']>
+
+// export type RouteDataSignal<T, R extends Resolve<T>> = Signal<UnwrapFunctionReturnType<R['resolve']>>

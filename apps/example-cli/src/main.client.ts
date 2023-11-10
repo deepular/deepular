@@ -7,6 +7,6 @@ import { router } from './router';
 
 import.meta.hot?.accept();
 
-void bootstrapApplication(AppComponent, router,{
+void bootstrapApplication(AppComponent, router, {
   ...appConfig,
 });
