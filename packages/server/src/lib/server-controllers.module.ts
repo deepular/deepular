@@ -10,7 +10,15 @@ import {
 import { Signal, signal, TransferState } from '@angular/core';
 import { Type } from '@deepkit/type';
 import { FactoryProvider } from '@deepkit/injector';
-import { catchError, finalize, firstValueFrom, from, Observable, of, tap } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  firstValueFrom,
+  from,
+  Observable,
+  of,
+  tap,
+} from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ClassType } from '@deepkit/core';
 
@@ -163,7 +171,7 @@ export class ServerControllersModule extends ControllersModule {
                       error.set(err);
                       return of(null);
                     }),
-                    finalize(() => loading.set(false))
+                    finalize(() => loading.set(false)),
                   );
                   value = toSignal(result);
                 }

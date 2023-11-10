@@ -39,12 +39,12 @@ describe('server controllers', () => {
     };
 
     serverControllersModule = new ServerControllersModule({
-        rpcControllers: new Set([rpcController]),
-      } as ServerModule);
+      rpcControllers: new Set([rpcController]),
+    } as ServerModule);
 
     transferState = {
       set: vitest.fn(),
-    }
+    };
 
     serverControllersModule.addProvider({
       provide: TransferState,
@@ -80,13 +80,15 @@ describe('server controllers', () => {
 
       serverController =
         injector.get<ServerController<TestRpcController>>(serverControllerType);
-    })
+    });
 
     test('works', async () => {
       const value = Math.random();
       method.mockResolvedValueOnce(value);
 
-      await expect(serverController.method({ test: '' })).resolves.toEqual(value);
+      await expect(serverController.method({ test: '' })).resolves.toEqual(
+        value,
+      );
 
       expect(transferState.set).toHaveBeenCalledWith(
         'TestRpcController#method([{"test":""}])0',
@@ -99,11 +101,12 @@ describe('server controllers', () => {
     let signalController: SignalController<TestRpcController>;
 
     beforeEach(() => {
-      const signalControllerType = typeOf<SignalController<TestRpcController>>();
+      const signalControllerType =
+        typeOf<SignalController<TestRpcController>>();
 
       serverControllersModule.addSignalController(
         signalControllerType,
-        'TestRpcController'
+        'TestRpcController',
       );
 
       const injector = Injector.fromModule(serverControllersModule);
@@ -119,7 +122,7 @@ describe('server controllers', () => {
       await TestBed.runInInjectionContext(async () => {
         const { value, error, loading } = signalController.method();
 
-        expect(value()).toBe(undefined)
+        expect(value()).toBe(undefined);
         expect(error()).toBe(null);
         expect(loading()).toBe(true);
 

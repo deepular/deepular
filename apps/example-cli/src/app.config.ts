@@ -1,11 +1,19 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter, ActivatedRouteSnapshot } from '@angular/router';
-import { ServerController } from '@ngkit/core';
+import { provideRouter } from '@ngkit/core';
 
-import { HomeController } from './pages/home/home.controller';
 import { HomeResolver } from './pages/home/home.resolver';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter([])],
+    provideRouter([
+      {
+        path: '/home',
+        loadComponent: () =>
+          import('./pages/home/home.component').then(m => m.HomeComponent),
+        resolve: {
+          data: HomeResolver,
+        },
+      },
+    ]),
+  ],
 };

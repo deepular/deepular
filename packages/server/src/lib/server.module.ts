@@ -3,11 +3,14 @@ import { InjectorContext } from '@deepkit/injector';
 import {
   APP_INITIALIZER,
   ApplicationConfig,
-  mergeApplicationConfig,
   Provider,
   TransferState,
 } from '@angular/core';
-import { CORE_CONFIG, makeSerializedClassTypeStateKey } from '@ngkit/core';
+import {
+  CORE_CONFIG,
+  makeSerializedClassTypeStateKey,
+  mergeApplicationConfig,
+} from '@ngkit/core';
 import { provideServerRendering } from '@angular/platform-server';
 import { reflect, SerializedTypes, serializeType } from '@deepkit/type';
 import { rpcClass } from '@deepkit/rpc';
@@ -58,11 +61,12 @@ export class ServerModule extends createModule({
       providers: [provideServerRendering(), ngAppInit],
     };
 
-    const finalAppConfig = this.config.app
-      ? mergeApplicationConfig(CORE_CONFIG, serverConfig, this.config.app)
-      : mergeApplicationConfig(CORE_CONFIG, serverConfig);
-
-    this.configure({ app: finalAppConfig });
+    const appConfig = mergeApplicationConfig(
+      CORE_CONFIG,
+      serverConfig,
+      this.config.app,
+    );
+    this.configure({ app: appConfig });
   }
 
   override processController(

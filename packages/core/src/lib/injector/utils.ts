@@ -30,7 +30,6 @@ import {
   NgModuleType,
   ProviderWithScope,
 } from './module';
-import { processRoute, Routes } from '../router';
 
 export function getComponentDependencies<T>(
   componentDef: ɵComponentDef<T>,
@@ -64,7 +63,9 @@ export function getInjectorDef(type: any): ɵɵInjectorDef<any> | null {
   return type[ɵNG_INJ_DEF] || null;
 }
 
-export function getComponentDef<T>(type: ClassType<T>): ɵComponentDef<T> | null {
+export function getComponentDef<T>(
+  type: ClassType<T>,
+): ɵComponentDef<T> | null {
   return type[ɵNG_COMP_DEF as keyof typeof type] || null;
 }
 
@@ -144,7 +145,7 @@ export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
 
 export function setupRootComponent<T>(
   component: ClassType<T>,
-  { modules, routes }: { modules?: readonly AppModule[]; routes?: Routes; } = {},
+  { modules }: { modules?: readonly AppModule[] } = {},
 ): ServiceContainer {
   const rootModule = createStandaloneComponentModule(component);
   const serviceContainer = new ServiceContainer(rootModule);
@@ -153,12 +154,7 @@ export function setupRootComponent<T>(
       throw new Error('Only root modules are allowed');
     }
     serviceContainer.appModule.addImport(module);
-  })
-  if (routes) {
-    for (const route of routes) {
-      processRoute(route, serviceContainer);
-    }
-  }
+  });
   serviceContainer.process();
   return serviceContainer;
 }

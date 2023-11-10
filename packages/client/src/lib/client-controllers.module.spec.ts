@@ -1,12 +1,18 @@
-import { beforeEach, vitest, Mock, test, describe, expect, afterEach } from 'vitest';
+import {
+  beforeEach,
+  vitest,
+  Mock,
+  test,
+  describe,
+  expect,
+  afterEach,
+} from 'vitest';
 import { RpcClient } from '@deepkit/rpc';
 import { ChangeDetectorRef, TransferState } from '@angular/core';
 import { typeOf } from '@deepkit/type';
 import { ServerController, SignalController } from '@ngkit/core';
 import { Injector } from '@deepkit/injector';
 import { TestBed } from '@angular/core/testing';
-// nx-ignore-next-line
-import { tick } from '@ngkit/testing';
 
 import { ClientControllersModule } from './client-controllers.module';
 import { TransferStateMissingForClientControllerMethodException } from './errors';
@@ -73,11 +79,12 @@ describe('client controllers', () => {
     let serverController: ServerController<TestRpcController>;
 
     beforeEach(() => {
-      const serverControllerType = typeOf<ServerController<TestRpcController>>();
+      const serverControllerType =
+        typeOf<ServerController<TestRpcController>>();
 
       clientControllersModule.addServerController(
         serverControllerType,
-        'TestRpcController'
+        'TestRpcController',
       );
 
       const injector = Injector.fromModule(clientControllersModule);
@@ -85,7 +92,6 @@ describe('client controllers', () => {
       serverController =
         injector.get<ServerController<TestRpcController>>(serverControllerType);
     });
-
 
     test('returns transfer state', async () => {
       const value = Math.random();
@@ -105,7 +111,10 @@ describe('client controllers', () => {
       remoteController.method.mockReturnValue(value);
 
       internalClientController.getTransferState.mockImplementationOnce(() => {
-        throw new TransferStateMissingForClientControllerMethodException(internalClientController as any, 'method');
+        throw new TransferStateMissingForClientControllerMethodException(
+          internalClientController as any,
+          'method',
+        );
       });
 
       await expect(serverController.method()).resolves.toEqual(value);
@@ -117,15 +126,16 @@ describe('client controllers', () => {
   describe('signal controller method', () => {
     let signalController: SignalController<TestRpcController>;
     let changeDetectorRef: {
-      detectChanges: Mock
+      detectChanges: Mock;
     };
 
     beforeEach(() => {
-      const signalControllerType = typeOf<SignalController<TestRpcController>>();
+      const signalControllerType =
+        typeOf<SignalController<TestRpcController>>();
 
       clientControllersModule.addSignalController(
         signalControllerType,
-        'TestRpcController'
+        'TestRpcController',
       );
 
       const injector = Injector.fromModule(clientControllersModule);
@@ -135,10 +145,12 @@ describe('client controllers', () => {
       };
 
       TestBed.configureTestingModule({
-        providers: [{
-          provide: ChangeDetectorRef,
-          useValue: changeDetectorRef,
-        }],
+        providers: [
+          {
+            provide: ChangeDetectorRef,
+            useValue: changeDetectorRef,
+          },
+        ],
       });
 
       signalController =
@@ -153,7 +165,9 @@ describe('client controllers', () => {
       test('with arguments', async () => {
         const transferStateValue = Math.random();
 
-        internalClientController.getTransferState.mockReturnValue(transferStateValue);
+        internalClientController.getTransferState.mockReturnValue(
+          transferStateValue,
+        );
 
         await TestBed.runInInjectionContext(async () => {
           const { value, refetch } = signalController.method();
@@ -179,7 +193,9 @@ describe('client controllers', () => {
       test('without arguments', async () => {
         const transferStateValue = Math.random();
 
-        internalClientController.getTransferState.mockReturnValue(transferStateValue);
+        internalClientController.getTransferState.mockReturnValue(
+          transferStateValue,
+        );
 
         await TestBed.runInInjectionContext(async () => {
           const { value, refetch } = signalController.method({});
@@ -200,7 +216,7 @@ describe('client controllers', () => {
 
           expect(value()).toEqual(newValue);
         });
-      })
+      });
     });
   });
 });

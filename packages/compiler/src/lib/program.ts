@@ -3,8 +3,6 @@ import type { NgCompilerOptions } from '@angular/compiler-cli/src/ngtsc/core/api
 import type api from '@angular/compiler-cli/src/transformers/api';
 import ts from 'typescript';
 
-import { transformSourceFile } from './utils';
-
 export class NgKitProgram extends NgtscProgram {
   constructor(
     rootNames: readonly string[],
@@ -34,12 +32,5 @@ export class NgKitProgram extends NgtscProgram {
     //   const sourceFile = tsProgramGetSourceFileByPath(path);
     //   return sourceFile ? this.transformSourceFile(sourceFile) : undefined;
     // }
-  }
-
-  private transformSourceFile(sourceFile: ts.SourceFile): ts.SourceFile {
-    return transformSourceFile(
-      sourceFile,
-      this.getTsProgram().getCompilerOptions(),
-    );
   }
 }

@@ -3,37 +3,30 @@ import { RpcWebSocketClient } from '@deepkit/rpc';
 import {
   ApplicationConfig,
   ɵNG_COMP_DEF,
-  mergeApplicationConfig,
   ɵComponentDef,
   Type,
 } from '@angular/core';
 
-import { CORE_CONFIG, createRouteConfig, Routes, setupRootComponent } from '@ngkit/core';
+import {
+  CORE_CONFIG,
+  setupRootComponent,
+  mergeApplicationConfig,
+} from '@ngkit/core';
 
 import { ClientControllersModule } from './client-controllers.module';
 
-export interface Config extends Partial<ApplicationConfig> {
-  readonly routes: Routes;
-}
-
 export async function bootstrapApplication<T>(
   rootComponent: Type<T>,
-  { routes }: Config,
+  appConfig?: ApplicationConfig,
 ): Promise<void> {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const client = new RpcWebSocketClient(`${protocol}//${window.location.host}`);
 
   setupRootComponent(rootComponent, {
     modules: [new ClientControllersModule(client)],
-    routes,
   });
 
-  const routeConfig = createRouteConfig(routes);
-
-  const finalAppConfig = mergeApplicationConfig(
-    CORE_CONFIG,
-    routeConfig,
-  );
+  appConfig = mergeApplicationConfig(CORE_CONFIG, appConfig);
 
   // const refetchers = import.meta.hot?.data.refetchers;
 
@@ -43,7 +36,7 @@ export async function bootstrapApplication<T>(
     delete import.meta.hot.data.destroy;
   }
 
-  const appRef = await _bootstrapApplication(rootComponent, finalAppConfig);
+  const appRef = await _bootstrapApplication(rootComponent, appConfig);
 
   if (import.meta.hot) {
     import.meta.hot!.data.refetch = false;

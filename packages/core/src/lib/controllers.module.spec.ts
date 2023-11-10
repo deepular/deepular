@@ -1,5 +1,3 @@
-import { Type, TypeClass } from '@deepkit/type';
-
 import { ControllersModule } from './controllers.module';
 import { AppModule } from './injector';
 import { ServerController, SignalController } from './controller';

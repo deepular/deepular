@@ -1,3 +1,1 @@
-describe('InternalClientController', () => {
-
-});
+describe('InternalClientController', () => {});

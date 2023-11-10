@@ -4,23 +4,21 @@ import { ClassType } from '@deepkit/core';
 import { RootModuleDefinition } from '@deepkit/app';
 import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
-import { createRouteConfig, Routes, setupRootComponent } from '@ngkit/core';
+import { setupRootComponent } from '@ngkit/core';
 
 import { ServerModule } from './server.module';
 import { ServerControllersModule } from './server-controllers.module';
+import { ApplicationConfig } from '@angular/core';
 
 export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
   readonly document?: string;
   readonly documentPath?: string;
-  readonly routes: Routes;
 }
 
 export async function startServer(
   rootComponent: ClassType,
   {
-    // Core
-    routes,
     // App
     imports,
     controllers,
@@ -35,13 +33,11 @@ export async function startServer(
     // FrameworkModule
     ...frameworkOptions
   }: NgKitServerOptions,
+  appConfig?: ApplicationConfig,
 ): Promise<App<any>> {
-  // TODO: this has to be created after routes have been processed. maybe use Router.resetConfig() instead
-  const routeConfig = createRouteConfig(routes);
-
   const serverModule = new ServerModule({
     rootComponent,
-    app: routeConfig,
+    app: appConfig,
     documentPath,
     document,
   });
@@ -67,7 +63,6 @@ export async function startServer(
   const controllersModule = new ServerControllersModule(serverModule);
   setupRootComponent(rootComponent, {
     modules: [controllersModule],
-    routes,
   });
 
   const logger = app.get(Logger);
