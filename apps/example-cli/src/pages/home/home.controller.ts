@@ -1,6 +1,6 @@
 import { rpc } from '@deepkit/rpc';
 
-@rpc.controller('HomeController')
+@rpc.controller()
 export class HomeController {
   @rpc.action()
   fetchData(): {} {

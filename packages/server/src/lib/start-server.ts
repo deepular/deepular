@@ -4,7 +4,7 @@ import { ClassType } from '@deepkit/core';
 import { RootModuleDefinition } from '@deepkit/app';
 import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
-import { setupRootComponent } from '@ngkit/core';
+import { provideRouter, setupRootComponent } from '@ngkit/core';
 import { ApplicationConfig } from '@angular/core';
 
 import { ServerModule } from './server.module';
@@ -14,11 +14,14 @@ export interface NgKitServerOptions extends RootModuleDefinition {
   readonly publicDir: string;
   readonly document?: string;
   readonly documentPath?: string;
+  readonly router: ReturnType<typeof provideRouter>
 }
 
 export async function startServer(
   rootComponent: ClassType,
   {
+    // Core
+    router,
     // App
     imports,
     controllers,
@@ -33,14 +36,19 @@ export async function startServer(
     // FrameworkModule
     ...frameworkOptions
   }: NgKitServerOptions,
-  appConfig?: ApplicationConfig,
+  appConfig: ApplicationConfig,
 ): Promise<App<any>> {
   const serverModule = new ServerModule({
     rootComponent,
     app: appConfig,
+    router,
     documentPath,
     document,
   });
+
+  const controllersModule = new ServerControllersModule(serverModule);
+
+  serverModule.controllersModule = controllersModule;
 
   const app = new App({
     imports: [
@@ -60,7 +68,6 @@ export async function startServer(
 
   app.serviceContainer.process();
 
-  const controllersModule = new ServerControllersModule(serverModule);
   setupRootComponent(rootComponent, {
     modules: [controllersModule],
   });

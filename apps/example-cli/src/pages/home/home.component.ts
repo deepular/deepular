@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
-import { SignalController } from '@ngkit/core';
-
-import type { HomeController } from './home.controller';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @Component({
   selector: 'home',
   standalone: true,
-  template: ``,
+  template: `Hello {{ route.data }}`,
 })
 export class HomeComponent {
-  constructor(private readonly home: SignalController<HomeController>) {}
+  constructor(protected readonly route: ActivatedRouteSnapshot) {}
 }

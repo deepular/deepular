@@ -8,7 +8,7 @@ import {
 import { render, screen } from '@testing-library/angular';
 import { assert } from '@deepkit/type';
 
-import { processRoute } from './process';
+import { NgKitRoute } from './process';
 import {
   CanActivate,
   CanActivateChild,
@@ -45,7 +45,7 @@ describe('route', () => {
     }
 
     test('class', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         canActivate: [TestGuard],
@@ -59,7 +59,7 @@ describe('route', () => {
     });
 
     test('callback', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         providers: [TestGuard],
@@ -86,7 +86,7 @@ describe('route', () => {
     }
 
     test('class', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         canActivateChild: [TestGuard],
@@ -100,7 +100,7 @@ describe('route', () => {
     });
 
     test('callback', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         providers: [TestGuard],
@@ -128,7 +128,7 @@ describe('route', () => {
     }
 
     test('class', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         canDeactivate: [TestGuard],
@@ -142,7 +142,7 @@ describe('route', () => {
     });
 
     test('callback', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         providers: [TestGuard],
@@ -169,7 +169,7 @@ describe('route', () => {
     }
 
     test('class', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         canMatch: [TestGuard],
@@ -183,7 +183,7 @@ describe('route', () => {
     });
 
     test('callback', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         providers: [TestGuard],
@@ -212,7 +212,7 @@ describe('route', () => {
     }
 
     test('class', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         resolve: {
@@ -228,7 +228,7 @@ describe('route', () => {
     });
 
     test('callback', async () => {
-      const route = processRoute({
+      const route = NgKitRoute.process({
         path: '',
         component: TestComponent,
         providers: [TestResolver],
@@ -250,7 +250,7 @@ describe('route', () => {
   });
 
   test('loadChildren', async () => {
-    const route = processRoute({
+    const route = NgKitRoute.process({
       path: '',
       loadChildren: async () => [
         {
@@ -270,7 +270,7 @@ describe('route', () => {
   });
 
   test('loadComponent', async () => {
-    const route = processRoute({
+    const route = NgKitRoute.process({
       path: '',
       loadComponent: async () => TestComponent,
     });

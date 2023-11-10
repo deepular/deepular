@@ -7,6 +7,7 @@ import {
   TransferState,
 } from '@angular/core';
 import {
+  ControllersModule,
   CORE_CONFIG,
   makeSerializedClassTypeStateKey,
   mergeApplicationConfig,
@@ -29,6 +30,8 @@ export class ServerModule extends createModule({
     string,
     SerializedTypes
   >();
+
+  controllersModule: ControllersModule | undefined;
 
   override postProcess(): void {
     this.rpcControllers.forEach(({ controller }) => {
@@ -61,10 +64,15 @@ export class ServerModule extends createModule({
       providers: [provideServerRendering(), ngAppInit],
     };
 
+    if (!this.controllersModule) {
+      throw new Error('Missing ControllersModule');
+    }
+
     const appConfig = mergeApplicationConfig(
       CORE_CONFIG,
       serverConfig,
       this.config.app,
+      { providers: [this.config.router(this.controllersModule)] }
     );
     this.configure({ app: appConfig });
   }
