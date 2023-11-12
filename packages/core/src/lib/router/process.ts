@@ -163,6 +163,9 @@ export class NgKitRoute {
     if (this.route.canActivate) {
       this.route.canActivate = this.route.canActivate.map(canActivate => {
         if (isClass(canActivate)) {
+          if (!this.module.isProvided(canActivate)) {
+            this.module.addProvider(canActivate);
+          }
           return (...args: Parameters<NgCanActivateFn>) => {
             const guard = this.module.injector!.get(canActivate);
             return guard.canActivate(...args);
