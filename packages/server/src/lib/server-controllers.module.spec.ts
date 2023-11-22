@@ -38,9 +38,13 @@ describe('server controllers', () => {
       injector: InjectorContext.forProviders([TestRpcController]),
     };
 
-    serverControllersModule = new ServerControllersModule({
+    const serverModule = {
       rpcControllers: new Set([rpcController]),
-    } as ServerModule);
+    } as ServerModule
+
+    serverControllersModule = new ServerControllersModule(serverModule);
+
+    serverControllersModule.rpcControllers = new Map([[rpcController.controller.name, rpcController]]);
 
     transferState = {
       set: vitest.fn(),
