@@ -234,10 +234,9 @@ export const ɵNG_FAC_DEF = 'ɵfac' as const;
 
 export type NgModuleType<T> = ClassType<T> | ModuleWithProviders<T>;
 
-// @ts-ignore
 export class AppModule<
-  T extends RootModuleDefinition = {},
-  C extends ExtractClassType<T['config']> = any,
+  T2 extends RootModuleDefinition = {},
+  C extends ExtractClassType<T2['config']> = any,
 > extends InjectorModule<C, AppModule> {
   public setupConfigs: ((module: AppModule<any>, config: any) => void)[] = [];
   // readonly [NG_FAC_DEF]: ɵɵFactoryDeclaration<this, never>;
@@ -252,7 +251,7 @@ export class AppModule<
   public listeners: ListenerType[] = [];
 
   constructor(
-    public options: T,
+    public options: T2,
     public name: string = '',
     public setups: ((module: AppModule<any>, config: any) => void)[] = [],
     public override id: string = uuid(),
@@ -410,7 +409,7 @@ export class AppModule<
    * Allows to change the module config before `setup` and bootstrap is called.
    * This is the last step right before the config is validated.
    */
-  setupConfig(callback: (module: AppModule<T>, config: C) => void): this {
+  setupConfig(callback: (module: AppModule<T2>, config: C) => void): this {
     this.setupConfigs.push(callback as any);
     return this;
   }
@@ -586,12 +585,12 @@ export interface AppModuleClass<C> {
  * });
  * ```
  */
-export function createModule<T extends CreateModuleDefinition>(
-  options: T,
+export function createModule<T1 extends CreateModuleDefinition>(
+  options: T1,
   name: string = '',
-): AppModuleClass<ExtractClassType<T['config']>> {
-  return class AnonAppModule extends AppModule<T> {
-    constructor(config?: PartialDeep<ExtractClassType<T['config']>>) {
+): AppModuleClass<ExtractClassType<T1['config']>> {
+  return class AnonAppModule extends AppModule<T1> {
+    constructor(config?: PartialDeep<ExtractClassType<T1['config']>>) {
       super(options, name);
       if (config) {
         this.configure(config);
