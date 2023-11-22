@@ -14,6 +14,7 @@ import {
 import { EnvironmentProviders } from '@angular/core';
 import { ClassType, isClass } from '@deepkit/core';
 import { TypeFunction, Type, reflect, isSameType } from '@deepkit/type';
+import { Writable } from 'type-fest';
 
 import {
   AppModule,
@@ -36,26 +37,24 @@ import {
 import { maybeUnwrapDefaultExport } from './utils';
 import { ControllersModule } from '../controllers.module';
 
-const routeModuleProviders = [
-  provideNgDependency(ActivatedRoute),
-  provideNgDependency(Router),
-];
-
 export class RouteModule extends createModule({
-  providers: routeModuleProviders,
+  providers: [
+    provideNgDependency(ActivatedRoute),
+    provideNgDependency(Router),
+  ],
 }) {
   componentModule?: AppModule;
   readonly controllersModule?: ControllersModule;
 
   constructor(
     readonly current: Route,
-    _controllersModule?: ControllersModule,
+    controllersModule?: ControllersModule,
     parent?: NgKitRoute,
   ) {
     super();
     this.name = current.path || 'index';
-    if (_controllersModule) {
-      this.controllersModule = _controllersModule.clone();
+    if (controllersModule) {
+      this.controllersModule = controllersModule.create();
       this.addImport(this.controllersModule);
     }
     if (current.providers) {
@@ -89,7 +88,7 @@ export class RouteModule extends createModule({
       this.addImport(this.componentModule);
     } else {
       if (this.controllersModule) {
-        this.componentModule.addImport(this.controllersModule.clone());
+        this.componentModule.addImport(this.controllersModule.create());
       }
       this.componentModule.addProvider(...this.getProviders());
       // FIXME: ServiceNotFoundError: Service 'HomeComponent' in RouteModule not found. Make sure it is provided.
@@ -105,7 +104,7 @@ export class NgKitRoute {
   public componentServiceContainer?: ServiceContainer;
 
   constructor(
-    private readonly route: Route,
+    private readonly route: Writable<Route>,
     private readonly controllersModule?: ControllersModule,
     parent?: NgKitRoute,
   ) {
@@ -148,15 +147,15 @@ export class NgKitRoute {
   }
 
   private resolveCallback<Fn extends (...args: any) => any>(
-    cb: Fn,
-    deps: readonly [type: Type, value: unknown][] = [],
+    callback: Fn,
+    dependencies: readonly [type: Type, value: unknown][] = [],
   ): ReturnType<Fn> {
-    const cbType = reflect(cb) as TypeFunction;
+    const cbType = reflect(callback) as TypeFunction;
     const args = cbType.parameters.map(parameter => {
-      const dep = deps.find(dep => isSameType(parameter.type, dep[0]));
-      return dep?.[1] || this.module.injector!.get(parameter.type);
+      const dependency = dependencies.find(dependency => isSameType(parameter.type, dependency[0]));
+      return dependency?.[1] || this.module.injector!.get(parameter.type);
     });
-    return cb(...args);
+    return callback(...args);
   }
 
   private processGuards() {
@@ -306,13 +305,9 @@ export class NgKitRoute {
 
   process(): NgRoute {
     this.processChildren();
-
     this.processGuards();
-
     this.processResolvers();
-
     this.processComponent();
-
     this.serviceContainer.process();
 
     return this.route as NgRoute;

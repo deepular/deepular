@@ -27,7 +27,7 @@ export class ClientControllersModule extends ControllersModule {
     super();
   }
 
-  clone(): ClientControllersModule {
+  create(): ClientControllersModule {
     return new ClientControllersModule(this.client);
   }
 

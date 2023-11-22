@@ -34,7 +34,7 @@ export class ServerControllersModule extends ControllersModule {
     super();
   }
 
-  clone(): ServerControllersModule {
+  create(): ServerControllersModule {
     return new ServerControllersModule(this.serverModule);
   }
 

@@ -1,8 +1,9 @@
 // nx-ignore-next-line
 import { render, setupTestingModule } from '@ngkit/testing';
-import { createModule } from '@ngkit/core';
 import { Component, ElementRef } from '@angular/core';
 import { NgIf } from '@angular/common';
+
+import { createModule } from './injector';
 
 test('fails to resolve declaration specific dependencies for providers', () => {
   class TestService {
@@ -41,7 +42,7 @@ test('declaration specific dependencies should be available for components', asy
     constructor(elementRef: ElementRef) {}
   }
 
-  await expect(async () => render(TestComponent)).not.toThrowError();
+  await expect(async () => await render(TestComponent)).not.toThrowError();
 });
 
 test('standalone directives imported in standalone components', async () => {

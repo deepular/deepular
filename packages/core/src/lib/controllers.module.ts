@@ -24,7 +24,7 @@ export abstract class ControllersModule extends createModule({
   protected readonly serverControllerTypes = new Map<string, Type>();
   protected readonly controllerNames = new Set<string>();
 
-  abstract clone(): ControllersModule;
+  abstract create(): ControllersModule;
 
   protected abstract addServerController(
     serverControllerType: Type,

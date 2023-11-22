@@ -25,7 +25,7 @@ export interface RouterStateTransition {
 export type CanActivateFn = (...args: any[]) => ReturnType<NgCanActivateFn>;
 
 export interface CanActivate {
-  canActivate: NgCanActivateFn;
+  readonly canActivate: NgCanActivateFn;
 }
 
 export type CanActivateGuard = ClassType<CanActivate> | CanActivateFn;
@@ -35,7 +35,7 @@ export type CanActivateChildFn = (
 ) => ReturnType<NgCanActivateChildFn>;
 
 export interface CanActivateChild {
-  canActivateChild: NgCanActivateChildFn;
+  readonly canActivateChild: NgCanActivateChildFn;
 }
 
 export type CanActivateChildGuard =
@@ -57,7 +57,7 @@ export type CanDeactivateFn<T> = (
 ) => ReturnType<NgCanDeactivateFn<T>>;
 
 export interface CanDeactivate<T> {
-  canDeactivate: NgCanDeactivateFn<T>;
+  readonly canDeactivate: NgCanDeactivateFn<T>;
 }
 
 export type CanDeactivateGuard<T> =
@@ -76,7 +76,7 @@ export type NgCanMatchFn = (
 export type CanMatchFn = (...args: any[]) => ReturnType<NgCanMatchFn>;
 
 export interface CanMatch {
-  canMatch: NgCanMatchFn;
+  readonly canMatch: NgCanMatchFn;
 }
 
 export type CanMatchGuard = ClassType<CanMatch> | CanMatchFn;
@@ -84,7 +84,7 @@ export type CanMatchGuard = ClassType<CanMatch> | CanMatchFn;
 export type ResolveFn<T> = (...args: any[]) => ReturnType<NgResolveFn<T>>;
 
 export interface Resolve<T> {
-  resolve: NgResolveFn<T>;
+  readonly resolve: NgResolveFn<T>;
 }
 
 export type ResolveData = {
@@ -117,16 +117,16 @@ export interface Route
     | 'loadChildren'
     | 'loadComponent'
   > {
-  canActivate?: readonly CanActivateGuard[];
-  canMatch?: readonly CanMatchGuard[];
-  canActivateChild?: readonly CanActivateChildGuard[];
-  canDeactivate?: readonly CanDeactivateGuard<any>[];
-  resolve?: ResolveData;
-  providers?: readonly ProviderWithScope[];
-  imports?: readonly AppModule[];
-  children?: Routes;
-  loadChildren?: LoadChildrenCallback;
-  loadComponent?: LoadComponentCallback;
+  readonly canActivate?: readonly CanActivateGuard[];
+  readonly canMatch?: readonly CanMatchGuard[];
+  readonly canActivateChild?: readonly CanActivateChildGuard[];
+  readonly canDeactivate?: readonly CanDeactivateGuard<any>[];
+  readonly resolve?: ResolveData;
+  readonly providers?: readonly ProviderWithScope[];
+  readonly imports?: readonly AppModule[];
+  readonly children?: Routes;
+  readonly loadChildren?: LoadChildrenCallback;
+  readonly loadComponent?: LoadComponentCallback;
 }
 
 export type Routes = readonly Route[];

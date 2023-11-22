@@ -57,7 +57,7 @@ test('provider in imported module should not be available in parent module when 
   expect(() =>
     setupRootComponent(FixtureComponent),
   ).toThrowErrorMatchingInlineSnapshot(
-    '"Undefined dependency \\"test: TestService\\" of FixtureComponent(?). Type has no provider in no scope."',
+    '"Undefined dependency \\"test: TestService\\" of FixtureComponent(?). Type has no provider."',
   );
 });
 

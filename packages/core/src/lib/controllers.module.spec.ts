@@ -10,7 +10,7 @@ describe('ControllersModule', () => {
 
         protected addSignalController(): void {}
 
-        clone(): ControllersModule {
+        create(): ControllersModule {
           return new TestControllersModule();
         }
       }
@@ -35,7 +35,7 @@ describe('ControllersModule', () => {
 
         protected addSignalController(): void {}
 
-        clone(): ControllersModule {
+        create(): ControllersModule {
           return new TestControllersModule();
         }
       }
