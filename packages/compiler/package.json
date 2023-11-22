@@ -16,7 +16,7 @@
     "patch-package": "8.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "16.2.8",
+    "@angular/compiler-cli": "17.0.3",
     "typescript": "5.2.2"
   },
   "publishConfig": {

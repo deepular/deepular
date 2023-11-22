@@ -118,7 +118,7 @@ test('exported declarations in imported angular modules should be present in par
   expect(component.nativeElement).toMatchInlineSnapshot(`
       <div
         id="root1"
-        ng-version="16.2.8"
+        ng-version="17.0.3"
       >
         <ng-test>
           <span

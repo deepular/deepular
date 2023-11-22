@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "patch-compiler": "sh scripts/patch-compiler.sh",
-    "postinstall": "deepkit-type-install && pnpm run patch-compiler && lefthook install && pnpm run link",
+    "postinstall": "deepkit-type-install && pnpm run patch-compiler && lefthook install",
     "link": "npm-local-development --no-watcher .",
     "patch-compiler-package": "patch-package --patch-dir packages/compiler/src/patches"
   },
   "private": true,
   "devDependencies": {
-    "@angular/cli": "16.2.8",
-    "@angular/platform-browser-dynamic": "16.2.8",
+    "@angular/cli": "17.0.3",
+    "@angular/platform-browser-dynamic": "17.0.3",
     "@commitlint/config-conventional": "18.1.0",
     "@commitlint/config-nx-scopes": "18.3.0",
     "@nx/devkit": "17.0.2",
@@ -27,7 +27,7 @@
     "@nx/workspace": "17.0.2",
     "@release-it/bumper": "5.1.0",
     "@release-it/conventional-changelog": "7.0.2",
-    "@testing-library/angular": "14.3.0",
+    "@testing-library/angular": "14.5.0",
     "@testing-library/jest-dom": "6.1.4",
     "@types/node": "20.8.10",
     "@typescript-eslint/eslint-plugin": "6.9.1",
@@ -52,15 +52,15 @@
   },
   "dependencies": {
     "@analogjs/vite-plugin-angular": "0.2.21",
-    "@angular-devkit/build-angular": "16.2.8",
-    "@angular/animations": "16.2.8",
-    "@angular/common": "16.2.8",
-    "@angular/compiler": "16.2.8",
-    "@angular/compiler-cli": "16.2.8",
-    "@angular/core": "16.2.8",
-    "@angular/platform-browser": "16.2.8",
-    "@angular/platform-server": "16.2.8",
-    "@angular/router": "16.2.8",
+    "@angular-devkit/build-angular": "17.0.3",
+    "@angular/animations": "17.0.3",
+    "@angular/common": "17.0.3",
+    "@angular/compiler": "17.0.3",
+    "@angular/compiler-cli": "17.0.3",
+    "@angular/core": "17.0.3",
+    "@angular/platform-browser": "17.0.3",
+    "@angular/platform-server": "17.0.3",
+    "@angular/router": "17.0.3",
     "@deepkit/app": "1.0.1-alpha.108",
     "@deepkit/broker": "1.0.1-alpha.108",
     "@deepkit/bson": "1.0.1-alpha.108",
@@ -82,9 +82,10 @@
     "@deepkit/vite": "1.0.1-alpha.108",
     "@deepkit/workflow": "1.0.1-alpha.108",
     "@jsheaven/read-config-file": "1.0.1",
-    "@ngtools/webpack": "16.2.8",
+    "@ngtools/webpack": "17.0.3",
     "@nx/vite": "17.0.2",
     "deepmerge": "4.3.1",
+    "esbuild": "0.18.20",
     "patch-package": "8.0.0",
     "postcss": "8.4.31",
     "rollup-plugin-preserve-shebang": "1.0.1",
@@ -112,6 +113,7 @@
     }
   },
   "resolutions": {
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "esbuild": "0.18.20"
   }
 }

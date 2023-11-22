@@ -1,0 +1,40 @@
+diff --git a/node_modules/@angular/core/fesm2022/core.mjs b/node_modules/@angular/core/fesm2022/core.mjs
+index 69200cef18431311af5da04c57bd8cfa46ce9750..c41813fdfdd7a4ff916841f37d249ecc5d505305 100755
+--- a/node_modules/@angular/core/fesm2022/core.mjs
++++ b/node_modules/@angular/core/fesm2022/core.mjs
+@@ -2109,8 +2109,12 @@ function extractDefListOrFactory(dependencies, pipeDef) {
+     }
+     const defExtractor = pipeDef ? getPipeDef$1 : extractDirectiveDef;
+     return () => (typeof dependencies === 'function' ? dependencies() : dependencies)
+-        .map(dep => defExtractor(dep))
+-        .filter(nonNull);
++	       .flatMap(dep => {
++            const ngModuleDef = getNgModuleDef(dep);
++            if (!ngModuleDef) return defExtractor(dep);
++            return extractDefListOrFactory(ngModuleDef.exports, pipeDef)();
++        })
++        .filter(nonNull);
+ }
+ /**
+  * A map that contains the generated component IDs and type.
+diff --git a/node_modules/@angular/core/index.d.ts b/node_modules/@angular/core/index.d.ts
+index 6acb48b57f2eeb2b7518f7a5b5fdc889ee3466b2..9193945d2a2bcc1c33ec58409a85c5a2e767a515 100755
+--- a/node_modules/@angular/core/index.d.ts
++++ b/node_modules/@angular/core/index.d.ts
+@@ -12,6 +12,7 @@ import { SIGNAL } from '@angular/core/primitives/signals';
+ import { Subject } from 'rxjs';
+ import { Subscribable } from 'rxjs';
+ import { Subscription } from 'rxjs';
+++import { AppModule } from '@ngkit/core';
+
+ /**
+  * @description
+@@ -1330,7 +1331,7 @@ export declare interface Component extends Directive {
+      * More information about standalone components, directives, and pipes can be found in [this
+      * guide](guide/standalone-components).
+      */
+-    imports?: (Type<any> | ReadonlyArray<any>)[];
++    imports?: (Type<any> | ReadonlyArray<any> | AppModule)[];
+     /**
+      * The set of schemas that declare elements to be allowed in a standalone component. Elements and
+      * properties that are neither Angular components nor directives must be declared in a schema.
