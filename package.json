@@ -109,7 +109,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "typescript@5.2.2": "patches/typescript@5.2.2.patch"
+      "typescript@5.2.2": "patches/typescript@5.2.2.patch",
+      "@deepkit/type-compiler@1.0.1-alpha.108": "patches/@deepkit__type-compiler@1.0.1-alpha.108.patch"
     }
   },
   "resolutions": {

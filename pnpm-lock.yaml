@@ -5,6 +5,9 @@ overrides:
   esbuild: 0.18.20
 
 patchedDependencies:
+  '@deepkit/type-compiler@1.0.1-alpha.108':
+    hash: bw4cw3e352vw3duamoczs5uo4u
+    path: patches/@deepkit__type-compiler@1.0.1-alpha.108.patch
   typescript@5.2.2:
     hash: gjjh7cjpfn7iqsdltnrgjjosyq
     path: patches/typescript@5.2.2.patch
@@ -93,7 +96,7 @@ dependencies:
     version: 1.0.1-alpha.108(@deepkit/core@1.0.1-alpha.108)
   '@deepkit/type-compiler':
     specifier: 1.0.1-alpha.108
-    version: 1.0.1-alpha.108(typescript@5.2.2)
+    version: 1.0.1-alpha.108(patch_hash=bw4cw3e352vw3duamoczs5uo4u)(typescript@5.2.2)
   '@deepkit/vite':
     specifier: 1.0.1-alpha.108
     version: 1.0.1-alpha.108(@deepkit/type-compiler@1.0.1-alpha.108)(rollup@2.79.1)
@@ -4290,7 +4293,7 @@ packages:
       }
     dev: false
 
-  /@deepkit/type-compiler@1.0.1-alpha.108(typescript@5.2.2):
+  /@deepkit/type-compiler@1.0.1-alpha.108(patch_hash=bw4cw3e352vw3duamoczs5uo4u)(typescript@5.2.2):
     resolution:
       {
         integrity: sha512-tyqidre0rc3vF2JHFLN2egA3G2HfTogP56nFwFmDqWmG4hP+bevt41pBQ1/dp+DM2bbqrG7bnys5PSbqyoMOhg==,
@@ -4311,6 +4314,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: false
+    patched: true
 
   /@deepkit/type-spec@1.0.1-alpha.108:
     resolution:
@@ -4343,7 +4347,7 @@ packages:
     peerDependencies:
       '@deepkit/type-compiler': ^1.0.1-alpha.93
     dependencies:
-      '@deepkit/type-compiler': 1.0.1-alpha.108(typescript@5.2.2)
+      '@deepkit/type-compiler': 1.0.1-alpha.108(patch_hash=bw4cw3e352vw3duamoczs5uo4u)(typescript@5.2.2)
       '@rollup/pluginutils': 5.0.5(rollup@2.79.1)
     transitivePeerDependencies:
       - rollup
