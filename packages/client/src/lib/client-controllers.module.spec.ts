@@ -8,14 +8,17 @@ import {
   afterEach,
 } from 'vitest';
 import { RpcClient } from '@deepkit/rpc';
-import { ChangeDetectorRef, TransferState } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, DestroyRef, TransferState } from '@angular/core';
 import { typeOf } from '@deepkit/type';
 import { ServerController, SignalController } from '@ngkit/core';
 import { Injector } from '@deepkit/injector';
 import { TestBed } from '@angular/core/testing';
+import { Subject } from 'rxjs';
 
 import { ClientControllersModule } from './client-controllers.module';
 import { TransferStateMissingForClientControllerMethodException } from './errors';
+import { InternalClientController } from './internal-client-controller';
+import { ApplicationStable } from './application-stable';
 
 interface TestRpcController {
   method(arg1?: any): number;
@@ -29,11 +32,7 @@ describe('client controllers', () => {
   let remoteController: {
     method: Mock;
   };
-  let internalClientController: {
-    methodNames: readonly string[];
-    deserializers: ReadonlyMap<string, Mock>;
-    getTransferState: Mock;
-  };
+  let internalClientController: InternalClientController & any;
   let clientControllersModule: ClientControllersModule & any;
 
   beforeEach(() => {
@@ -54,12 +53,20 @@ describe('client controllers', () => {
       useValue: transferState,
     });
 
+    clientControllersModule.addProvider({
+      provide: ApplicationStable,
+      transient: true,
+      useValue: vitest.fn(),
+    });
+
     const deserialize = vitest.fn().mockImplementation(args => args);
 
     internalClientController = {
       methodNames: ['method'],
       deserializers: new Map([['method', deserialize]]),
       getTransferState: vitest.fn(),
+      hasTransferState: vitest.fn(),
+      useTransferState: vitest.fn(),
     };
 
     vitest
@@ -96,6 +103,8 @@ describe('client controllers', () => {
     test('returns transfer state', async () => {
       const value = Math.random();
 
+      internalClientController.useTransferState.mockReturnValue(true);
+
       internalClientController.getTransferState.mockReturnValue(value);
 
       await expect(serverController.method()).resolves.toEqual(value);
@@ -104,20 +113,17 @@ describe('client controllers', () => {
     });
 
     test('calls remote controller method when transfer state is missing', async () => {
-      transferState.hasKey.mockReturnValue(false);
-
       const value = Math.random();
+
+      internalClientController.useTransferState.mockReturnValue(false);
 
       remoteController.method.mockReturnValue(value);
 
-      internalClientController.getTransferState.mockImplementationOnce(() => {
-        throw new TransferStateMissingForClientControllerMethodException(
-          internalClientController as any,
-          'method',
-        );
-      });
+      remoteController.method();
 
       await expect(serverController.method()).resolves.toEqual(value);
+
+      expect(internalClientController.getTransferState).not.toHaveBeenCalled();
 
       expect(remoteController.method).toHaveBeenCalled();
     });
@@ -165,6 +171,10 @@ describe('client controllers', () => {
       test('with arguments', async () => {
         const transferStateValue = Math.random();
 
+        internalClientController.useTransferState.mockReturnValue(
+          true,
+        );
+
         internalClientController.getTransferState.mockReturnValue(
           transferStateValue,
         );
@@ -193,6 +203,10 @@ describe('client controllers', () => {
       test('without arguments', async () => {
         const transferStateValue = Math.random();
 
+        internalClientController.useTransferState.mockReturnValue(
+          true,
+        );
+
         internalClientController.getTransferState.mockReturnValue(
           transferStateValue,
         );
@@ -209,10 +223,10 @@ describe('client controllers', () => {
           await refetch();
 
           expect(remoteController.method.mock.calls[0]).toMatchInlineSnapshot(`
-          [
-            {},
-          ]
-        `);
+            [
+              {},
+            ]
+          `);
 
           expect(value()).toEqual(newValue);
         });

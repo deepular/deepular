@@ -11,6 +11,7 @@ import {
 } from '@ngkit/core';
 
 import { TransferStateMissingForClientControllerMethodException } from './errors';
+import { ApplicationStable } from './application-stable';
 
 export class InternalClientController {
   static getProviderToken(controllerName: string): string {
@@ -27,6 +28,7 @@ export class InternalClientController {
   constructor(
     private readonly controllerName: string,
     private readonly transferState: TransferState,
+    private readonly appStable: ApplicationStable,
   ) {
     const serializedClassType = this.transferState.get(
       makeSerializedClassTypeStateKey(this.controllerName),
@@ -52,35 +54,52 @@ export class InternalClientController {
     this.methodNames = [...this.deserializers.keys()];
   }
 
-  getTransferState<T>(
+  useTransferState(
     methodName: string,
     args: readonly unknown[],
     consumerIdx: ControllerConsumerIndex,
-  ): T | null {
+  ): boolean {
+    return !this.appStable.value && this.hasTransferState(methodName, args, consumerIdx);
+  }
+
+  hasTransferState(
+    methodName: string,
+    args: readonly unknown[],
+    consumerIdx: ControllerConsumerIndex,
+  ): boolean {
     const transferStateKey = makeDeserializableControllerMethodStateKey(
       this.controllerName,
       methodName,
       args,
       consumerIdx,
     );
+    return this.transferState.hasKey(transferStateKey);
+  }
 
-    if (!this.transferState.hasKey(transferStateKey)) {
+  getTransferState<T>(
+    methodName: string,
+    args: readonly unknown[],
+    consumerIdx: ControllerConsumerIndex,
+  ): T {
+    const transferStateKey = makeDeserializableControllerMethodStateKey(
+      this.controllerName,
+      methodName,
+      args,
+      consumerIdx,
+    );
+    const transferStateValue = this.transferState.get(transferStateKey, null);
+
+    if (!transferStateValue) {
       throw new TransferStateMissingForClientControllerMethodException(
         this,
         methodName,
       );
     }
 
-    const transferStateValue = this.transferState.get(transferStateKey, null);
-    if (!transferStateValue) {
-      throw new Error('Something went wrong');
-    }
-    this.transferState.remove(transferStateKey);
-
     const bson = new Uint8Array(transferStateValue.data);
-    const deserialize = this.deserializers.get(methodName)!;
+    const deserialize = this.deserializers.get(methodName) as NgKitDeserializer<T>;
     const { data } = deserialize(bson);
 
-    return data as T;
+    return data;
   }
 }

@@ -1,26 +1,26 @@
 import {
-  getProviderNameForType,
   ServerController,
   serverControllerConsumerIndex,
   SignalController,
   signalControllerConsumerIndex,
   SignalControllerMethod,
-  ControllersModule,
+  ControllersModule, provideNgDependency,
 } from '@ngkit/core';
 import { RpcClient, RemoteController } from '@deepkit/rpc';
 import { FactoryProvider } from '@deepkit/injector';
 import {
-  ChangeDetectorRef,
+  ApplicationRef,
+  ChangeDetectorRef, DestroyRef,
   inject,
   signal,
   TransferState,
 } from '@angular/core';
-import { Type, TypeClass } from '@deepkit/type';
+import { Type } from '@deepkit/type';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { InternalClientController } from './internal-client-controller';
-import { TransferStateMissingForClientControllerMethodException } from './errors';
+import { ApplicationStable } from './application-stable';
 
 export class ClientControllersModule extends ControllersModule {
   constructor(private readonly client: RpcClient) {
@@ -57,27 +57,19 @@ export class ClientControllersModule extends ControllersModule {
 
           return new Proxy(remoteController, {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            get(target: any, propertyName: string): any {
-              if (!clientController.methodNames.includes(propertyName)) return;
+            get(target: any, methodName: string): any {
+              if (!clientController.methodNames.includes(methodName)) return;
 
               return async (...args: readonly unknown[]): Promise<unknown> => {
-                const execute = () => target[propertyName](...args);
-
-                try {
+                if (clientController.useTransferState(methodName, args, consumerIdx)) {
                   return clientController.getTransferState(
-                    propertyName,
+                    methodName,
                     args,
                     consumerIdx,
                   );
-                } catch (err) {
-                  if (
-                    err instanceof
-                    TransferStateMissingForClientControllerMethodException
-                  ) {
-                    return await execute();
-                  }
-                  throw err;
                 }
+
+                return await target[methodName](...args);
               };
             },
           });
@@ -145,27 +137,19 @@ export class ClientControllersModule extends ControllersModule {
                   }
                 };
 
-                try {
+                if (clientController.useTransferState(methodName, args, consumerIdx)) {
                   const result = clientController.getTransferState(
                     methodName,
                     args,
                     consumerIdx,
                   );
                   value$ = new BehaviorSubject(result);
-                } catch (err) {
-                  if (
-                    err instanceof
-                    TransferStateMissingForClientControllerMethodException
-                  ) {
-                    void load(...args);
-                  } else {
-                    throw err;
-                  }
+                } else {
+                  void load(...args);
                 }
 
                 const value = toSignal(value$.asObservable(), {
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
+                  // @ts-expect-error types mismatch
                   requireSync: value$.constructor.name === BehaviorSubject.name,
                 });
 
@@ -187,6 +171,12 @@ export class ClientControllersModule extends ControllersModule {
   }
 
   override postProcess() {
+    this.addProvider(
+      provideNgDependency(ApplicationRef),
+      provideNgDependency(DestroyRef),
+    );
+    this.addProvider(ApplicationStable)
+
     for (const controllerName of this.controllerNames) {
       const remoteControllerProvider: FactoryProvider<
         RemoteController<unknown>
@@ -200,8 +190,8 @@ export class ClientControllersModule extends ControllersModule {
       const clientControllerProvider: FactoryProvider<InternalClientController> =
         {
           provide: InternalClientController.getProviderToken(controllerName),
-          useFactory: (transferState: TransferState) =>
-            new InternalClientController(controllerName, transferState),
+          useFactory: (transferState: TransferState, appStable: ApplicationStable) =>
+            new InternalClientController(controllerName, transferState, appStable),
         };
       this.addProvider(clientControllerProvider);
       this.addExport(clientControllerProvider);
