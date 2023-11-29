@@ -5,6 +5,7 @@ stats.html
 dist
 tmp
 /out-tsc
+.vite-node
 
 # dependencies
 node_modules
