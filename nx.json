@@ -41,12 +41,10 @@
       "!{projectRoot}/.release-it.json",
       "!{projectRoot}/version.json"
     ],
-    "sharedGlobals": [
-      "{workspaceRoot}/packages/rollup.config.js"
-    ]
+    "sharedGlobals": ["{workspaceRoot}/packages/rollup.config.js"]
   },
   "workspaceLayout": {
-    "appsDir": "apps",
+    "appsDir": "examples",
     "libsDir": "packages"
   }
 }
