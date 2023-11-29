@@ -91,7 +91,7 @@ export class RouteModule extends createModule({
         this.componentModule.addImport(this.controllersModule.create());
       }
       this.componentModule.addProvider(...this.getProviders());
-      // FIXME: ServiceNotFoundError: Service 'HomeComponent' in RouteModule not found. Make sure it is provided.
+      // FIXME: ServiceNotFoundError: Service 'ServerControllerResolverComponent' in RouteModule not found. Make sure it is provided.
       // this.componentModule.setParent(this);
       new ServiceContainer(this.componentModule).process();
     }

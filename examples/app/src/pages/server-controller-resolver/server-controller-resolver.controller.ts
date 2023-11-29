@@ -1,9 +1,9 @@
 import { rpc } from '@deepkit/rpc';
 
 @rpc.controller()
-export class HomeController {
+export class ServerControllerResolverController {
   @rpc.action()
-  fetchData(): string {
+  fetch(): string {
     return 'World';
   }
 }

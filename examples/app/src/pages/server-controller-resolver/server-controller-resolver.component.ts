@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'home',
+  selector: 'server-controller-resolver',
   standalone: true,
   template: `Hello {{ route.snapshot.data['data'] }}`,
 })
-export class HomeComponent {
+export class ServerControllerResolverComponent {
   constructor(protected readonly route: ActivatedRoute) {}
 }
