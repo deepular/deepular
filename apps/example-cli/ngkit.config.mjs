@@ -1,1 +1,1 @@
-export default { watch: false };
+export default { watch: true };

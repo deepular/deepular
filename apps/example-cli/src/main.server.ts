@@ -11,8 +11,6 @@ import { router } from './router';
 const publicDir = join(__dirname, 'public');
 const documentPath = join(__dirname, '..', 'index.html');
 
-import.meta.hot?.accept();
-
 void startServer(
   AppComponent,
   {
