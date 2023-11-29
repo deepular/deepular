@@ -25,6 +25,12 @@ export class NgKitViteConfig {
       publicDir: this.config.publicDir,
       server: {
         hmr: this.config.watch,
+        watch: {
+          useFsEvents: true,
+          atomic: 500,
+          usePolling: false,
+          awaitWriteFinish: true,
+        },
       },
       mode: this.config.mode,
       build: {
@@ -82,14 +88,6 @@ export class NgKitViteConfig {
     const viteConfig = this.createBase();
 
     return mergeConfig(viteConfig, {
-      server: {
-        watch: {
-          useFsEvents: true,
-          atomic: 500,
-          usePolling: false,
-          awaitWriteFinish: true,
-        },
-      },
       build: {
         outDir: this.config.server.outDir,
         target: 'esnext',
@@ -114,12 +112,6 @@ export class NgKitViteConfig {
       server: {
         hmr: this.config.client.hmr,
         port: 4200,
-        watch: {
-          useFsEvents: true,
-          atomic: 500,
-          usePolling: false,
-          awaitWriteFinish: true,
-        },
       },
       build: {
         outDir: this.config.client.outDir,

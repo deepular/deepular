@@ -68,10 +68,6 @@ export class ServeController implements Command {
 
     await runner.executeFile(this.config.server.entry);
 
-    if (!this.config.watch) {
-      await server.close();
-    }
-
     server.emitter?.on('message', payload => {
       handleMessage(
         runner,
@@ -85,6 +81,8 @@ export class ServeController implements Command {
       process.on('uncaughtException', err => {
         this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
       });
+    } else {
+      await server.close();
     }
   }
 
