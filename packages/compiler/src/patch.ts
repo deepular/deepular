@@ -18,6 +18,8 @@ const groupedPatches = getGroupedPatches(join(appPath, patchDir));
 const errors: string[] = [];
 const warnings: string[] = [...groupedPatches.warnings];
 
+console.log('Patching packages');
+
 for (const patches of Object.values(
   groupedPatches.pathSpecifierToPatchFiles,
 ) as any[]) {
