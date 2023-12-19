@@ -1,5 +1,7 @@
 
 
+## [0.1.1](https://github.com/marcus-sa/ngkit/compare/client-v0.1.0...client-v0.1.1) (2023-12-19)
+
 ## 0.1.0 (2023-12-19)
 
 
