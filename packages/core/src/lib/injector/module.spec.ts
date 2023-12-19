@@ -1,9 +1,8 @@
-// nx-ignore-next-line
-import { render, setupTestingModule } from '@ngkit/testing';
 import { TestBed } from '@angular/core/testing';
 import { screen } from '@testing-library/angular';
 import { Component, Injectable, NgModule } from '@angular/core';
 
+import { render, setupTestingModule } from '../../testing';
 import { createModule } from './module';
 import { setupRootComponent } from './utils';
 

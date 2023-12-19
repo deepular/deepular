@@ -1,5 +1,6 @@
-import { AppModule, ServiceContainer } from '@ngkit/core';
 import { TestBed } from '@angular/core/testing';
+
+import { AppModule, ServiceContainer } from '../lib/injector';
 
 export function setupTestingModule(module: AppModule): ServiceContainer {
   const serviceContainer = new ServiceContainer(module);

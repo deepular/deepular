@@ -26,9 +26,9 @@
       "@ngkit/client": ["packages/client/src/index.ts"],
       "@ngkit/compiler": ["packages/compiler/src/index.ts"],
       "@ngkit/core": ["packages/core/src/index.ts"],
+      "@ngkit/core/testing": ["packages/core/src/testing.ts"],
       "@ngkit/dev": ["packages/dev/src/index.ts"],
-      "@ngkit/server": ["packages/server/src/index.ts"],
-      "@ngkit/testing": ["packages/testing/src/index.ts"]
+      "@ngkit/server": ["packages/server/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"],

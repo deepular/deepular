@@ -1,8 +1,7 @@
-// nx-ignore-next-line
-import { render, setupTestingModule } from '@ngkit/testing';
 import { Component, ElementRef } from '@angular/core';
 import { NgIf } from '@angular/common';
 
+import { render, setupTestingModule } from '../testing';
 import { createModule } from './injector';
 
 test('fails to resolve declaration specific dependencies for providers', () => {

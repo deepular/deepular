@@ -4,8 +4,9 @@ import {
   RenderComponentOptions,
   RenderResult,
 } from '@testing-library/angular';
-// nx-ignore-next-line
-import { processRoutes, Routes, setupRootComponent } from '@ngkit/core';
+
+import { processRoutes, Routes } from '../lib/router';
+import { setupRootComponent } from '../lib/injector';
 
 export interface RenderOptions<T>
   extends Omit<RenderComponentOptions<T>, 'routes'> {
