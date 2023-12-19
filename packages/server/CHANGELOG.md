@@ -1,5 +1,7 @@
 
 
+## [0.1.3](https://github.com/deepular/deepular/compare/server-v0.1.2...server-v0.1.3) (2023-12-19)
+
 ## [0.1.2](https://github.com/deepular/deepular/compare/server-v0.1.1...server-v0.1.2) (2023-12-19)
 
 
