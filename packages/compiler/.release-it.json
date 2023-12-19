@@ -33,13 +33,13 @@
     },
     "@release-it/bumper": {
       "in": {
-        "file": "packages/compiler/package.json",
-        "path": "version"
+        "file": "packages/compiler/package.version",
+        "type": "text/plain"
       },
       "out": [
         {
-          "file": "packages/compiler/package.json",
-          "path": "version"
+          "file": "packages/compiler/package.version",
+          "type": "text/plain"
         },
         {
           "file": "dist/packages/compiler/package.json",

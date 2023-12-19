@@ -4,9 +4,9 @@ import { Injector } from '@deepkit/injector';
 import { typeOf } from '@deepkit/type';
 import { TransferState } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { sleep } from '@deepkit/core';
+
 import { ServerController, SignalController } from '@ngkit/core';
-// nx-ignore-next-line
-import { tick } from '@ngkit/testing';
 
 import { ServerControllersModule } from './server-controllers.module';
 import { ServerModule } from './server.module';
@@ -130,7 +130,7 @@ describe('server controllers', () => {
         expect(error()).toBe(null);
         expect(loading()).toBe(true);
 
-        await tick();
+        await sleep(0);
 
         expect(value()).toEqual(mockValue);
         expect(error()).toBe(null);

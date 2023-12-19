@@ -33,13 +33,13 @@
     },
     "@release-it/bumper": {
       "in": {
-        "file": "packages/server/package.json",
-        "path": "version"
+        "file": "packages/server/package.version",
+        "type": "text/plain"
       },
       "out": [
         {
-          "file": "packages/server/package.json",
-          "path": "version"
+          "file": "packages/server/package.version",
+          "type": "text/plain"
         },
         {
           "file": "dist/packages/server/package.json",
