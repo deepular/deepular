@@ -1,5 +1,13 @@
 
 
+## [0.1.2](https://github.com/marcus-sa/ngkit/compare/compiler-v0.1.1...compiler-v0.1.2) (2023-12-19)
+
+
+### Bug Fixes
+
+* **compiler:** add missing `#!/usr/bin/env node` ([028f0cc](https://github.com/marcus-sa/ngkit/commit/028f0cce91ec5cd7b8e1646081c6b7f365aa7422))
+* remove `.env` ([c533192](https://github.com/marcus-sa/ngkit/commit/c533192597b220fe4486658895015834545ed4ee))
+
 ## [0.1.1](https://github.com/marcus-sa/ngkit/compare/compiler-v0.1.0...compiler-v0.1.1) (2023-12-19)
 
 ## 0.1.0 (2023-12-19)
