@@ -1,5 +1,12 @@
 
 
+## [0.2.0](https://github.com/deepular/deepular/compare/core-v0.1.2...core-v0.2.0) (2023-12-19)
+
+
+### Features
+
+* **core:** add `isClient` and `isServer` utils ([a064455](https://github.com/deepular/deepular/commit/a0644550d640279ea82b77401f3be9eab5b56a12))
+
 ## [0.1.2](https://github.com/deepular/deepular/compare/core-v0.1.1...core-v0.1.2) (2023-12-19)
 
 
