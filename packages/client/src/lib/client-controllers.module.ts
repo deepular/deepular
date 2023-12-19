@@ -5,7 +5,7 @@ import {
   signalControllerConsumerIndex,
   SignalControllerMethod,
   ControllersModule, provideNgDependency,
-} from '@ngkit/core';
+} from '@deepular/core';
 import { RpcClient, RemoteController } from '@deepkit/rpc';
 import { FactoryProvider } from '@deepkit/injector';
 import {

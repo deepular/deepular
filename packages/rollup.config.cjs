@@ -59,7 +59,7 @@ module.exports = (config) => {
     const external = config.external;
     config.external = (id) => packages.includes(id) ? false : external(id);
 
-    // peer-deps-external conflicts with nx-resolve-dist-packages when @ngkit packages are specified in package.json peerDependencies
+    // peer-deps-external conflicts with nx-resolve-dist-packages when @deepular packages are specified in package.json peerDependencies
     config.plugins = config.plugins.filter(plugin => plugin.name !== 'peer-deps-external');
 
     config.plugins.push(nxResolveDistPackages(packages));

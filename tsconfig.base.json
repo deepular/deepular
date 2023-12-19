@@ -23,12 +23,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ngkit/client": ["packages/client/src/index.ts"],
-      "@ngkit/compiler": ["packages/compiler/src/index.ts"],
-      "@ngkit/core": ["packages/core/src/index.ts"],
-      "@ngkit/core/testing": ["packages/core/src/testing.ts"],
-      "@ngkit/dev": ["packages/dev/src/index.ts"],
-      "@ngkit/server": ["packages/server/src/index.ts"]
+      "@deepular/client": ["packages/client/src/index.ts"],
+      "@deepular/compiler": ["packages/compiler/src/index.ts"],
+      "@deepular/core": ["packages/core/src/index.ts"],
+      "@deepular/core/testing": ["packages/core/src/testing.ts"],
+      "@deepular/dev": ["packages/dev/src/index.ts"],
+      "@deepular/server": ["packages/server/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"],

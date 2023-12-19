@@ -6,7 +6,7 @@ index 3ec95667acbb432c3dc2ab6d6dce8ee281af33ac..e43773a61529ddfc4137608386df5abe
 +      let NgKitProgram;
 +      let NgKitCompilerHost;
 +      void new Promise(async () => {
-+        ({ NgKitProgram, NgKitCompilerHost } = await import(process.env.NGKIT_COMPILER_PATH || '@ngkit/compiler'));
++        ({ NgKitProgram, NgKitCompilerHost } = await import(process.env.NGKIT_COMPILER_PATH || '@deepular/compiler'));
 +      });
 
        import {createRequire as __cjsCompatRequire} from 'module';

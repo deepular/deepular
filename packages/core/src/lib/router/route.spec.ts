@@ -8,7 +8,7 @@ import {
   UrlSegment,
 } from '@angular/router';
 import { render, screen } from '@testing-library/angular';
-import { ControllersModule, createModule, ServiceContainer } from '@ngkit/core';
+import { ControllersModule, createModule, ServiceContainer } from '@deepular/core';
 import { assert, Type } from '@deepkit/type';
 
 import { NgKitRoute, processRoutes } from './process';

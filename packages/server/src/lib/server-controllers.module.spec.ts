@@ -6,7 +6,7 @@ import { TransferState } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { sleep } from '@deepkit/core';
 
-import { ServerController, SignalController } from '@ngkit/core';
+import { ServerController, SignalController } from '@deepular/core';
 
 import { ServerControllersModule } from './server-controllers.module';
 import { ServerModule } from './server.module';

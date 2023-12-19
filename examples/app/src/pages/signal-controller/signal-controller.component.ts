@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SignalController } from '@ngkit/core';
+import { SignalController } from '@deepular/core';
 
 import type { SignalControllerController } from './signal-controller.controller';
 

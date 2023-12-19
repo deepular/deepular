@@ -10,7 +10,7 @@ import {
 import { RpcClient } from '@deepkit/rpc';
 import { ApplicationRef, ChangeDetectorRef, DestroyRef, TransferState } from '@angular/core';
 import { typeOf } from '@deepkit/type';
-import { ServerController, SignalController } from '@ngkit/core';
+import { ServerController, SignalController } from '@deepular/core';
 import { Injector } from '@deepkit/injector';
 import { TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import 'zone.js/node';
 import { join } from 'node:path';
-import { startServer } from '@ngkit/server';
+import { startServer } from '@deepular/server';
 
 import { AppComponent } from './app.component';
 import { appConfig } from './app.config';

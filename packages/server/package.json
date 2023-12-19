@@ -1,5 +1,5 @@
 {
-  "name": "@ngkit/server",
+  "name": "@deepular/server",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.js",
@@ -12,7 +12,7 @@
     "tslib": "2.6.2"
   },
   "peerDependencies": {
-    "@ngkit/core": "workspace:*",
+    "@deepular/core": "workspace:*",
     "@angular/core": "17.0.3",
     "@angular/platform-server": "17.0.3",
     "@angular/platform-browser": "17.0.3",

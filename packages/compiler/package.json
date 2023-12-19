@@ -1,5 +1,5 @@
 {
-  "name": "@ngkit/compiler",
+  "name": "@deepular/compiler",
   "version": "0.0.0",
   "type": "module",
   "typings": "./src/index.d.ts",

@@ -3,7 +3,7 @@ import {
   getProviderNameForType,
   NgKitSerializer,
   unwrapType,
-} from '@ngkit/core';
+} from '@deepular/core';
 import { ReflectionClass, resolveRuntimeType } from '@deepkit/type';
 import { BSONSerializer } from '@deepkit/bson';
 import { ClassType } from '@deepkit/core';

@@ -11,7 +11,7 @@ import {
   CORE_CONFIG,
   makeSerializedClassTypeStateKey,
   mergeApplicationConfig,
-} from '@ngkit/core';
+} from '@deepular/core';
 import { provideServerRendering } from '@angular/platform-server';
 import { reflect, SerializedTypes, serializeType } from '@deepkit/type';
 import { rpcClass } from '@deepkit/rpc';

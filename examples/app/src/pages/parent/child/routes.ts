@@ -1,4 +1,4 @@
-import { Routes } from '@ngkit/core';
+import { Routes } from '@deepular/core';
 
 export const routes: Routes = [
   {

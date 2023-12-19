@@ -11,7 +11,7 @@ const { getGroupedPatches } = require('patch-package/dist/patchFs');
 const appPath = process.cwd();
 const patchDir = ngKitCompilerPath
   ? `${dirname(relative(appPath, ngKitCompilerPath))}/patches`
-  : 'node_modules/@ngkit/compiler/patches';
+  : 'node_modules/@deepular/compiler/patches';
 
 const groupedPatches = getGroupedPatches(join(appPath, patchDir));
 

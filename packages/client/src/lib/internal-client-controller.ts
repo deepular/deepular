@@ -8,7 +8,7 @@ import {
   makeSerializedClassTypeStateKey,
   NgKitDeserializer,
   unwrapType,
-} from '@ngkit/core';
+} from '@deepular/core';
 
 import { TransferStateMissingForClientControllerMethodException } from './errors';
 import { ApplicationStable } from './application-stable';

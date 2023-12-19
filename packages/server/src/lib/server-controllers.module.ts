@@ -6,7 +6,7 @@ import {
   SignalController,
   signalControllerConsumerIndex,
   SignalControllerMethod,
-} from '@ngkit/core';
+} from '@deepular/core';
 import { Signal, signal, TransferState } from '@angular/core';
 import { Type } from '@deepkit/type';
 import { FactoryProvider } from '@deepkit/injector';

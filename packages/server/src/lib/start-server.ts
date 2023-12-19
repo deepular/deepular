@@ -4,7 +4,7 @@ import { ClassType } from '@deepkit/core';
 import { RootModuleDefinition } from '@deepkit/app';
 import { Logger } from '@deepkit/logger';
 import { App } from '@deepkit/app';
-import { provideRouter, setupRootComponent } from '@ngkit/core';
+import { provideRouter, setupRootComponent } from '@deepular/core';
 import { ApplicationConfig } from '@angular/core';
 
 import { ServerModule } from './server.module';

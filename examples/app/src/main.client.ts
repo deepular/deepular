@@ -1,5 +1,5 @@
 import 'zone.js';
-import { bootstrapApplication } from '@ngkit/client';
+import { bootstrapApplication } from '@deepular/client';
 
 import { AppComponent } from './app.component';
 import { appConfig } from './app.config';

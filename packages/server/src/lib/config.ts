@@ -1,5 +1,5 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@ngkit/core';
+import { provideRouter } from '@deepular/core';
 
 export class ServerConfig {
   readonly rootComponent: any; // ClassType

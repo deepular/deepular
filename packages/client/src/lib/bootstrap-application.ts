@@ -12,7 +12,7 @@ import {
   setupRootComponent,
   mergeApplicationConfig,
   provideRouter,
-} from '@ngkit/core';
+} from '@deepular/core';
 
 import { ClientControllersModule } from './client-controllers.module';
 

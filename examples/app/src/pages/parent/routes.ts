@@ -1,4 +1,4 @@
-import { Routes } from '@ngkit/core';
+import { Routes } from '@deepular/core';
 
 import { ParentComponent } from './parent.component';
 

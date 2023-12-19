@@ -1,4 +1,4 @@
-import { provideRouter, Routes, ServerController } from '@ngkit/core';
+import { provideRouter, Routes, ServerController } from '@deepular/core';
 
 import type { ServerControllerResolverController } from './pages/server-controller-resolver/server-controller-resolver.controller';
 

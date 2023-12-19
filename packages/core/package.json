@@ -1,5 +1,5 @@
 {
-  "name": "@ngkit/core",
+  "name": "@deepular/core",
   "version": "0.0.0",
   "type": "module",
   "main": "./src/index.js",
