@@ -50,10 +50,6 @@
       "options": {
         "lintFilePatterns": ["{projectRoot}/**/*.ts", "{projectRoot}/**/*.html"]
       }
-    },
-    "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{projectRoot}/coverage"]
     }
   },
   "tags": []

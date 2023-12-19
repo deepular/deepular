@@ -28,6 +28,13 @@ export default defineConfig(({ mode }) => ({
     environment: 'jsdom',
     setupFiles: ['src/test-setup.ts'],
     include: ['src/**/*.spec.ts'],
+    deps: {
+      optimizer: {
+        web: {
+          exclude: ['rxjs'],
+        },
+      }
+    },
   },
   define: {
     'import.meta.vitest': mode !== 'production',
