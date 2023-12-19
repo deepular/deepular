@@ -5,11 +5,11 @@
   "typings": "./src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcus-sa/ngkit.git"
+    "url": "https://github.com/deepular/deepular.git"
   },
   "bin": {
-    "ngkit-compiler-install": "./patch.esm.js",
-    "ngkit-patch": "./patch.esm.js"
+    "deepular-compiler-install": "./patch.esm.js",
+    "deepular-patch": "./patch.esm.js"
   },
   "dependencies": {
     "tslib": "2.6.2",

@@ -79,7 +79,7 @@ export class ServeController implements Command {
 
     if (this.config.watch) {
       process.on('uncaughtException', err => {
-        this.logger.error('<red>[ngkit] Failed to start server: \n</red>', err);
+        this.logger.error('<red>[deepular] Failed to start server: \n</red>', err);
       });
     } else {
       await server.close();

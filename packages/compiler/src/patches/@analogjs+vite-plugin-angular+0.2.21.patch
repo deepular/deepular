@@ -16,7 +16,7 @@ index 7df0395..c3e6122 100644
                              ? './tsconfig.spec.json'
                              : './tsconfig.app.json');
 -                    compilerCli = yield (0, devkit_1.loadEsmModule)('@angular/compiler-cli');
-+                    compilerCli = yield (0, devkit_1.loadEsmModule)(process.env.NGKIT_COMPILER_PATH || '@deepular/compiler');
++                    compilerCli = yield (0, devkit_1.loadEsmModule)(process.env.DEEPULAR_COMPILER_PATH || '@deepular/compiler');
                      return {
                          optimizeDeps: {
                              include: ['rxjs/operators', 'rxjs'],

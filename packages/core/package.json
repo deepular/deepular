@@ -6,7 +6,7 @@
   "typings": "./src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcus-sa/ngkit.git"
+    "url": "https://github.com/deepular/deepular.git"
   },
   "dependencies": {
     "tslib": "2.6.2"

@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/app/src",
-  "prefix": "ngkit",
+  "prefix": "deepular",
   "implicitDependencies": ["compiler", "dev"],
   "targets": {
     "build": {
@@ -11,7 +11,7 @@
       "outputs": ["{projectRoot}/dist"],
       "inputs": [
         {
-          "env": "NGKIT_COMPILER_PATH"
+          "env": "DEEPULAR_COMPILER_PATH"
         }
       ],
       "dependsOn": [
@@ -30,7 +30,7 @@
       "executor": "nx:run-commands",
       "inputs": [
         {
-          "env": "NGKIT_COMPILER_PATH"
+          "env": "DEEPULAR_COMPILER_PATH"
         }
       ],
       "dependsOn": [

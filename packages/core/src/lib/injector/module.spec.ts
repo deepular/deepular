@@ -60,7 +60,7 @@ test('provider in imported module should not be available in parent module when 
   );
 });
 
-test('providers in imported angular modules should be present in parent ngkit module', () => {
+test('providers in imported angular modules should be present in parent deepular module', () => {
   @Injectable()
   class TestNgService {}
 
@@ -84,7 +84,7 @@ test('providers in imported angular modules should be present in parent ngkit mo
   expect(injector.get(TestService).test).toBeInstanceOf(TestNgService);
 });
 
-test('exported declarations in imported angular modules should be present in parent ngkit module', () => {
+test('exported declarations in imported angular modules should be present in parent deepular module', () => {
   @Component({
     selector: 'ng-test',
     template: `<span data-testid="ng-test">TestNgComponent</span>`,

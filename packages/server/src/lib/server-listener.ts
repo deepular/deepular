@@ -45,7 +45,7 @@ export class ServerListener {
     if (event.response.headersSent) return;
     if (event.route) return;
     event.routeFound(
-      new RouteConfig('ngkit', ['GET'], event.url, {
+      new RouteConfig('deepular', ['GET'], event.url, {
         type: 'controller',
         controller: ServerListener,
         module: this.module,

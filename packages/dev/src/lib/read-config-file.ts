@@ -13,7 +13,7 @@ const availableConfigFileExtensions = [
   'json',
   'json5',
 ] as const;
-const defaultConfigFileName = 'ngkit.config';
+const defaultConfigFileName = 'deepular.config';
 
 export async function findDefaultConfigFilePath(
   root: string = process.cwd(),
