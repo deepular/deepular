@@ -86,7 +86,7 @@
     "@deepkit/workflow": "1.0.1-alpha.108",
     "@jsheaven/read-config-file": "1.0.1",
     "@ngtools/webpack": "17.0.3",
-    "@nx/vite": "17.0.2",
+    "@nx/vite": "17.2.6",
     "deepmerge": "4.3.1",
     "esbuild": "0.18.20",
     "patch-package": "8.0.0",
