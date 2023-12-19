@@ -1,5 +1,12 @@
 
 
+## [0.1.2](https://github.com/deepular/deepular/compare/core-v0.1.1...core-v0.1.2) (2023-12-19)
+
+
+### Bug Fixes
+
+* remove `.env` ([c533192](https://github.com/deepular/deepular/commit/c533192597b220fe4486658895015834545ed4ee))
+
 ## [0.1.1](https://github.com/marcus-sa/ngkit/compare/core-v0.1.0...core-v0.1.1) (2023-12-19)
 
 ## 0.1.0 (2023-12-19)
