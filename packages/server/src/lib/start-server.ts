@@ -69,7 +69,7 @@ export async function startServer(
   app.serviceContainer.process();
 
   setupRootComponent(rootComponent, {
-    modules: [controllersModule],
+    imports: [controllersModule],
   });
 
   const logger = app.get(Logger);

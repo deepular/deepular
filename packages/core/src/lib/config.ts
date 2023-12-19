@@ -1,8 +1,8 @@
+import { provideClientHydration } from '@angular/platform-browser';
 import {
   ApplicationConfig,
   mergeApplicationConfig as _mergeApplicationConfig,
 } from '@angular/core';
-import { provideClientHydration } from '@angular/platform-browser';
 
 export const CORE_CONFIG: ApplicationConfig = {
   providers: [provideClientHydration()],

@@ -1,10 +1,10 @@
 import { bootstrapApplication as _bootstrapApplication } from '@angular/platform-browser';
-import { RpcWebSocketClient } from '@deepkit/rpc';
+import { RpcWebSocketClient, RpcClient } from '@deepkit/rpc';
 import {
   ApplicationConfig,
   ɵNG_COMP_DEF,
   ɵComponentDef,
-  Type,
+  Type, PLATFORM_ID,
 } from '@angular/core';
 
 import {
@@ -26,7 +26,13 @@ export async function bootstrapApplication<T>(
 
   const clientControllersModule = new ClientControllersModule(client);
   setupRootComponent(rootComponent, {
-    modules: [clientControllersModule],
+    imports: [clientControllersModule],
+    providers: [
+      {
+        provide: RpcClient,
+        useValue: client,
+      },
+    ],
   });
 
   const ngAppConfig = mergeApplicationConfig(CORE_CONFIG, appConfig, {

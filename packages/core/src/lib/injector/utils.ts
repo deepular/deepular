@@ -1,3 +1,5 @@
+import { AbstractClassType, ClassType, isClass } from '@deepkit/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import {
   FactoryProvider,
   isClassProvider,
@@ -5,6 +7,7 @@ import {
 } from '@deepkit/injector';
 import {
   inject,
+  PLATFORM_ID,
   ɵComponentDef,
   ɵNG_COMP_DEF,
   ɵNG_INJ_DEF,
@@ -14,7 +17,6 @@ import {
   ɵɵdefineNgModule,
   ɵɵInjectorDef,
 } from '@angular/core';
-import { AbstractClassType, ClassType, isClass } from '@deepkit/core';
 import {
   reflect,
   ReflectionKind,
@@ -30,6 +32,10 @@ import {
   NgModuleType,
   ProviderWithScope,
 } from './module';
+
+export const isClient = (): boolean => isPlatformBrowser(inject(PLATFORM_ID));
+
+export const isServer = (): boolean => isPlatformServer(inject(PLATFORM_ID));
 
 export function getComponentDependencies<T>(
   componentDef: ɵComponentDef<T>,
@@ -145,16 +151,22 @@ export function convertNgModule<T>(ngModule: NgModuleType<T>): AppModule<any> {
 
 export function setupRootComponent<T>(
   component: ClassType<T>,
-  { modules }: { modules?: readonly AppModule[] } = {},
+  { imports, providers }: {
+    imports?: readonly AppModule[];
+    providers?: readonly ProviderWithScope[];
+  } = {},
 ): ServiceContainer {
-  const rootModule = createStandaloneComponentModule(component);
-  const serviceContainer = new ServiceContainer(rootModule);
-  modules?.forEach(module => {
+  const rootModule = createStandaloneComponentModule(component).forRoot();
+  if (providers) {
+    rootModule.providers.push(...providers);
+  }
+  imports?.forEach(module => {
     if (!module.root) {
       throw new Error('Only root modules are allowed');
     }
-    serviceContainer.appModule.addImport(module);
+    rootModule.addImport(module);
   });
+  const serviceContainer = new ServiceContainer(rootModule);
   serviceContainer.process();
   return serviceContainer;
 }
