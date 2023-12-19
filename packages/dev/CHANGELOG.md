@@ -1,5 +1,7 @@
 
 
+## [0.1.4](https://github.com/deepular/deepular/compare/dev-v0.1.3...dev-v0.1.4) (2023-12-19)
+
 ## [0.1.3](https://github.com/marcus-sa/ngkit/compare/dev-v0.1.2...dev-v0.1.3) (2023-12-19)
 
 ## [0.1.2](https://github.com/marcus-sa/ngkit/compare/dev-v0.1.1...dev-v0.1.2) (2023-12-19)
