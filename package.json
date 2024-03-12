@@ -13,7 +13,7 @@
   "devDependencies": {
     "@angular/cli": "17.0.3",
     "@angular/platform-browser-dynamic": "17.0.3",
-    "@commitlint/config-conventional": "18.1.0",
+    "@commitlint/config-conventional": "19.1.0",
     "@commitlint/config-nx-scopes": "18.3.0",
     "@mands/nx-playwright": "^0.6.3",
     "@nx/devkit": "17.0.2",
